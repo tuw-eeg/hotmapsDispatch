@@ -1,0 +1,44 @@
+param :  t:          L_t     :=  
+1           600
+2           560
+3           540
+4           530
+5           520
+6           560
+7           660
+8           840
+9           940
+10          980
+11          1040
+12          1100
+13          1070
+14          1050
+15          1040
+16          1030
+17          960
+18          840
+19          820
+20          740
+21          740
+22          720
+23          700
+24          640
+;
+
+param :  j:                      Pmax_j      eta_KW_j    :=             
+        'Kohlekraftwerk'        600         0.41
+        'GuD'                   400         0.58
+        'Gasturbine'            300         0.4
+        ;
+
+param :  f:                      BP_f    EF_f := 
+        'Steinkohle'            10      0.35
+        'Erdgas'                25      0.2
+        ;                               
+
+set brennstoffe_jf := (Kohlekraftwerk,Steinkohle)   (GuD,Erdgas)    (Gasturbine,Erdgas) ;
+
+param : C_CO2 := 5;
+
+
+
