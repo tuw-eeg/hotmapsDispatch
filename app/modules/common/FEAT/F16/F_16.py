@@ -20,17 +20,12 @@ from AD.F16_input.main import load_data
 
 import CM.CM_TUWdispatch.run_cm as dispatch
 #%%
-def execute(data):
-    val = dispatch.main(data) 
+def execute(data,inv_flag):
+    val = dispatch.main(data,inv_flag) 
     return val 
 #%%
 if __name__ == "__main__":
-    print('calculation started')
-    
-    
-    data = load_data()
-    
-    result = execute(data)
-    print(str(sum([result.x_th_jt[j,5]() for j in result.j])))
-    
+    print('calculation started')   
+    data,inv_flag = load_data()    
+    solutions,instance = execute(data,inv_flag)    
     print('calculation done')

@@ -10,12 +10,25 @@ import numpy as np
 import os
 import json
 
-def plot_solutions(path2json=os.path.split(os.path.abspath("__file__"))[0]+"\Solution\solution.json"):
+path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
+                                                       abspath(__file__))))
+
+path2json = path+r"\AD\F16_input\Solution\solution.json"
+path2output = path+r"\AD\F16_input\Output_Graphics"
+
+def plot_solutions(path2json=path2json,time="w"):
+    if time == "w":
+        t = range(1,730*3+1)  #JAN,FEB,MAR
+    elif time == "s":
+        t = range(730*6-730,730*8-730+1)   # JUN,JUL,AUG
+    
+    else:
+        t = range(0,730*12+1)
+        
     try:
         with open(path2json) as f:
             dic = json.load(f)
-        path2output = os.path.split(os.path.abspath("__file__"))[0]+"\Output_Graphics"
-
+        
         if os.path.isdir(path2output) == False:
             print("Create Dictionary...")
             os.mkdir(path2output)
