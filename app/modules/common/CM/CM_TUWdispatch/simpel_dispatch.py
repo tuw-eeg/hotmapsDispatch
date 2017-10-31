@@ -209,7 +209,7 @@ def run(data,inv_flag):
     m.ramping_j_mv_t = pe.Constraint(m.j_mv,m.t,rule=ramp_j_mv_t_rule)
     
     #%% Zielfunktion
-    def cost_rule(m):
+    def cost_rule(m):           
         if inv_flag:
             c_inv = sum([m.Cap_j[j] - m.x_th_cap_j[j] * m.IK_j[j] for j in m.j]) + sum([m.Cap_hs[hs]*m.IK_hs[hs] for hs in m.j_hs])
         else:
@@ -217,7 +217,7 @@ def run(data,inv_flag):
         c_op = sum([m.Cap_j[j] * m.OP_j[j] for j in m.j])
         c_var= sum([m.mc_jt[j,t] * m.x_th_jt[j,t] for j in m.j for t in m.t  if j not in m.j_chp])  # 
         sv_chp = (m.ratioPMaxFW - m.ratioPMax) / (m.ratioPMax*m.ratioPMaxFW)
-        c_var = c_var + sum([(m.x_el_jt[j,t] + sv_chp * m.x_th_jt[j,t])/ m.n_el_j[j] for j in m.j_chp for t in m.t])
+        c_var = c_var + sum([m.mc_jt[j,t] *(m.x_el_jt[j,t] + sv_chp * m.x_th_jt[j,t])/ m.n_el_j[j] for j in m.j_chp for t in m.t])
         c_peak_el = m.P_el_max*10000  
         c_ramp = sum ([m.ramp_j_mv_t[j,t] * m.c_ramp_waste for j in m.j_mv for t in m.t]) + sum ([m.ramp_j_chp_t[j,t] * m.c_ramp_chp for j in m.j_chp for t in m.t])
         c_tot = c_inv + c_var + c_op + c_peak_el + c_ramp
@@ -243,7 +243,7 @@ def run(data,inv_flag):
     instance.solutions.store_to(results)
     print("*****************\ntime for solving: " + str(datetime.now()-solv_start)+"\n*****************")
 
-    return(instance)
+    return(instance,results)
 
 
 

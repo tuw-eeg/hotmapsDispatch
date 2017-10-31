@@ -17,11 +17,11 @@ from CM.CM_TUWdispatch.save_sol_to_json import save_sol_to_json
 
 def main(data,inv_flag):
     
-    instance = simpel_dispatch.run(data,inv_flag)
+    instance,results = simpel_dispatch.run(data,inv_flag)
     
-    solutions = save_sol_to_json(instance)
+    solutions = save_sol_to_json(instance,results)
  
-    return solutions,instance
+    return solutions,instance,results 
 
 if __name__ == "__main__":
     print('calculation started')

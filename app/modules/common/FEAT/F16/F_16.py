@@ -4,7 +4,7 @@ Created on Tue Sep 26 11:52:51 2017
 
 @author: root
 """
-#%%
+#%%ppp
 import os
 import sys
 import pandas as pd
@@ -27,5 +27,5 @@ def execute(data,inv_flag):
 if __name__ == "__main__":
     print('calculation started')   
     data,inv_flag = load_data()    
-    solutions,instance = execute(data,inv_flag)    
+    solutions,instance,results = execute(data,inv_flag)    
     print('calculation done')
