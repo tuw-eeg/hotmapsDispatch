@@ -4,9 +4,16 @@ Created on Tue Sep 26 11:52:51 2017
 
 @author: root
 """
+
+
 #%% Import needed modules
 import pyomo.environ as pe
 from datetime import datetime
+
+
+# SKalierungs FAKTOR 
+demand_f = 1  
+
 
 def run(data,inv_flag):
     #%% Creation of a  Model
@@ -82,7 +89,7 @@ def run(data,inv_flag):
 
     #%  At any time, the heating generation must cover the heating demand
     def genearation_covers_demand_t_rule(m,t): 
-        rule = sum([m.x_th_jt[j,t] for j in m.j]) >= m.demand_th_t[t] 
+        rule = sum([m.x_th_jt[j,t] for j in m.j]) >= demand_f * m.demand_th_t[t] 
         return rule 
     m.genearation_covers_demand_t = pe.Constraint(m.t,rule=genearation_covers_demand_t_rule)  
     

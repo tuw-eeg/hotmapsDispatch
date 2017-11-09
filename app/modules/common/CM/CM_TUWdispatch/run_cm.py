@@ -19,7 +19,7 @@ def main(data,inv_flag):
     
     instance,results = simpel_dispatch.run(data,inv_flag)
     
-    solutions = save_sol_to_json(instance,results)
+    solutions = save_sol_to_json(instance,results,inv_flag)
  
     return solutions,instance,results 
 

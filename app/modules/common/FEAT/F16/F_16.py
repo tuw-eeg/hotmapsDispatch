@@ -17,7 +17,7 @@ if path not in sys.path:
     sys.path.append(path)
 
 from AD.F16_input.main import load_data 
-
+from CM.CM_TUWdispatch.simpel_plot import plot_solutions
 import CM.CM_TUWdispatch.run_cm as dispatch
 #%%
 def execute(data,inv_flag):
@@ -27,5 +27,6 @@ def execute(data,inv_flag):
 if __name__ == "__main__":
     print('calculation started')   
     data,inv_flag = load_data()    
-    solutions,instance,results = execute(data,inv_flag)    
+    solutions,instance,results = execute(data,inv_flag)
+    plot_solutions()    
     print('calculation done')
