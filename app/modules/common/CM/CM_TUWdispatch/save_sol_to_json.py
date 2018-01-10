@@ -46,10 +46,8 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
               "Maximum Electrical Load of Heatpumps and Power to Heat devices" : \
                                    max(np.array([instance.x_th_jt[(j,t)]() / instance.n_th_j[j] for j in instance.j_hp for t in instance.t])+\
                                        np.array([instance.x_th_jt[(j,t)]() / instance.n_th_j[j] for j in instance.j_pth for t in instance.t])),
-              "Thermal Generation Mix":{j:sum([instance.x_th_jt[(j,t)]() for t in instance.t]) for j in instance.j}                          
-                                       
-                                       
-#             "Total Heat Generation Costs":c_tot
+              "Thermal Generation Mix":{j:sum([instance.x_th_jt[(j,t)]() for t in instance.t]) for j in instance.j},                          
+#              "Total Heat Generation Costs":c_tot
 #             "Specific Heat Generation Costs":c_tot
              
 #              "Eletrical Power Energymix (CHP's)":{j:[instance.x_el_jt[(j,t)]() for t in instance.t] for j in instance.j_chp},
@@ -69,7 +67,7 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
 #              "Ramping Costs": sum ([instance.ramp_j_mv_t[j,t]() * instance.c_ramp_waste for j in instance.j_mv for t in instance.t]) + sum ([instance.ramp_j_chp_t[j,t]()*instance.c_ramp_chp for j in instance.j_chp for t in instance.t]),
             }
     solution["Heat Demand"] = [instance.demand_th_t[t] for t in instance.t]
-              
+    solution["Electricity Price"] = [instance.electricity_price_t[t] for t in instance.t]          
             
             
        

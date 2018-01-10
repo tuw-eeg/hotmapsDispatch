@@ -10,9 +10,10 @@ import numpy as np
 import os
 import json
 import itertools
-
+import pandas as pd
 #%%
-
+demand_f = 1
+#%%
 def get_cmap(n, name='tab10'):
     '''Returns a function that maps each index in 0, 1, ..., n-1 to a distinct 
     RGB color; the keyword argument name must be a standard mpl colormap name.'''
@@ -50,20 +51,35 @@ def pie_chart(dic,path2output,decison_var,fig,ax):
                 bbox_inches='tight')
 
 def stack_chart(fig,ax,t,dic,y,legend,decison_var,flag=0):
-    ax.plot(t,np.array(dic["Heat Demand"])[t],"k")
-    ax.stackplot(t,y)
+    ax.plot(t,demand_f*np.array(dic["Heat Demand"])[t],"k",linewidth=0.5)
+    null = [i for i,x in enumerate(range(y.shape[0])) if np.sum(y[x,:]) !=0]
+    legend = np.array(legend)[null].tolist()
+    legend.insert(0,"Heat Demand")
+    ax.stackplot(t,y[null])
     ax.grid()
     ax.set_xlim([t[0], t[-1]])     
     ax.set_title(decison_var)
     ax.set_xlabel("Time in Hours")
-    ax.set_ylabel("")
+    ax.set_ylabel(r"$MWh_{th}$")
     ax.legend(legend,bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    if flag:
-        name= "_summer.png"
-    else:
-        name= "_winter.png"
-    fig.savefig(path2output+r"\\"+decison_var+name,dpi=300,bbox_inches='tight')
+    ax2 = ax.twinx()
+    ax2.plot(t,demand_f*np.array(dic["Electricity Price"])[t],color=get_cmap(1)(1),linewidth=0.5)
+    ax2.set_ylabel("Electricity Price in "+r"$\frac{€}{MWh}$",color=get_cmap(1)(1))
+    ax2.tick_params(axis='y', colors=get_cmap(1)(1))
     
+    name = "over_year"
+    if flag =="summer":
+        name= "_summer.png"
+    if flag == "winter":
+        name= "_winter.png"
+    
+    fig.savefig(path2output+r"\\"+decison_var+name,dpi=300,bbox_inches='tight')
+#%%
+def matrix(dic,decison_var,legend,t):
+    y = np.array(dic[decison_var][legend[0]])[t]
+    for val_ind in legend[1:]:
+        y=np.row_stack((y,np.array(dic[decison_var][val_ind])[t]))
+    return y    
 #%%    
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
@@ -72,8 +88,9 @@ path2output = path+r"\AD\F16_input\Output_Graphics"
 #%%
 def plot_solutions(path2json=path2json):
     
-    tw = range(1,8000+1)  #JAN
+    tw = range(0,350)  #JAN
     ts = range(730*5,730*5+336+1)   # Summer
+    t = range(0,8760)
         
     try:
         with open(path2json) as f:
@@ -92,21 +109,23 @@ def plot_solutions(path2json=path2json):
     
     decison_var="Thermal Power Energymix" 
     legend = list(dic["Thermal Power Energymix"].keys())
-    y1 = np.array(dic[decison_var][legend[0]])[tw]
-    y2 =  np.array(dic[decison_var][legend[0]])[ts] 
+    
 
-    for val_ind in legend[1:]:
-        y1=np.row_stack((y1,np.array(dic[decison_var][val_ind])[tw]))
-        y2=np.row_stack((y2,np.array(dic[decison_var][val_ind])[ts]))
         
-    legend.insert(0,"Heat Demand")
-
+    y1 = matrix(dic,decison_var,legend,tw)
+    y2 = matrix(dic,decison_var,legend,ts)  
+    y3 = matrix(dic,decison_var,legend,t)
+    
 
     fig1,ax1 = plt.subplots()
-    stack_chart(fig1,ax1,tw,dic,y1,legend,decison_var)
+    stack_chart(fig1,ax1,tw,dic,y1,legend,decison_var,"w")
     
     fig2,ax2 = plt.subplots()
-    stack_chart(fig2,ax2,ts,dic,y2,legend,decison_var,1)
+    stack_chart(fig2,ax2,ts,dic,y2,legend,decison_var,"s")
+    
+    fig8,ax8 = plt.subplots()
+    stack_chart(fig8,ax8,t,dic,y3,legend,decison_var,"t")
+    
     
     fig3, ax3 = plt.subplots()
     decison_var ="Heat Price"
@@ -114,7 +133,7 @@ def plot_solutions(path2json=path2json):
     ax3.grid()
     ax3.set_title(decison_var)
     ax3.set_xlabel("Time in Hours")
-    ax3.set_ylabel("Heat Price in EUR/MWh")
+    ax3.set_ylabel("Heat Price in "+r"$\frac{€}{MWh}$")
     ax3.legend(["Heat Price"],bbox_to_anchor=(1.05, 1), loc=2, 
                borderaxespad=0.)
     fig3.savefig(path2output+r"\\"+decison_var+".png",dpi=300,
@@ -131,6 +150,24 @@ def plot_solutions(path2json=path2json):
     fig6, ax6 = plt.subplots()
     bar_chart(dic[decison_var],path2output,decison_var,fig6,ax6)
             
-                          
+#    fig7, ax7 = plt.subplots() 
+#    decision_vars = ["Electricity Production by CHP",
+#                     "Thermal Production by CHP",
+#                     "Electrical Consumption of Heatpumps and Power to Heat devices"]
+#                     "Maximum electric load of Heatpumps and Power to Heat devices",
+#                     "Total Heat Generation Costs",
+#                     "Specific Heat Generation Costs",
+#                     "Reveneau from electricity"]
+    
+    
+#    text = [str(round(dic[decison_var],2)) for decison_var in decision_vars]
+##    
+##    ax7.table(cellText= text,
+##                  rowLabels= decision_vars,
+##                  loc='center')
+#           
+#    ax7.axis('off') 
+#    fig7.subplots_adjust(top=0.88,bottom=0.085,left=0.51,right=0.75,hspace=0.18,
+#                         wspace=0.185)
 #%%
-plot_solutions()
+#plot_solutions()

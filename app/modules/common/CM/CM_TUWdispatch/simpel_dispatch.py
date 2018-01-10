@@ -12,8 +12,8 @@ from datetime import datetime
 
 
 # SKalierungs FAKTOR 
-demand_f = 1  
-
+demand_f =  1
+debug_flag = 0
 
 def run(data,inv_flag):
     #%% Creation of a  Model
@@ -24,17 +24,13 @@ def run(data,inv_flag):
     m.j_hp = pe.Set(initialize={data["tec"][0]})
     m.j_pth = pe.Set(initialize={data["tec"][1]})
     m.j_st = pe.Set(initialize={data["tec"][2]})
-    m.j_mv = pe.Set(initialize={data["tec"][3]})
+    m.j_waste = pe.Set(initialize={data["tec"][3]})
     m.j_chp = pe.Set(initialize={data["tec"][4]})
     m.j_bp = pe.Set(initialize={data["tec"][5]})
     m.j_wh = pe.Set(initialize = data["tec"][6:9])
     m.j_gt = pe.Set(initialize = data["tec"][9:12])
-    m.year = pe.Set(initialize=data["years"])
-    m.sz = pe.Set(initialize=data["scenarios"])
     m.j_hs = pe.Set(initialize={"Heat Storage"})
 
-    
-    
     #%% Parameter - TODO: depends on how the input data looks finally
     m.demand_th_t = pe.Param(m.t,initialize=data["demand_th"])
     max_demad = max(data["demand_th"].values())
@@ -51,6 +47,12 @@ def run(data,inv_flag):
     m.n_th_j = pe.Param(m.j,initialize=data["n_th"]) 
     m.x_th_cap_j = pe.Param(m.j,initialize=data["P_th_cap"]) 
     m.x_el_cap_j = pe.Param(m.j,initialize=data["P_el_cap"]) 
+    m.pot_j = pe.Param(m.j,initialize=data["POT"]) 
+    m.lt_j = pe.Param(m.j,initialize=data["LT"])
+    m.el_surcharge = pe.Param(m.j,initialize=50)  # Taxes for electricity price
+    m.ir = pe.Param(initialize=data["IR"])
+    m.alpha_j = pe.Param(m.j,initialize=data["alpha"])
+    
     
     m.load_cap_hs  = pe.Param(m.j_hs,initialize=50)   
     m.unload_cap_hs  = pe.Param(m.j_hs,initialize=140)
@@ -60,7 +62,7 @@ def run(data,inv_flag):
     m.cap_hs = pe.Param(m.j_hs,initialize=10)
     m.c_ramp_chp = pe.Param(initialize=10)
     m.c_ramp_waste = pe.Param(initialize=100)
-
+    m.alpha_hs = pe.Param(m.j_hs,initialize={"Heat Storage":data["heat_storage"]["alpha"]})
            
     #%% Variablen
     m.x_th_jt = pe.Var(m.j,m.t,within=pe.NonNegativeReals)
@@ -74,7 +76,7 @@ def run(data,inv_flag):
     m.store_level_hs_t = pe.Var(m.j_hs,m.t,within=pe.NonNegativeReals)
     
     m.ramp_j_chp_t = pe.Var(m.j_chp, m.t,within=pe.NonNegativeReals)
-    m.ramp_j_mv_t = pe.Var(m.j_mv, m.t,within=pe.NonNegativeReals)
+    m.ramp_j_waste_t = pe.Var(m.j_waste, m.t,within=pe.NonNegativeReals)
     
     #%% Nebenbedingungen 
     
@@ -97,7 +99,9 @@ def run(data,inv_flag):
     def capacity_restriction_max_j_rule (m,j):
         #% ToDo: Define upper bound
         if inv_flag:
-            rule = m.Cap_j[j]  <= max_demad
+            rule = m.Cap_j[j]  <= demand_f*max(data["demand_th"])
+        elif debug_flag:
+            rule = m.Cap_j[j]  == m.pot_j[j]
         else:
             rule = m.Cap_j[j] == m.x_th_cap_j[j]
         return rule 
@@ -124,7 +128,7 @@ def run(data,inv_flag):
     def waste_incineration_restriction_jt_rule(m,j,t): 
         rule = m.x_th_jt[j,t] <=  m.x_th_cap_j[j]
         return rule
-    m.waste_incineration_restriction_jt = pe.Constraint(m.j_mv,m.t,rule=waste_incineration_restriction_jt_rule)
+    m.waste_incineration_restriction_jt = pe.Constraint(m.j_waste,m.t,rule=waste_incineration_restriction_jt_rule)
     
     #% Restriction for the Heat Pumps in the cold Seasion , temp_vec[t] < -grenz °C
     def heat_pump_restriction_jt_rule(m,j,t):
@@ -208,17 +212,17 @@ def run(data,inv_flag):
             return m.ramp_j_chp_t[j,t] >= m.x_th_jt[j,t] - m.x_th_jt[j,t-1]
     m.ramping_j_chp_t = pe.Constraint(m.j_chp,m.t,rule=ramp_j_chp_t_rule)
     
-    def ramp_j_mv_t_rule (m,j,t):
+    def ramp_j_waste_t_rule (m,j,t):
         if t==1:
-            return m.ramp_j_mv_t[j,t] == 0 
+            return m.ramp_j_waste_t[j,t] == 0 
         else:
-            return m.ramp_j_mv_t[j,t] >= m.x_th_jt[j,t] - m.x_th_jt[j,t-1]
-    m.ramping_j_mv_t = pe.Constraint(m.j_mv,m.t,rule=ramp_j_mv_t_rule)
+            return m.ramp_j_waste_t[j,t] >= m.x_th_jt[j,t] - m.x_th_jt[j,t-1]
+    m.ramping_j_waste_t = pe.Constraint(m.j_waste,m.t,rule=ramp_j_waste_t_rule)
     
     #%% Zielfunktion
-    def cost_rule(m):           
+    def cost_rule(m): 
         if inv_flag:
-            c_inv = sum([m.Cap_j[j] - m.x_th_cap_j[j] * m.IK_j[j] for j in m.j]) + sum([m.Cap_hs[hs]*m.IK_hs[hs] for hs in m.j_hs])
+            c_inv = sum([(m.Cap_j[j] - m.x_th_cap_j[j])  * m.IK_j[j] * m.alpha_j[j] for j in m.j]) + sum([m.Cap_hs[hs]*m.IK_hs[hs] for hs in m.j_hs])
         else:
             c_inv = 0
         c_op = sum([m.Cap_j[j] * m.OP_j[j] for j in m.j])
@@ -226,10 +230,10 @@ def run(data,inv_flag):
         sv_chp = (m.ratioPMaxFW - m.ratioPMax) / (m.ratioPMax*m.ratioPMaxFW)
         c_var = c_var + sum([m.mc_jt[j,t] *(m.x_el_jt[j,t] + sv_chp * m.x_th_jt[j,t])/ m.n_el_j[j] for j in m.j_chp for t in m.t])
         c_peak_el = m.P_el_max*10000  
-        c_ramp = sum ([m.ramp_j_mv_t[j,t] * m.c_ramp_waste for j in m.j_mv for t in m.t]) + sum ([m.ramp_j_chp_t[j,t] * m.c_ramp_chp for j in m.j_chp for t in m.t])
+        c_ramp = sum ([m.ramp_j_waste_t[j,t] * m.c_ramp_waste for j in m.j_waste for t in m.t]) + sum ([m.ramp_j_chp_t[j,t] * m.c_ramp_chp for j in m.j_chp for t in m.t])
         c_tot = c_inv + c_var + c_op + c_peak_el + c_ramp
  
-        rev_tot = sum([m.x_el_jt[j,t]*m.electricity_price_t[t] for j in m.j for t in m.t])
+        rev_tot = sum([m.x_el_jt[j,t]*(m.electricity_price_t[t]) for j in m.j for t in m.t])
         
         rule = c_tot - rev_tot
         return rule
