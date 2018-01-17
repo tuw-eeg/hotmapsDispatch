@@ -16,7 +16,7 @@ class SliceMaker(object):
     return item
 
 # heat demand scale factor
-demand_f =  1
+demand_f =  0.8
 # debug flag for 
 debug_flag = 0
 
@@ -26,7 +26,7 @@ def run(data,inv_flag):
     #%% Sets - TODO: depends on how the input data looks finally
     
     select = SliceMaker()     # [start1:stop1:step1, start2:stop2:step2, ...]
-    select = select[5:5+1]
+    select = select[:]
     if type(select) == tuple:
         tec = []
         for s in select: 
@@ -114,7 +114,7 @@ def run(data,inv_flag):
     def capacity_restriction_max_j_rule (m,j):
         #% ToDo: Define upper bound
         if inv_flag:
-            rule = m.Cap_j[j]  <= demand_f*max(data["demand_th"])
+            rule = m.Cap_j[j]  <= demand_f*max_demad
         elif debug_flag:
             rule = m.Cap_j[j]  == m.pot_j[j]
         else:

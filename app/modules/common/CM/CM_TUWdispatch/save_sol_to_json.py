@@ -14,22 +14,7 @@ path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
 path2solution = path+r"\AD\F16_input\Solution" 
 
 def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
-  
-#    if inv_flag:
-#        c_inv = sum([instance.Cap_j[j]() - instance.x_th_cap_j[j]() * instance.IK_j[j] for j in instance.j]) + sum([instance.Cap_hs[hs]()*instance.IK_hs[hs] for hs in instance.j_hs])
-#    else:
-#        c_inv = 0
-#            
-#    c_op_j = {j:instance.Cap_j[j]() * instance.OP_j[j] for j in instance.j}
-#    c_var_j= {j:sum([instance.mc_jt[(j,t)] * instance.x_th_jt[(j,t)]() for t in instance.t]) for j in instance.j if j not in instance.j_chp}  # 
-#    sv_chp = (instance.ratioPMaxFW - instance.ratioPMax) / (instance.ratioPMax*instance.ratioPMaxFW)
-#    c_var_j = {j:c_var_j[j] + sum([instance.mc_jt[(j,t)] *(instance.x_el_jt[(j,t)]() + sv_chp * instance.x_th_jt[(j,t)]())/ instance.n_el_j[j] for t in instance.t]) for j in instance.j_chp}
-#    c_peak_el = instance.P_el_max()*10000  
-#    c_ramp_w = sum ([instance.ramp_j_mv_t[j,t]() * instance.c_ramp_waste() for j in instance.j_mv for t in instance.t]) 
-#    c_ramp_chp = sum ([instance.ramp_j_chp_t[j,t]() * instance.c_ramp_chp() for j in instance.j_chp for t in instance.t])
-#    
-#    c_tot = c_inv[j],c_var + c_op + c_peak_el + c_ramp
-    
+      
     if os.path.isdir(path2solution) ==False:
         print("Create Solution Dictionary")
         os.mkdir(path2solution)
@@ -84,6 +69,8 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Invesment Cost"] = 0                                                                                             
     
     solution["Electrical Peak Load Costs"] = instance.P_el_max()*10000
+    solution["Specific Capital Costs of installed Capacities"] = {j:instance.IK_j[j] * instance.alpha_j[j] for j in solution["Installed Capacities"].keys() if solution["Installed Capacities"][j] !=0 }
+    solution["Technologies"] = [j for j in instance.j]
     
     
     with open(path2solution+r"\solution.json", "w") as f:
