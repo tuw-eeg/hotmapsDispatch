@@ -11,47 +11,62 @@ import pyomo.environ as pe
 from datetime import datetime
 
 
-# SKalierungs FAKTOR 
+class SliceMaker(object):
+  def __getitem__(self, item):
+    return item
+
+# heat demand scale factor
 demand_f =  1
+# debug flag for 
 debug_flag = 0
 
 def run(data,inv_flag):
     #%% Creation of a  Model
     m = pe.AbstractModel()
     #%% Sets - TODO: depends on how the input data looks finally
+    
+    select = SliceMaker()     # [start1:stop1:step1, start2:stop2:step2, ...]
+    select = select[5:5+1]
+    if type(select) == tuple:
+        tec = []
+        for s in select: 
+            tec=tec+data["tec"][s]
+    else:
+        tec=data["tec"][select]
+        
     m.t = pe.RangeSet(1,8760)
-    m.j = pe.Set(initialize=data["tec"])
-    m.j_hp = pe.Set(initialize={data["tec"][0]})
-    m.j_pth = pe.Set(initialize={data["tec"][1]})
-    m.j_st = pe.Set(initialize={data["tec"][2]})
-    m.j_waste = pe.Set(initialize={data["tec"][3]})
-    m.j_chp = pe.Set(initialize={data["tec"][4]})
-    m.j_bp = pe.Set(initialize={data["tec"][5]})
-    m.j_wh = pe.Set(initialize = data["tec"][6:9])
-    m.j_gt = pe.Set(initialize = data["tec"][9:12])
+    m.j = pe.Set(initialize=tec)
+    m.j_hp = pe.Set(initialize=[key for key in tec if key==data["tec"][0]])
+    m.j_pth = pe.Set(initialize=[key for key in tec if key==data["tec"][1]])
+    m.j_st = pe.Set(initialize=[key for key in tec if key==data["tec"][2]])
+    m.j_waste = pe.Set(initialize=[key for key in tec if key==data["tec"][3]])
+    m.j_chp = pe.Set(initialize=[key for key in tec if key==data["tec"][4]])
+    m.j_bp = pe.Set(initialize=[key for key in tec if key==data["tec"][5]])
+    m.j_wh = pe.Set(initialize = [key for key in tec if key in data["tec"][6:9]])
+    m.j_gt = pe.Set(initialize = [key for key in tec if key in data["tec"][9:12]])
     m.j_hs = pe.Set(initialize={"Heat Storage"})
 
     #%% Parameter - TODO: depends on how the input data looks finally
     m.demand_th_t = pe.Param(m.t,initialize=data["demand_th"])
     max_demad = max(data["demand_th"].values())
     m.radiation_t = pe.Param(m.t,initialize=data["radiation"])
-    m.IK_j = pe.Param(m.j,initialize=data["IK"]) 
-    m.OP_j = pe.Param(m.j,initialize=data["OP"]) 
-    m.n_el_j = pe.Param(m.j ,initialize=data["n_el"])
+    m.IK_j = pe.Param(m.j,initialize={key:data["IK"][key] for key in tec}) 
+    m.OP_j = pe.Param(m.j,initialize={key:data["OP"][key] for key in tec}) 
+    m.n_el_j = pe.Param(m.j ,initialize={key:data["n_el"][key] for key in tec})
     m.electricity_price_t = pe.Param(m.t,initialize=data["electricity price"])
     m.P_min_el_chp = pe.Param(initialize=0)
     m.Q_min_th_chp = pe.Param(initialize=0)
     m.ratioPMaxFW = pe.Param(initialize=450/700)
     m.ratioPMax = pe.Param(initialize=450/820)
-    m.mc_jt = pe.Param(m.j,m.t,initialize= data["mc"])
-    m.n_th_j = pe.Param(m.j,initialize=data["n_th"]) 
-    m.x_th_cap_j = pe.Param(m.j,initialize=data["P_th_cap"]) 
-    m.x_el_cap_j = pe.Param(m.j,initialize=data["P_el_cap"]) 
-    m.pot_j = pe.Param(m.j,initialize=data["POT"]) 
-    m.lt_j = pe.Param(m.j,initialize=data["LT"])
+    m.mc_jt = pe.Param(m.j,m.t,initialize= {(key,t):data["mc"][key,t] for t in range(1,8760+1) for key in tec})
+    m.n_th_j = pe.Param(m.j,initialize={key:data["n_th"][key] for key in tec}) 
+    m.x_th_cap_j = pe.Param(m.j,initialize={key:data["P_th_cap"][key] for key in tec}) 
+    m.x_el_cap_j = pe.Param(m.j,initialize={key:data["P_el_cap"][key] for key in tec}) 
+    m.pot_j = pe.Param(m.j,initialize={key:data["POT"][key] for key in tec}) 
+    m.lt_j = pe.Param(m.j,initialize={key:data["LT"][key] for key in tec})
     m.el_surcharge = pe.Param(m.j,initialize=50)  # Taxes for electricity price
     m.ir = pe.Param(initialize=data["IR"])
-    m.alpha_j = pe.Param(m.j,initialize=data["alpha"])
+    m.alpha_j = pe.Param(m.j,initialize={key:data["alpha"][key] for key in tec})
     
     
     m.load_cap_hs  = pe.Param(m.j_hs,initialize=50)   
@@ -222,7 +237,7 @@ def run(data,inv_flag):
     #%% Zielfunktion
     def cost_rule(m): 
         if inv_flag:
-            c_inv = sum([(m.Cap_j[j] - m.x_th_cap_j[j])  * m.IK_j[j] * m.alpha_j[j] for j in m.j]) + sum([m.Cap_hs[hs]*m.IK_hs[hs] for hs in m.j_hs])
+            c_inv = sum([(m.Cap_j[j] - m.x_th_cap_j[j])  * m.IK_j[j] * m.alpha_j[j] for j in m.j]) + sum([m.Cap_hs[hs]*m.IK_hs[hs]* m.alpha_hs[hs] for hs in m.j_hs])
         else:
             c_inv = 0
         c_op = sum([m.Cap_j[j] * m.OP_j[j] for j in m.j])

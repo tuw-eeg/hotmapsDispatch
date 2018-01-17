@@ -63,11 +63,11 @@ def stack_chart(fig,ax,t,dic,y,legend,decison_var,flag=0):
     ax.set_ylabel(r"$MWh_{th}$")
     ax.legend(legend,bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     ax2 = ax.twinx()
-    ax2.plot(t,demand_f*np.array(dic["Electricity Price"])[t],color=get_cmap(1)(1),linewidth=0.5)
-    ax2.set_ylabel("Electricity Price in "+r"$\frac{€}{MWh}$",color=get_cmap(1)(1))
+    ax2.plot(t,demand_f*np.array(dic["Electricity Price"])[t],color=get_cmap(10)(10),linewidth=0.5)
+    ax2.set_ylabel("Electricity Price in "+r"$\frac{€}{MWh}$",color=get_cmap(10)(10))
     ax2.tick_params(axis='y', colors=get_cmap(1)(1))
     
-    name = "over_year"
+    name = "_over_year.png"
     if flag =="summer":
         name= "_summer.png"
     if flag == "winter":
@@ -79,6 +79,9 @@ def matrix(dic,decison_var,legend,t):
     y = np.array(dic[decison_var][legend[0]])[t]
     for val_ind in legend[1:]:
         y=np.row_stack((y,np.array(dic[decison_var][val_ind])[t]))
+    
+    if len(y.shape) == 1:
+        y=y.reshape((1,y.shape[0]))
     return y    
 #%%    
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
@@ -150,24 +153,35 @@ def plot_solutions(path2json=path2json):
     fig6, ax6 = plt.subplots()
     bar_chart(dic[decison_var],path2output,decison_var,fig6,ax6)
             
-#    fig7, ax7 = plt.subplots() 
-#    decision_vars = ["Electricity Production by CHP",
-#                     "Thermal Production by CHP",
-#                     "Electrical Consumption of Heatpumps and Power to Heat devices"]
-#                     "Maximum electric load of Heatpumps and Power to Heat devices",
+    fig7, ax7 = plt.subplots() 
+    decision_vars = ["Electricity Production by CHP",
+                     "Thermal Production by CHP",
+                     "Mean Value Heat Price",
+                     "Median Value Heat Price",
+                     "Electrical Consumption of Heatpumps and Power to Heat devices",
+                     "Maximum Electrical Load of Heatpumps and Power to Heat devices",
+                     "Revenue From Electricity",
+                     "Ramping Costs",
+                     "Operational Cost",
+                     "Invesment Cost",
+                     "Electrical Peak Load Costs",
+                     "Variable Cost CHP's",
+                     "Total Variable Cost",
+                     "Total Costs"]
 #                     "Total Heat Generation Costs",
 #                     "Specific Heat Generation Costs",
-#                     "Reveneau from electricity"]
     
     
-#    text = [str(round(dic[decison_var],2)) for decison_var in decision_vars]
+    text = [[str(round(dic[decison_var],2))] for decison_var in decision_vars]
 ##    
-##    ax7.table(cellText= text,
-##                  rowLabels= decision_vars,
-##                  loc='center')
-#           
-#    ax7.axis('off') 
-#    fig7.subplots_adjust(top=0.88,bottom=0.085,left=0.51,right=0.75,hspace=0.18,
-#                         wspace=0.185)
+    ax7.table(cellText= text,
+                  rowLabels= decision_vars,
+                  loc='center')
+           
+    ax7.axis('off') 
+    fig7.subplots_adjust(top=0.88,bottom=0.085,left=0.51,right=0.75,hspace=0.18,
+                         wspace=0.185)
+    
+    fig7.savefig(path2output+r"\\solver_output.png",dpi=300,bbox_inches='tight')
 #%%
 #plot_solutions()

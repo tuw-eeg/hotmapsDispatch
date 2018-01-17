@@ -21,12 +21,12 @@ if path not in sys.path:
 def load_data(path2data = os.path.split(os.path.abspath(__file__))[0]):
 #    print(path2data)
     val = pickle.load(open(path2data+r"\data.dat", "rb"))
-    inv_flag = True
+    inv_flag = 1
     return val, inv_flag 
 
 
 if __name__ == "__main__":
     print('Loading Data...')
-    result,flag = load_data()
+    val,flag = load_data()
 #    print(result)
     print('Loading done')
