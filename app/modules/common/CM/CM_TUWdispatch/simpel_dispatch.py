@@ -4,80 +4,84 @@ Created on Tue Sep 26 11:52:51 2017
 
 @author: root
 """
-
-
 #%% Import needed modules
 import pyomo.environ as pe
 from datetime import datetime
 
+import os 
+import sys
+path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
+                                                       abspath(__file__))))
+if path not in sys.path:
+    sys.path.append(path)
+from CM.CM_TUWdispatch.preprocessing import preprocessing
 
-class SliceMaker(object):
-  def __getitem__(self, item):
-    return item
+import logging
+logging.getLogger('pyomo.core').setLevel(logging.ERROR)
+    
+#%%
 
 # heat demand scale factor
 demand_f =  0.8
 # debug flag for 
 debug_flag = 0
 
+#%%
+
 def run(data,inv_flag):
     #%% Creation of a  Model
     m = pe.AbstractModel()
     #%% Sets - TODO: depends on how the input data looks finally
-    
-    select = SliceMaker()     # [start1:stop1:step1, start2:stop2:step2, ...]
-    select = select[:]
-    if type(select) == tuple:
-        tec = []
-        for s in select: 
-            tec=tec+data["tec"][s]
-    else:
-        tec=data["tec"][select]
+    val = preprocessing(data,demand_f,inv_flag)
         
+    if val == None:
+        return None,None
+    
     m.t = pe.RangeSet(1,8760)
-    m.j = pe.Set(initialize=tec)
-    m.j_hp = pe.Set(initialize=[key for key in tec if key==data["tec"][0]])
-    m.j_pth = pe.Set(initialize=[key for key in tec if key==data["tec"][1]])
-    m.j_st = pe.Set(initialize=[key for key in tec if key==data["tec"][2]])
-    m.j_waste = pe.Set(initialize=[key for key in tec if key==data["tec"][3]])
-    m.j_chp = pe.Set(initialize=[key for key in tec if key==data["tec"][4]])
-    m.j_bp = pe.Set(initialize=[key for key in tec if key==data["tec"][5]])
-    m.j_wh = pe.Set(initialize = [key for key in tec if key in data["tec"][6:9]])
-    m.j_gt = pe.Set(initialize = [key for key in tec if key in data["tec"][9:12]])
-    m.j_hs = pe.Set(initialize={"Heat Storage"})
+    m.j = pe.Set(initialize = val[0])
+    m.j_hp = pe.Set(initialize = val[1])
+    m.j_pth = pe.Set(initialize = val[2])
+    m.j_st = pe.Set(initialize = val[3])
+    m.j_waste = pe.Set(initialize = val[4])
+    m.j_chp = pe.Set(initialize = val[5])
+    m.j_bp = pe.Set(initialize = val[6])
+    m.j_wh = pe.Set(initialize = val[7])
+    m.j_gt = pe.Set(initialize = val[8])
+    m.j_hs = pe.Set(initialize = val[9])
 
     #%% Parameter - TODO: depends on how the input data looks finally
-    m.demand_th_t = pe.Param(m.t,initialize=data["demand_th"])
-    max_demad = max(data["demand_th"].values())
-    m.radiation_t = pe.Param(m.t,initialize=data["radiation"])
-    m.IK_j = pe.Param(m.j,initialize={key:data["IK"][key] for key in tec}) 
-    m.OP_j = pe.Param(m.j,initialize={key:data["OP"][key] for key in tec}) 
-    m.n_el_j = pe.Param(m.j ,initialize={key:data["n_el"][key] for key in tec})
-    m.electricity_price_t = pe.Param(m.t,initialize=data["electricity price"])
-    m.P_min_el_chp = pe.Param(initialize=0)
-    m.Q_min_th_chp = pe.Param(initialize=0)
-    m.ratioPMaxFW = pe.Param(initialize=450/700)
-    m.ratioPMax = pe.Param(initialize=450/820)
-    m.mc_jt = pe.Param(m.j,m.t,initialize= {(key,t):data["mc"][key,t] for t in range(1,8760+1) for key in tec})
-    m.n_th_j = pe.Param(m.j,initialize={key:data["n_th"][key] for key in tec}) 
-    m.x_th_cap_j = pe.Param(m.j,initialize={key:data["P_th_cap"][key] for key in tec}) 
-    m.x_el_cap_j = pe.Param(m.j,initialize={key:data["P_el_cap"][key] for key in tec}) 
-    m.pot_j = pe.Param(m.j,initialize={key:data["POT"][key] for key in tec}) 
-    m.lt_j = pe.Param(m.j,initialize={key:data["LT"][key] for key in tec})
-    m.el_surcharge = pe.Param(m.j,initialize=50)  # Taxes for electricity price
-    m.ir = pe.Param(initialize=data["IR"])
-    m.alpha_j = pe.Param(m.j,initialize={key:data["alpha"][key] for key in tec})
+    m.demand_th_t = pe.Param(m.t,initialize = val[10])
+    max_demad = val[11]
+            
+    m.radiation_t = pe.Param(m.t,initialize=val[12])
+    m.IK_j = pe.Param(m.j,initialize=val[13]) 
+    m.OP_j = pe.Param(m.j,initialize=val[14]) 
+    m.n_el_j = pe.Param(m.j ,initialize=val[15])
+    m.electricity_price_t = pe.Param(m.t,initialize=val[16])
+    m.P_min_el_chp = pe.Param(initialize=val[17])
+    m.Q_min_th_chp = pe.Param(initialize=val[18])
+    m.ratioPMaxFW = pe.Param(initialize=val[19])
+    m.ratioPMax = pe.Param(initialize=val[20])
+    m.mc_jt = pe.Param(m.j,m.t,initialize= val[21])
+    m.n_th_j = pe.Param(m.j,initialize=val[22]) 
+    m.x_th_cap_j = pe.Param(m.j,initialize=val[23]) 
+    m.x_el_cap_j = pe.Param(m.j,initialize=val[24]) 
+    m.pot_j = pe.Param(m.j,initialize=val[25]) 
+    m.lt_j = pe.Param(m.j,initialize=val[26])
+    m.el_surcharge = pe.Param(m.j,initialize=val[27])  # Taxes for electricity price
+    m.ir = pe.Param(initialize=val[28])
+    m.alpha_j = pe.Param(m.j,initialize=val[29])
     
     
-    m.load_cap_hs  = pe.Param(m.j_hs,initialize=50)   
-    m.unload_cap_hs  = pe.Param(m.j_hs,initialize=140)
-    m.n_hs = pe.Param(m.j_hs,initialize=0.95)
-    m.loss_hs = pe.Param(m.j_hs,initialize=0.02)
-    m.IK_hs = pe.Param(m.j_hs,initialize=30)
-    m.cap_hs = pe.Param(m.j_hs,initialize=10)
-    m.c_ramp_chp = pe.Param(initialize=10)
-    m.c_ramp_waste = pe.Param(initialize=100)
-    m.alpha_hs = pe.Param(m.j_hs,initialize={"Heat Storage":data["heat_storage"]["alpha"]})
+    m.load_cap_hs  = pe.Param(m.j_hs,initialize=val[30])   
+    m.unload_cap_hs  = pe.Param(m.j_hs,initialize=val[31])
+    m.n_hs = pe.Param(m.j_hs,initialize=val[32])
+    m.loss_hs = pe.Param(m.j_hs,initialize=val[33])
+    m.IK_hs = pe.Param(m.j_hs,initialize=val[34])
+    m.cap_hs = pe.Param(m.j_hs,initialize=val[35])
+    m.c_ramp_chp = pe.Param(initialize=val[36])
+    m.c_ramp_waste = pe.Param(initialize=val[37])
+    m.alpha_hs = pe.Param(m.j_hs,initialize=val[38])
            
     #%% Variablen
     m.x_th_jt = pe.Var(m.j,m.t,within=pe.NonNegativeReals)
@@ -259,12 +263,12 @@ def run(data,inv_flag):
     #print("*****************\ntime to load data: " + str(datetime.now()-solv_start)+"\n*****************")
     print("*****************\nCreating Model...\n*****************")
     solv_start = datetime.now()
-    instance = m.create_instance(report_timing= True)
+    instance = m.create_instance(report_timing= False)
     print("*****************\ntime to create model: " + str(datetime.now()-solv_start)+"\n*****************")
     solv_start = datetime.now()
     print("*****************\nStart Solving...\n*****************")
     opt = pe.SolverFactory("gurobi")
-    results = opt.solve(instance, load_solutions=False,tee=True,suffixes=['.*'])   # tee= Solver Progress, Suffix um z.B Duale Variablen anzuzeigen -> '.*' für alle   
+    results = opt.solve(instance, load_solutions=False,tee=False,suffixes=['.*'])   # tee= Solver Progress, Suffix um z.B Duale Variablen anzuzeigen -> '.*' für alle   
     instance.solutions.load_from(results)
     instance.solutions.store_to(results)
     print("*****************\ntime for solving: " + str(datetime.now()-solv_start)+"\n*****************")

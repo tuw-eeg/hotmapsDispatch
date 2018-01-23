@@ -28,5 +28,6 @@ if __name__ == "__main__":
     print('calculation started')   
     data,inv_flag = load_data()    
     solutions,instance,results = execute(data,inv_flag)
-    plot_solutions()    
+    if solutions != None:
+        plot_solutions()    
     print('calculation done')

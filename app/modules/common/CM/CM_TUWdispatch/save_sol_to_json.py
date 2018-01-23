@@ -18,8 +18,8 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
     if os.path.isdir(path2solution) ==False:
         print("Create Solution Dictionary")
         os.mkdir(path2solution)
-    
-    print("Saving Solver-Output to: <"+path2solution+r"\solution.json>")    
+    print("Saving Solver Output ....")
+       
     solution={"Thermal Power Energymix":{j:[instance.x_th_jt[(j,t)]() for t in instance.t] for j in instance.j},
               "Installed Capacities": {j:instance.Cap_j[j]() for j in instance.j},
               "Heat Price": [results.solution(0).constraint["genearation_covers_demand_t["+str(t)+"]"]["Dual"] for t in instance.t],
@@ -76,5 +76,7 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
     with open(path2solution+r"\solution.json", "w") as f:
         json.dump(solution, f)
         
+    print("Done ! , saved to: <"+path2solution+r"\solution.json> ...") 
+    
     return solution
 

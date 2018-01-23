@@ -83,6 +83,26 @@ def stack_chart(fig,ax,t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     
     fig.savefig(path2output+r"\\"+decison_var+name,dpi=300,bbox_inches='tight')
 #%%
+def load_duration_curve(fig,ax,t,dic,y,legend,decison_var,path2output,cmap):
+    summe = np.sum(y,0)
+    idx = np.argsort(-summe)
+    dauerkurve = y[:,idx]
+    ax.plot(t,summe[idx],"k",linewidth=0.5)
+    null = [i for i,x in enumerate(range(y.shape[0])) if np.sum(y[x,:]) !=0]
+    legend = np.array(legend)[null].tolist()
+    colors = [cmap[i] for i in legend]
+    legend.insert(0,"Dauerkurve")
+    ax.stackplot(t,dauerkurve[null],colors=colors)
+    ax.grid()
+    ax.set_xlim([t[0], t[-1]])     
+    ax.set_title(decison_var)
+    ax.set_xlabel("Time in Hours")
+    ax.set_ylabel(r"$MWh_{th}$")
+    ax.legend(legend,bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        
+    fig.savefig(path2output+r"\\load_duration_curve.png",dpi=300,bbox_inches='tight')
+   
+#%%
 def matrix(dic,decison_var,legend,t):
     y = np.array(dic[decison_var][legend[0]])[t]
     for val_ind in legend[1:]:
@@ -105,12 +125,12 @@ def plot_tabel(dic,decision_vars,path2output):
 #%%
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
-path2json = path+r"\AD\F16_input\Solution\solution.json"
+path2json = path+r"\AD\F16_input\Solution\solution5.json"
 path2output = path+r"\AD\F16_input\Output_Graphics"
 #%%
 def plot_solutions(path2json=path2json):
     
-    
+ #%%   
     tw = range(0,350)  #JAN
     ts = range(730*5,730*5+336+1)   # Summer
     t = range(0,8760)
@@ -129,7 +149,7 @@ def plot_solutions(path2json=path2json):
         print("\n*********\nThere is no JSON File in this path: "+
               path2json+"\n*********\n")
         return True
-    
+    #%%
     cmap = colormapping(dic["Technologies"])
     
     
