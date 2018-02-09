@@ -15,9 +15,9 @@ path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
 if path not in sys.path:
     sys.path.append(path)
 from CM.CM_TUWdispatch.preprocessing import preprocessing
-
-import logging
-logging.getLogger('pyomo.core').setLevel(logging.ERROR)
+#
+#import logging
+#logging.getLogger('pyomo.core').setLevel(logging.ERROR)
     
 #%%
 
@@ -55,7 +55,7 @@ def run(data,inv_flag):
             
     m.radiation_t = pe.Param(m.t,initialize=val[12])
     m.IK_j = pe.Param(m.j,initialize=val[13]) 
-    m.OP_j = pe.Param(m.j,initialize=val[14]) 
+    m.OP_fix_j = pe.Param(m.j,initialize=val[14]) 
     m.n_el_j = pe.Param(m.j ,initialize=val[15])
     m.electricity_price_t = pe.Param(m.t,initialize=val[16])
     m.P_min_el_chp = pe.Param(initialize=val[17])
@@ -82,7 +82,13 @@ def run(data,inv_flag):
     m.c_ramp_chp = pe.Param(initialize=val[36])
     m.c_ramp_waste = pe.Param(initialize=val[37])
     m.alpha_hs = pe.Param(m.j_hs,initialize=val[38])
-           
+    
+
+    m.rf_j = pe.Param(m.j,initialize=val[39])
+    m.rf_tot = pe.Param(initialize=val[40])
+    m.OP_var_j = pe.Param(m.j,initialize=val[41])
+    m.temperature_t = pe.Param(m.t,initialize=val[42])
+    thresh =  val[43]
     #%% Variablen
     m.x_th_jt = pe.Var(m.j,m.t,within=pe.NonNegativeReals)
     m.Cap_j = pe.Var(m.j,within=pe.NonNegativeReals)       
@@ -101,7 +107,7 @@ def run(data,inv_flag):
     
     #% electircal power generation
     def gen_el_jt_rule(m,j,t):
-        if j not in m.j_chp:
+        if j not in m.j_chp and m.n_th_j[j] != 0:
             return m.x_el_jt[j,t] == m.x_th_jt[j,t] / m.n_th_j[j] * m.n_el_j[j]
         else:
             return pe.Constraint.Skip
@@ -151,7 +157,7 @@ def run(data,inv_flag):
     
     #% Restriction for the Heat Pumps in the cold Seasion , temp_vec[t] < -grenz °C
     def heat_pump_restriction_jt_rule(m,j,t):
-        if t in range(1,24*60+1) or t in range(8760-24*30, 8760+1):
+        if m.temperature_t[t] <= thresh:
             return m.x_th_jt[j,t] == 0
         else: 
             return m.x_th_jt[j,t] <=  max_demad
@@ -238,19 +244,26 @@ def run(data,inv_flag):
             return m.ramp_j_waste_t[j,t] >= m.x_th_jt[j,t] - m.x_th_jt[j,t-1]
     m.ramping_j_waste_t = pe.Constraint(m.j_waste,m.t,rule=ramp_j_waste_t_rule)
     
+    def renewable_factor_j_rule (m):
+        rule = sum([sum([(m.x_th_jt[j,t]+m.x_el_jt[j,t]) for t in m.t])*m.rf_j[j] for j in m.j]) >=  m.rf_tot * sum([sum([(m.x_th_jt[j,t]+m.x_el_jt[j,t]) for t in m.t])for j in m.j])        
+        return rule 
+    
+    m.renewable_factor = pe.Constraint(rule=renewable_factor_j_rule)
+        
     #%% Zielfunktion
     def cost_rule(m): 
         if inv_flag:
             c_inv = sum([(m.Cap_j[j] - m.x_th_cap_j[j])  * m.IK_j[j] * m.alpha_j[j] for j in m.j]) + sum([m.Cap_hs[hs]*m.IK_hs[hs]* m.alpha_hs[hs] for hs in m.j_hs])
         else:
             c_inv = 0
-        c_op = sum([m.Cap_j[j] * m.OP_j[j] for j in m.j])
+        c_op_fix = sum([m.Cap_j[j] * m.OP_fix_j[j] for j in m.j])
+        c_op_var = sum([m.x_th_jt[j,t]* m.OP_var_j[j] for j in m.j for t in m.t])
         c_var= sum([m.mc_jt[j,t] * m.x_th_jt[j,t] for j in m.j for t in m.t  if j not in m.j_chp])  # 
         sv_chp = (m.ratioPMaxFW - m.ratioPMax) / (m.ratioPMax*m.ratioPMaxFW)
         c_var = c_var + sum([m.mc_jt[j,t] *(m.x_el_jt[j,t] + sv_chp * m.x_th_jt[j,t])/ m.n_el_j[j] for j in m.j_chp for t in m.t])
         c_peak_el = m.P_el_max*10000  
         c_ramp = sum ([m.ramp_j_waste_t[j,t] * m.c_ramp_waste for j in m.j_waste for t in m.t]) + sum ([m.ramp_j_chp_t[j,t] * m.c_ramp_chp for j in m.j_chp for t in m.t])
-        c_tot = c_inv + c_var + c_op + c_peak_el + c_ramp
+        c_tot = c_inv + c_var + c_op_fix + c_op_var + c_peak_el + c_ramp
  
         rev_tot = sum([m.x_el_jt[j,t]*(m.electricity_price_t[t]) for j in m.j for t in m.t])
         
@@ -263,12 +276,12 @@ def run(data,inv_flag):
     #print("*****************\ntime to load data: " + str(datetime.now()-solv_start)+"\n*****************")
     print("*****************\nCreating Model...\n*****************")
     solv_start = datetime.now()
-    instance = m.create_instance(report_timing= False)
+    instance = m.create_instance(report_timing= True)
     print("*****************\ntime to create model: " + str(datetime.now()-solv_start)+"\n*****************")
     solv_start = datetime.now()
     print("*****************\nStart Solving...\n*****************")
     opt = pe.SolverFactory("gurobi")
-    results = opt.solve(instance, load_solutions=False,tee=False,suffixes=['.*'])   # tee= Solver Progress, Suffix um z.B Duale Variablen anzuzeigen -> '.*' für alle   
+    results = opt.solve(instance, load_solutions=False,tee=True,suffixes=['.*'])   # tee= Solver Progress, Suffix um z.B Duale Variablen anzuzeigen -> '.*' für alle   
     instance.solutions.load_from(results)
     instance.solutions.store_to(results)
     print("*****************\ntime for solving: " + str(datetime.now()-solv_start)+"\n*****************")

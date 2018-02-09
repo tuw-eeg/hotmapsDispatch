@@ -60,13 +60,15 @@ def pie_chart(dic,path2output,decison_var,fig,ax,cmap):
 def stack_chart(fig,ax,t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     ax.plot(t,demand_f*np.array(dic["Heat Demand"])[t],"k",linewidth=0.5)
     null = [i for i,x in enumerate(range(y.shape[0])) if np.sum(y[x,:]) !=0]
-    legend = np.array(legend)[null].tolist()
+    mc_mask=np.argsort(np.array(dic["Marginal Costs"])[null])
+    
+    legend = np.array(legend)[null][mc_mask].tolist()
     colors = [cmap[i] for i in legend]
     legend.insert(0,"Heat Demand")
-    ax.stackplot(t,y[null],colors=colors)
+    ax.stackplot(t,y[null][mc_mask],colors=colors)
     ax.grid()
     ax.set_xlim([t[0], t[-1]])     
-    ax.set_title(decison_var)
+ 
     ax.set_xlabel("Time in Hours")
     ax.set_ylabel(r"$MWh_{th}$")
     ax.legend(legend,bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
@@ -81,6 +83,7 @@ def stack_chart(fig,ax,t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     if flag == "w":
         name= "_winter.png"
     
+    ax.set_title(decison_var+name)
     fig.savefig(path2output+r"\\"+decison_var+name,dpi=300,bbox_inches='tight')
 #%%
 def load_duration_curve(fig,ax,t,dic,y,legend,decison_var,path2output,cmap):
@@ -89,13 +92,14 @@ def load_duration_curve(fig,ax,t,dic,y,legend,decison_var,path2output,cmap):
     dauerkurve = y[:,idx]
     ax.plot(t,summe[idx],"k",linewidth=0.5)
     null = [i for i,x in enumerate(range(y.shape[0])) if np.sum(y[x,:]) !=0]
-    legend = np.array(legend)[null].tolist()
+    mc_mask=np.argsort(np.array(dic["Marginal Costs"])[null])
+    legend = np.array(legend)[null][mc_mask].tolist()
     colors = [cmap[i] for i in legend]
     legend.insert(0,"Dauerkurve")
-    ax.stackplot(t,dauerkurve[null],colors=colors)
+    ax.stackplot(t,dauerkurve[null][mc_mask],colors=colors)
     ax.grid()
     ax.set_xlim([t[0], t[-1]])     
-    ax.set_title(decison_var)
+    ax.set_title("Load Duration Curve")
     ax.set_xlabel("Time in Hours")
     ax.set_ylabel(r"$MWh_{th}$")
     ax.legend(legend,bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
@@ -125,14 +129,13 @@ def plot_tabel(dic,decision_vars,path2output):
 #%%
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
-path2json = path+r"\AD\F16_input\Solution\solution5.json"
+path2json = path+r"\AD\F16_input\Solution\solution.json"
 path2output = path+r"\AD\F16_input\Output_Graphics"
 #%%
 def plot_solutions(path2json=path2json):
     
- #%%   
     tw = range(0,350)  #JAN
-    ts = range(730*5,730*5+336+1)   # Summer
+    ts = range(730*5,730*5+336+1)   
     t = range(0,8760)
         
     try:
@@ -169,6 +172,9 @@ def plot_solutions(path2json=path2json):
     
     fig8,ax8 = plt.subplots()
     stack_chart(fig8,ax8,t,dic,y3,legend,decison_var,path2output,cmap,"t")
+    
+    fig9,ax9 = plt.subplots()
+    load_duration_curve(fig9,ax9,t,dic,y3,legend,decison_var,path2output,cmap)
     
     fig3, ax3 = plt.subplots()
     decison_var ="Heat Price"
