@@ -11,7 +11,8 @@ import json
 import matplotlib.pylab as plt
 from matplotlib.colors import to_hex
 from bokeh.plotting import figure, show, output_file,save
-from bokeh.models import ColumnDataSource,Legend,LinearAxis, Range1d,Label,LabelSet
+from bokeh.models import ColumnDataSource,Legend,LinearAxis, Range1d,Label,LabelSet, DataTable, DateFormatter, TableColumn
+from bokeh.layouts import widgetbox
 import os
 import itertools
 from math import pi
@@ -77,7 +78,7 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
                toolbar_sticky = False,
                plot_width=1000, 
                plot_height=650)
-    line = p.line(t,list(demand_f*np.array(dic["Heat Demand"])[t]),color="black",line_width=0.5)
+    line = p.line(t,list(demand_f*np.array(dic["Heat Demand"])[t]),color="black",line_width=0.5,muted_alpha=0.2)
     p.grid.minor_grid_line_color = '#eeeeee'
     null = [i for i,x in enumerate(range(y.shape[0])) if np.sum(y[x,:]) !=0]
     mc_mask=np.argsort(np.array(dic["Marginal Costs"])[null])
@@ -85,13 +86,13 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     colors = [cmap[i] for i in legend]
     sorted_values = y[null][mc_mask]
     x,y = create_patch_coordinates(sorted_values,t)
-    areas = [p.patch(xy[0],xy[1],color=colors[i], alpha=0.8, line_color=None) for i,xy in enumerate(zip(x,y)) ]
+    areas = [p.patch(xy[0],xy[1],color=colors[i], alpha=0.8, line_color=None,muted_alpha=0.2) for i,xy in enumerate(zip(x,y)) ]
     electricity = np.array(dic["Electricity Price"])[t]
     heat_p = np.array(dic["Heat Price"])[t]
     p.extra_y_ranges = {"2nd": Range1d(start=min(electricity)-1, end=max(electricity)+1)}
-    line2 = p.line(t,list(electricity),color="blue",line_width=0.5,y_range_name="2nd")
-    line3 = p.line(t,list(heat_p),color="green",line_width=0.5,y_range_name="2nd")
-    p.add_layout(LinearAxis(y_range_name="2nd",axis_label='electricity price in €/MWh'), 'right')
+    line2 = p.line(t,list(electricity),color="blue",line_width=0.5,y_range_name="2nd",muted_alpha=0.2)
+    line3 = p.line(t,list(heat_p),color="green",line_width=0.5,y_range_name="2nd",muted_alpha=0.2)
+    p.add_layout(LinearAxis(y_range_name="2nd",axis_label='price in €/MWh'), 'right')
     items = [("Heat Demand",   [line] ),
              ("Electricity Price",   [line2] ),
              ("Heat Price",   [line3] )]
@@ -117,13 +118,13 @@ def load_duration_curve(t,dic,y,legend,decison_var,path2output,cmap):
     summe = np.sum(y,0)
     idx = np.argsort(-summe)
     dauerkurve = y[:,idx]
-    line = p.line(t,summe[idx],color="black",line_width=0.5)
+    line = p.line(t,summe[idx],color="black",line_width=0.5,muted_alpha=0.2)
     null = [i for i,x in enumerate(range(y.shape[0])) if np.sum(y[x,:]) !=0]
     mc_mask=np.argsort(np.array(dic["Marginal Costs"])[null])
     legend = np.array(legend)[null][mc_mask].tolist()
     colors = [cmap[i] for i in legend]
     x,y = create_patch_coordinates(dauerkurve[null][mc_mask],t)
-    areas = [p.patch(xy[0],xy[1],color=colors[i], alpha=0.8, line_color=None) for i,xy in enumerate(zip(x,y)) ]
+    areas = [p.patch(xy[0],xy[1],color=colors[i], alpha=0.8, line_color=None,muted_alpha=0.2) for i,xy in enumerate(zip(x,y)) ]
     items = [("Load Duration Curve",   [line] )]
     for name,glyph in zip(legend,areas):
         items.append((name,[glyph]))
@@ -160,7 +161,7 @@ def pie_chart(dic,path2output,decison_var,cmap):
     start_angle= [0]+list(sizes_cum)[0:-1]   
     end_angle=list(sizes_cum-explode)
     wedges = [ p.wedge(x=x,y=y, radius=radius, start_angle= start_angle[i],
-               end_angle=end_angle[i], radius_units="screen", color=colors[i]) 
+               end_angle=end_angle[i], radius_units="screen", color=colors[i],muted_alpha=0.2) 
             for i in range(len(colors))]
     text=list(np.round(sizes[mask]*100,2))
     items = []
@@ -190,16 +191,32 @@ def bar_chart(dic,path2output,decison_var,cmap):
     legend= [legend[i] for i in k]
     val= [val[i] for i in k]
     colors = [cmap[i] for i in legend]
-    bars = [p.rect(x=5+i*15, y=val[i]/2, width=10, height=val[i], color=colors[i]) for i in range(len(val))]
+    bars = [p.rect(x=5+i*15, y=val[i]/2, width=10, height=val[i], color=colors[i],muted_alpha=0.2) for i in range(len(val))]
     text=list(np.round(val,2))
     items = []
     for name,glyph,label in zip(legend,bars,text):
         items.append((name+": "+str(label)+"",[glyph]))
     legend = Legend(items=items,location=(10, 10))    
     p.add_layout(legend, 'right')
-    p.legend.click_policy = "hide" # "mute"
+    p.legend.click_policy = "mute" # "mute"
     output_file(path2output+r"\\"+decison_var+"_absolut_bar_chart.html")
     save(p)
+#%%
+def plot_table (decision_vars,dic,path2output):   
+    val = [str(round(dic[decison_var],2)) for decison_var in decision_vars]
+    data = dict(
+            topic = decision_vars,
+            value = val,
+        )
+    source = ColumnDataSource(data)
+    columns = [
+            TableColumn(field="topic", title="Topic"),
+            TableColumn(field="value", title="Value"),
+        ]
+    data_table = DataTable(source=source, columns=columns, width=800, height=800)
+    output_file(path2output+"\data_table.html") 
+    save(widgetbox(data_table))
+   
 #%%
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
@@ -244,5 +261,22 @@ def plot_solutions(path2json=path2json):
     bar_chart(dic[decison_var],path2output,decison_var,cmap)
     decison_var = "Specific Capital Costs of installed Capacities"
     bar_chart(dic[decison_var],path2output,decison_var,cmap)
+    decision_vars = ["Electricity Production by CHP",
+                     "Thermal Production by CHP",
+                     "Mean Value Heat Price",
+                     "Median Value Heat Price",
+                     "Electrical Consumption of Heatpumps and Power to Heat devices",
+                     "Maximum Electrical Load of Heatpumps and Power to Heat devices",
+                     "Revenue From Electricity",
+                     "Ramping Costs",
+                     "Operational Cost",
+                     "Invesment Cost",
+                     "Electrical Peak Load Costs",
+                     "Variable Cost CHP's",
+                     "Total Variable Cost",
+                     "Total Costs"]
+    plot_table(decision_vars,dic,path2output)
 #%%
 plot_solutions()            
+#%%
+
