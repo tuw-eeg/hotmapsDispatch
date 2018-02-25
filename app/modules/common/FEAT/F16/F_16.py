@@ -7,9 +7,6 @@ Created on Tue Sep 26 11:52:51 2017
 #%%ppp
 import os
 import sys
-import pandas as pd
-import numpy as np
-import json
 
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
@@ -17,8 +14,8 @@ if path not in sys.path:
     sys.path.append(path)
 
 from AD.F16_input.main import load_data 
-from CM.CM_TUWdispatch.simpel_plot import plot_solutions
-#from CM.CM_TUWdispatch.preprocessing import preprocessing
+#from CM.CM_TUWdispatch.simpel_plot import plot_solutions
+from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
 import CM.CM_TUWdispatch.run_cm as dispatch
 #%%
 def execute(data,inv_flag):

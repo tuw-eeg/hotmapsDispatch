@@ -99,7 +99,8 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
     lt_j =                  {key:data["LT"][key] for key in tec}
     el_surcharge =          50  # Taxes for electricity price
     
-#TODO: Calculate alpha with interest rate from user , LT complete Data      
+#TODO: Calculate alpha with interest rate from user , 
+#      LT complete Data...     
     ir =                    0.05  # interest Rate
     q = 1+ir
     alpha = {}

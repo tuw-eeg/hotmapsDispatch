@@ -13,8 +13,8 @@ import itertools
 import pandas as pd
 #%%
 demand_f = 0.8
-#%%
-def get_cmap(n, name='tab20'):
+#%% tab20
+def get_cmap(n, name='hot'):
     '''Returns a function that maps each index in 0, 1, ..., n-1 to a distinct 
     RGB color; the keyword argument name must be a standard mpl colormap name.'''
     return plt.cm.get_cmap(name, n)
@@ -73,7 +73,7 @@ def stack_chart(fig,ax,t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     ax.set_ylabel(r"$MWh_{th}$")
     ax.legend(legend,bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     ax2 = ax.twinx()
-    ax2.plot(t,demand_f*np.array(dic["Electricity Price"])[t],color=plt.cm.get_cmap("tab20b", 1)(1),linewidth=0.5)
+    ax2.plot(t,np.array(dic["Electricity Price"])[t],color=plt.cm.get_cmap("tab20b", 1)(1),linewidth=0.5)
     ax2.set_ylabel("Electricity Price in "+r"$\frac{€}{MWh}$",color=plt.cm.get_cmap("tab20b", 1)(1))
     ax2.tick_params(axis='y', colors=get_cmap(1)(1))
     
@@ -220,4 +220,4 @@ def plot_solutions(path2json=path2json):
     
     plot_tabel(dic,decision_vars,path2output)
 #%%
-#plot_solutions()
+plot_solutions()

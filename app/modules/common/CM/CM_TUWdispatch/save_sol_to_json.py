@@ -63,7 +63,8 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
     sv_chp = (instance.ratioPMaxFW - instance.ratioPMax) / (instance.ratioPMax*instance.ratioPMaxFW)
     solution["Variable Cost CHP's"]= sum([instance.mc_jt[j,t] *(instance.x_el_jt[j,t]() + sv_chp * instance.x_th_jt[j,t]())/ instance.n_el_j[j] for j in instance.j_chp for t in instance.t])
     del sv_chp 
-    solution["Total Variable Cost"] = sum([instance.mc_jt[j,t] * instance.x_th_jt[j,t]() for j in instance.j for t in instance.t  if j not in instance.j_chp])+solution["Variable Cost CHP's"]
+    solution["Total Variable Cost"] = sum([instance.mc_jt[j,t] * instance.x_th_jt[j,t]() for j in instance.j for t in instance.t  if j not in instance.j_chp])+solution["Variable Cost CHP's"]  + \
+    sum([instance.x_th_jt[j,t]() * instance.OP_var_j[j] for j in instance.j for t in instance.t]) 
     solution["Total Costs"] = instance.cost()
     if inv_flag:
         solution["Invesment Cost"] = sum([(instance.Cap_j[j]() - instance.x_th_cap_j[j])  * instance.IK_j[j] * instance.alpha_j[j] for j in instance.j]) + sum([instance.Cap_hs[hs]()*instance.IK_hs[hs]* instance.alpha_hs[hs] for hs in instance.j_hs])
