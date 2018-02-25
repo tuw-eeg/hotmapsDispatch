@@ -12,7 +12,8 @@ import matplotlib.pylab as plt
 from matplotlib.colors import to_hex
 from bokeh.plotting import figure, show, output_file,save
 from bokeh.models import ColumnDataSource,Legend,LinearAxis, Range1d,Label,LabelSet, DataTable, DateFormatter, TableColumn
-from bokeh.layouts import widgetbox
+from bokeh.layouts import widgetbox, gridplot,column,row
+from bokeh.models.widgets import Panel, Tabs
 import os
 import itertools
 from math import pi
@@ -75,45 +76,69 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
                x_axis_label = "Time in Hours",
                y_axis_label = "MWh_th",
                tools = "pan,wheel_zoom,box_zoom,hover,reset,save",
-               toolbar_sticky = False,
-               plot_width=1000, 
-               plot_height=650)
-    line = p.line(t,list(demand_f*np.array(dic["Heat Demand"])[t]),color="black",line_width=0.5,muted_alpha=0.2)
+               toolbar_sticky = False)
     p.grid.minor_grid_line_color = '#eeeeee'
+    
+    line = p.line(t,list(demand_f*np.array(dic["Heat Demand"])[t]),color="black",line_width=0.5,muted_alpha=0.2)
+    
     null = [i for i,x in enumerate(range(y.shape[0])) if np.sum(y[x,:]) !=0]
     mc_mask=np.argsort(np.array(dic["Marginal Costs"])[null])
     legend = np.array(legend)[null][mc_mask].tolist()
     colors = [cmap[i] for i in legend]
     sorted_values = y[null][mc_mask]
+    
     x,y = create_patch_coordinates(sorted_values,t)
+    
     areas = [p.patch(xy[0],xy[1],color=colors[i], alpha=0.8, line_color=None,muted_alpha=0.2) for i,xy in enumerate(zip(x,y)) ]
+    
     electricity = np.array(dic["Electricity Price"])[t]
+    
     heat_p = np.array(dic["Heat Price"])[t]
-    p.extra_y_ranges = {"2nd": Range1d(start=min(electricity)-1, end=max(electricity)+1)}
-    line2 = p.line(t,list(electricity),color="blue",line_width=0.5,y_range_name="2nd",muted_alpha=0.2)
-    line3 = p.line(t,list(heat_p),color="green",line_width=0.5,y_range_name="2nd",muted_alpha=0.2)
-    p.add_layout(LinearAxis(y_range_name="2nd",axis_label='price in €/MWh'), 'right')
-    items = [("Heat Demand",   [line] ),
-             ("Electricity Price",   [line2] ),
-             ("Heat Price",   [line3] )]
+#    p.extra_y_ranges = {"2nd": Range1d(start=min(electricity)-1, end=max(electricity)+1)}
+#    line2 = p.line(t,list(electricity),color="blue",line_width=0.5,y_range_name="2nd",muted_alpha=0.2)
+#    line3 = p.line(t,list(heat_p),color="green",line_width=0.5,y_range_name="2nd",muted_alpha=0.2)
+#    p.add_layout(LinearAxis(y_range_name="2nd",axis_label='price in €/MWh'), 'right')
+    items = [("Heat Demand",   [line] )]
+#             ("Electricity Price",   [line2] ),
+#             ("Heat Price",   [line3] )]
     for label,glyph in zip(legend,areas):
         items.append((label,[glyph]))
     legend = Legend(items=items,location=(10, 10))
+    
     p.add_layout(legend, 'right')   
     p.legend.click_policy = "hide" # "mute"
     output_file(path2output+r"\\"+decison_var+name)
     p.toolbar.logo = None
-    save(p)
+#    save(p)
+    
+    p2 = figure(x_range=p.x_range,title="Electricity Price",
+                x_axis_label = "Time in Hours",
+                y_axis_label = "€/MWh",)
+    line2 = p2.line(t,list(electricity),color="blue",line_width=0.5,muted_alpha=0.2)
+    p2.toolbar.logo = None
+    p2.grid.minor_grid_line_color = '#eeeeee'
+    p3 = figure(x_range=p.x_range,y_range=(min(heat_p),np.percentile(heat_p, 90)),title="Heat Price",
+                x_axis_label = "Time in Hours",
+                y_axis_label = "€/MWh_th",)
+    line3 = p3.line(t,list(heat_p),color="red",line_width=0.5,muted_alpha=0.2)
+    p3.toolbar.logo = None
+    p3.grid.minor_grid_line_color = '#eeeeee'
+#    s = column(p, p2, p3)
+    s = gridplot([[p],[p2],[p3]],plot_width=1000, plot_height=300,
+                 toolbar_options=dict(logo=None))
+#    s.toolbar.logo = None
+    
+    return s
     
 #%%
 def load_duration_curve(t,dic,y,legend,decison_var,path2output,cmap):
     p = figure(title = "Load Duration Curve", 
            x_axis_label = "Time in Hours",
            y_axis_label = "MWh_th",
-           tools = "pan,wheel_zoom,box_zoom,hover,reset,save",
+           tools = "pan,wheel_zoom,box_zoom,reset,save",
            toolbar_sticky = False,
            plot_width=1000, 
-           plot_height=650)
+           plot_height=500)
     p.grid.minor_grid_line_color = '#eeeeee'
     summe = np.sum(y,0)
     idx = np.argsort(-summe)
@@ -136,12 +161,13 @@ def load_duration_curve(t,dic,y,legend,decison_var,path2output,cmap):
 #    p.legend.location = "top_left"
     output_file(path2output+r"\\load_duration_curve.html")
     p.toolbar.logo = None
-    save(p)
+#    save(p)
+    return p
 #%%
 def pie_chart(dic,path2output,decison_var,cmap): 
     p = figure(title = decison_var,
        plot_width=700, 
-       plot_height=700)
+       plot_height=400)
     p.axis.visible = False
     p.xgrid.visible = False
     p.ygrid.visible = False
@@ -156,7 +182,7 @@ def pie_chart(dic,path2output,decison_var,cmap):
     explode = 0/180*pi
     x=300
     y=300 
-    radius=225
+    radius=150
     colors = [cmap[i] for i in labels]   
     start_angle= [0]+list(sizes_cum)[0:-1]   
     end_angle=list(sizes_cum-explode)
@@ -172,7 +198,8 @@ def pie_chart(dic,path2output,decison_var,cmap):
     p.legend.click_policy = "hide" # "mute"
     output_file(path2output+r"\\"+decison_var+"_pie_chart.html")
     
-    save(p)
+#    save(p)
+    return p
        
 #%%
 def bar_chart(dic,path2output,decison_var,cmap):
@@ -200,7 +227,8 @@ def bar_chart(dic,path2output,decison_var,cmap):
     p.add_layout(legend, 'right')
     p.legend.click_policy = "mute" # "mute"
     output_file(path2output+r"\\"+decison_var+"_absolut_bar_chart.html")
-    save(p)
+#    save(p)
+    return p
 #%%
 def plot_table (decision_vars,dic,path2output):   
     val = [str(round(dic[decison_var],2)) for decison_var in decision_vars]
@@ -215,8 +243,14 @@ def plot_table (decision_vars,dic,path2output):
         ]
     data_table = DataTable(source=source, columns=columns, width=800, height=800)
     output_file(path2output+"\data_table.html") 
-    save(widgetbox(data_table))
-   
+#    save(widgetbox(data_table))
+    return widgetbox(data_table)
+#%%
+def tab_panes(path2output,**kwargs):
+    output_file(path2output+"\output.html")
+    tabs = [Panel(child=p, title=name) for name, p in kwargs.items()]
+    tabs = Tabs(tabs=tabs)
+    save(tabs)
 #%%
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
@@ -250,17 +284,17 @@ def plot_solutions(path2json=path2json):
     y3 = matrix(dic,decison_var,legend,t)
     cmap = colormapping(dic["Technologies"])
     
-    stack_chart(tw,dic,y1,legend,decison_var,path2output,cmap,"w")
-    stack_chart(ts,dic,y2,legend,decison_var,path2output,cmap,"s")
-    stack_chart(t,dic,y3,legend,decison_var,path2output,cmap)    
-    load_duration_curve(t,dic,y3,legend,decison_var,path2output,cmap)    
+    p1 = stack_chart(tw,dic,y1,legend,decison_var,path2output,cmap,"w")
+    p2 = stack_chart(ts,dic,y2,legend,decison_var,path2output,cmap,"s")
+    p3 = stack_chart(t,dic,y3,legend,decison_var,path2output,cmap)    
+    p4 = load_duration_curve(t,dic,y3,legend,decison_var,path2output,cmap)    
     decison_var = "Thermal Generation Mix"
-    pie_chart(dic[decison_var],path2output,decison_var,cmap)
+    p5 = pie_chart(dic[decison_var],path2output,decison_var,cmap)
     decison_var = "Installed Capacities"
-    pie_chart(dic[decison_var],path2output,decison_var,cmap)
-    bar_chart(dic[decison_var],path2output,decison_var,cmap)
+    p6 = pie_chart(dic[decison_var],path2output,decison_var,cmap)
+    p7 = bar_chart(dic[decison_var],path2output,decison_var,cmap)
     decison_var = "Specific Capital Costs of installed Capacities"
-    bar_chart(dic[decison_var],path2output,decison_var,cmap)
+    p8 = bar_chart(dic[decison_var],path2output,decison_var,cmap)
     decision_vars = ["Electricity Production by CHP",
                      "Thermal Production by CHP",
                      "Mean Value Heat Price",
@@ -275,8 +309,19 @@ def plot_solutions(path2json=path2json):
                      "Variable Cost CHP's",
                      "Total Variable Cost",
                      "Total Costs"]
-    plot_table(decision_vars,dic,path2output)
+    p9 = plot_table(decision_vars,dic,path2output)
+    
+    kwargs = {"Thermal Power Energymix (TPE)": p3,
+              "TPE Winter": p1,
+              "TPE Summer": p2,
+              "Load Duration Curve": p4,
+              "TPE percentage":p5,
+              "Installed Capacities (IC) absolute": p6,
+              "IC percentage": p7,
+              "Specific Capital Costs of IC":p8,
+              "Some Data":p9}
+    tab_panes(path2output,**kwargs)
+    
 #%%
 plot_solutions()            
-#%%
 
