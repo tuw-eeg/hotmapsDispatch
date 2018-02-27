@@ -4,8 +4,6 @@ Created on Tue Jan 23 11:52:40 2018
 
 @author: root
 """
-
-
 from time import sleep
 
 class SliceMaker(object):
@@ -124,7 +122,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
     alpha_hs =              {"Heat Storage":0}
     
     rf_j = {key:data["RF"][key] for key in tec}
-    rf_tot = 0.5
+    rf_tot = 0.9
     
     temperature = []
     for idx,val in data["temp"].items():
@@ -143,9 +141,3 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
             rf_j,rf_tot,OP_var_j,temperature,thresh)
     
     return args
-
-
-
-
-
-

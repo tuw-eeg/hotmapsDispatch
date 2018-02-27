@@ -6,6 +6,7 @@ Created on Fri Feb 23 18:51:21 2018
 """
 demand_f = 0.8
 #%%
+import pickle
 import numpy as np
 import json
 import matplotlib.pylab as plt
@@ -18,7 +19,7 @@ import os
 import itertools
 from math import pi
 #%%
-def get_cmap(n, name='hot'):
+def get_cmap(n, name='tab20'):
     '''Returns a function that maps each index in 0, 1, ..., n-1 to a distinct 
     RGB color; the keyword argument name must be a standard mpl colormap name.'''
     return plt.cm.get_cmap(name, n)
@@ -80,7 +81,6 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     p.grid.minor_grid_line_color = '#eeeeee'
     
     line = p.line(t,list(demand_f*np.array(dic["Heat Demand"])[t]),color="black",line_width=0.5,muted_alpha=0.2)
-    
     null = [i for i,x in enumerate(range(y.shape[0])) if np.sum(y[x,:]) !=0]
     mc_mask=np.argsort(np.array(dic["Marginal Costs"])[null])
     legend = np.array(legend)[null][mc_mask].tolist()
@@ -117,7 +117,7 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     line2 = p2.line(t,list(electricity),color="blue",line_width=0.5,muted_alpha=0.2)
     p2.toolbar.logo = None
     p2.grid.minor_grid_line_color = '#eeeeee'
-    p3 = figure(x_range=p.x_range,y_range=(min(heat_p),np.percentile(heat_p, 90)),title="Heat Price",
+    p3 = figure(x_range=p.x_range,y_range=(np.min(heat_p)-1,np.percentile(heat_p, 90)+1),title="Heat Price",
                 x_axis_label = "Time in Hours",
                 y_axis_label = "€/MWh_th",)
     line3 = p3.line(t,list(heat_p),color="red",line_width=0.5,muted_alpha=0.2)
@@ -127,7 +127,7 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     s = gridplot([[p],[p2],[p3]],plot_width=1000, plot_height=300,
                  toolbar_options=dict(logo=None))
 #    s.toolbar.logo = None
-    
+#    save(s)
     return s
     
 #%%
@@ -265,8 +265,12 @@ def plot_solutions(path2json=path2json):
         
         if os.path.isdir(path2output) == False:
             print("Create Dictionary...")
+            cmap = colormapping(dic["Technologies"])
             os.mkdir(path2output)
             print("Created: "+ path2output)
+            pickle.dump(cmap, 
+                        open(path2output+r'\cmap.spec', 'wb'))
+
             
             
     except FileNotFoundError:
@@ -282,8 +286,8 @@ def plot_solutions(path2json=path2json):
     y1 = matrix(dic,decison_var,legend,tw)
     y2 = matrix(dic,decison_var,legend,ts)
     y3 = matrix(dic,decison_var,legend,t)
-    cmap = colormapping(dic["Technologies"])
-    
+#    cmap = colormapping(dic["Technologies"])
+    cmap = pickle.load(open(path2output+r"\cmap.spec", "rb"))
     p1 = stack_chart(tw,dic,y1,legend,decison_var,path2output,cmap,"w")
     p2 = stack_chart(ts,dic,y2,legend,decison_var,path2output,cmap,"s")
     p3 = stack_chart(t,dic,y3,legend,decison_var,path2output,cmap)    
@@ -316,12 +320,12 @@ def plot_solutions(path2json=path2json):
               "TPE Summer": p2,
               "Load Duration Curve": p4,
               "TPE percentage":p5,
-              "Installed Capacities (IC) absolute": p6,
-              "IC percentage": p7,
+              "Installed Capacities (IC) percentage": p6,
+              "IC absolute": p7,
               "Specific Capital Costs of IC":p8,
               "Some Data":p9}
     tab_panes(path2output,**kwargs)
     
 #%%
-plot_solutions()            
+#plot_solutions()            
 
