@@ -4,7 +4,7 @@ Created on Fri Feb 23 18:51:21 2018
 
 @author: root
 """
-demand_f = 0.8
+demand_f = 1
 #%%
 import pickle
 import numpy as np
@@ -12,9 +12,9 @@ import json
 import matplotlib.pylab as plt
 from matplotlib.colors import to_hex
 from bokeh.plotting import figure, show, output_file,save
-from bokeh.models import ColumnDataSource,Legend,LinearAxis, Range1d,Label,LabelSet, DataTable, DateFormatter, TableColumn
+from bokeh.models import ColumnDataSource,Legend,LinearAxis, Range1d,Label,LabelSet, DataTable, DateFormatter, TableColumn,CustomJS
 from bokeh.layouts import widgetbox, gridplot,column,row
-from bokeh.models.widgets import Panel, Tabs
+from bokeh.models.widgets import Panel, Tabs, Button
 import os
 import itertools
 from math import pi
@@ -129,7 +129,6 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
 #    s.toolbar.logo = None
 #    save(s)
     return s
-    
 #%%
 def load_duration_curve(t,dic,y,legend,decison_var,path2output,cmap):
     p = figure(title = "Load Duration Curve", 
@@ -197,10 +196,8 @@ def pie_chart(dic,path2output,decison_var,cmap):
     p.add_layout(legend, 'right')
     p.legend.click_policy = "hide" # "mute"
     output_file(path2output+r"\\"+decison_var+"_pie_chart.html")
-    
 #    save(p)
     return p
-       
 #%%
 def bar_chart(dic,path2output,decison_var,cmap):
     p = figure(title = decison_var,
@@ -247,7 +244,7 @@ def plot_table (decision_vars,dic,path2output):
     return widgetbox(data_table)
 #%%
 def tab_panes(path2output,**kwargs):
-    output_file(path2output+"\output.html")
+    output_file(path2output+"\output.html",title="Dispatch output")
     tabs = [Panel(child=p, title=name) for name, p in kwargs.items()]
     tabs = Tabs(tabs=tabs)
     save(tabs)
@@ -323,9 +320,29 @@ def plot_solutions(path2json=path2json):
               "Installed Capacities (IC) percentage": p6,
               "IC absolute": p7,
               "Specific Capital Costs of IC":p8,
-              "Some Data":p9}
+              "Results":p9}
     tab_panes(path2output,**kwargs)
-    
 #%%
+input_list= ['name',
+ 'installed capacity (MW_th)',
+ 'efficiency th',
+ 'efficiency el',
+ 'investment costs (EUR/MW_th)',
+ 'OPEX fix (EUR/MWa)',
+ 'OPEX var (EUR/MWh)',
+ 'life time',
+ 'potential restriction (MW_th)',
+ 'renewable factor']
 #plot_solutions()            
+import pandas as pd
+data = pd.read_excel(r"C:\Users\Nesa\Desktop\input.xlsx")
+col = [TableColumn(field=name, title=name) for name in list(data) if name in input_list]
+source = ColumnDataSource(data)
+data_table = DataTable(source=source,columns=col,width=1150, height=800,editable=True)
+output_file(r"C:\Users\Nesa\Desktop\data_table.html") 
 
+code=open(r"C:\Users\Nesa\Desktop\Arbeit EEG\Hotmaps\Dispatch\app\modules\common\CM\CM_TUWdispatch\download.js").read()
+callback = CustomJS(args=dict(source=source), code=code)
+button = Button(label='Download', button_type='success', callback=callback)
+save (widgetbox(button,data_table))      
+#data = pd.read_csv(r"C:\Users\Nesa\Downloads\input.csv")

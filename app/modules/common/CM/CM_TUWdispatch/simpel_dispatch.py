@@ -22,7 +22,7 @@ from CM.CM_TUWdispatch.preprocessing import preprocessing
 #%%
 
 # heat demand scale factor
-demand_f =  0.8
+demand_f =  1
 # debug flag for 
 debug_flag = 0
 

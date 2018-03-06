@@ -122,7 +122,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
     alpha_hs =              {"Heat Storage":0}
     
     rf_j = {key:data["RF"][key] for key in tec}
-    rf_tot = 0.9
+    rf_tot = data["toatl_RF"]
     
     temperature = []
     for idx,val in data["temp"].items():
