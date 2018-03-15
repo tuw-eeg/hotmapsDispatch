@@ -12,7 +12,7 @@ import json
 import itertools
 import pandas as pd
 #%%
-demand_f = 0.8
+demand_f = 1
 #%% tab20
 def get_cmap(n, name='hot'):
     '''Returns a function that maps each index in 0, 1, ..., n-1 to a distinct 

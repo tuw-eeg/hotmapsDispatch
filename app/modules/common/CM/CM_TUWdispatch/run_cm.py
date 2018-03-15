@@ -15,9 +15,9 @@ from CM.CM_TUWdispatch.save_sol_to_json import save_sol_to_json
 #from CM.CM_TUWdispatch.plot_sol_from_json import plot_solutions
 
 
-def main(data,inv_flag):
+def main(data,inv_flag,demand_f):
     
-    instance,results = simpel_dispatch.run(data,inv_flag)
+    instance,results = simpel_dispatch.run(data,inv_flag,demand_f)
     
     if instance == None or results == None:
         return None,None,None

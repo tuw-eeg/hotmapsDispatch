@@ -18,8 +18,8 @@ from AD.F16_input.main import load_data
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
 import CM.CM_TUWdispatch.run_cm as dispatch
 #%%
-def execute(data,inv_flag):
-    val = dispatch.main(data,inv_flag) 
+def execute(data,inv_flag,demand_f=1):
+    val = dispatch.main(data,inv_flag,demand_f) 
     return val 
 #%%
 if __name__ == "__main__":

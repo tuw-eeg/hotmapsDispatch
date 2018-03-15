@@ -5,22 +5,32 @@ Created on Tue Jan 23 11:52:40 2018
 @author: root
 """
 from time import sleep
+import numpy as np
 
 class SliceMaker(object):
   def __getitem__(self, item):
     return item
 
 #TODO: Adapt to real data
-def preprocessing(data, demand_f = , inv_flag = 0):  
-    
-    select = SliceMaker()     
-    select = select[0:1,10:11]          # [start1:stop1:step1, start2:stop2:step2, ...]
-    if type(select) == tuple:
-        tec = []
-        for s in select: 
-            tec=tec+data["tec"][s]
+def preprocessing(data, demand_f = 1, inv_flag = 0):  
+      
+    if inv_flag:
+        select = SliceMaker()     
+        select = select[:]          # [start1:stop1:step1, start2:stop2:step2, ...]
+        if type(select) == tuple:
+            tec = []
+            for s in select: 
+                tec=tec+data["tec"][s]
+        else:
+            tec=data["tec"][select]
     else:
-        tec=data["tec"][select]
+        selection = np.array(list(data["P_th_cap"].values())).nonzero()[0].tolist()
+        if not selection:
+            print("No Capacities installed !!!")
+            return None
+        tec = []
+        for s in selection: 
+            tec.append(data["tec"][s])
 #TODO: assign to catagories
         
     j =         tec
@@ -40,23 +50,22 @@ def preprocessing(data, demand_f = , inv_flag = 0):
     max_demad =             max(data["demand_th"].values())
     max_installed_caps =    sum([data["P_th_cap"][key] for key in tec])
     delta =                 max_demad*demand_f - max_installed_caps
-    
     #XXX: 
     delta = 5*delta
-    
     if (max_installed_caps <= max_demad*demand_f) and not inv_flag:
         print("The installed capacities are not enough to cover the load")
-        if [key for key in tec if key in data["tec"][5:6]] == []:
-            print("There ist no Peak Boiler that could be updated with additional capacity")
-            return None
-        print("Additional "+str(round(delta,2))+" MW will be installed to the Peak Boilers")
-        print("PLease be aware, It can happen that the model can not be solved,")
-        print("due to the limitations of  other technologies at certain hours or due to certain technology conditions")
-        sleep(5)
-        
-        for key in data["tec"][5:6]:   
-            if key in tec:
-                data["P_th_cap"][key] = data["P_th_cap"][key]  + delta
+        return None
+#        if [key for key in tec if key in data["tec"][5:6]] == []:
+#            print("There ist no Peak Boiler that could be updated with additional capacity")
+#            return None
+#        print("Additional "+str(round(delta,2))+" MW will be installed to the Peak Boilers")
+#        print("PLease be aware, It can happen that the model can not be solved,")
+#        print("due to the limitations of  other technologies at certain hours or due to certain technology conditions")
+#        sleep(5)
+#        
+#        for key in data["tec"][5:6]:   
+#            if key in tec:
+#                data["P_th_cap"][key] = data["P_th_cap"][key]  + delta
             
     radiation_t =           data["radiation"]
     IK_j =                  {key:data["IK"][key] for key in tec}

@@ -22,13 +22,13 @@ from CM.CM_TUWdispatch.preprocessing import preprocessing
 #%%
 
 # heat demand scale factor
-demand_f =  1
+#demand_f =  1
 # debug flag for 
 debug_flag = 0
 
 #%%
 
-def run(data,inv_flag):
+def run(data,inv_flag,demand_f=1):
     #%% Creation of a  Model
     m = pe.AbstractModel()
     #%% Sets - TODO: depends on how the input data looks finally

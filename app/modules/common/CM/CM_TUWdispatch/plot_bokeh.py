@@ -12,7 +12,7 @@ import json
 import pandas as pd
 import matplotlib.pylab as plt
 from matplotlib.colors import to_hex
-from bokeh.plotting import figure, show, output_file,save
+from bokeh.plotting import figure, show, output_file,save,curdoc
 from bokeh.models import ColumnDataSource,Legend,LinearAxis, Range1d,Label,LabelSet, DataTable, DateFormatter, TableColumn,CustomJS
 from bokeh.layouts import widgetbox, gridplot,column,row, layout
 from bokeh.models.widgets import Panel, Tabs, Button
@@ -20,6 +20,15 @@ from bokeh.core.properties import value
 import os
 import itertools
 from math import pi
+import pandas as pd
+from subprocess import call
+import sys
+import pandas as pd
+path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
+                                                       abspath(__file__))))
+if path not in sys.path:
+    sys.path.append(path)
+#from FEAT.F16.F_16 import execute 
 #%%
 def get_cmap(n, name='tab20'):
     '''Returns a function that maps each index in 0, 1, ..., n-1 to a distinct 
@@ -236,7 +245,7 @@ def costBarStack_chart(dic,path2output,cmap):
                  dic["Fuel Costs"][x], -dic["Revenue From Electricity"][x]] for x in dic["Technologies"]}
     data["bars"] = bars
     
-    p = figure(x_range=bars, plot_height=400,
+    p = figure(x_range=bars, plot_height=400, plot_width=900,
             tools = "pan,wheel_zoom,box_zoom,reset,save")
 #    p.xaxis.visible = False
     p.xgrid.visible = False
@@ -251,9 +260,19 @@ def costBarStack_chart(dic,path2output,cmap):
     source = ColumnDataSource(data=data)
     
     p.vbar_stack(dic["Technologies"], x='bars', width=0.9, color=[cmap[x] for x in dic["Technologies"]], 
-                 source=source, legend=[value(x) for x in dic["Technologies"]])
+                 source=source, legend=[value(x) for x in dic["Technologies"]]) 
     
+    p.legend.location = "top_right"
+    p.legend.orientation = "vertical"
     
+    new_legend = p.legend[0]
+    p.legend[0].plot = None
+    p.add_layout(new_legend, 'right')
+
+#    p.vbar_stack(["a"])
+#    
+#    legend = Legend(items=items,location=(10, 10))    
+#    p.add_layout(legend, 'right')
 #    legend = list(dic)
 #    val = list(dic.values())
 #    k = [i for i,x in enumerate(val) if x!=0]
@@ -327,6 +346,7 @@ def tab_panes(path2output,**kwargs):
     output_file(path2output+"\output.html",title="Dispatch output")
     tabs = [Panel(child=p, title=name) for name, p in kwargs.items()]
     tabs = Tabs(tabs=tabs)
+    show(tabs)
     save(tabs)
     
 #%%
@@ -360,6 +380,7 @@ path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
 path2json = path+r"\AD\F16_input\Solution\solution.json"
 path2output = path+r"\AD\F16_input\Output_Graphics"
+path_parameter2 = path +  r"\AD\F16_input\DH_technology_cost.xlsx"
 #%%
 def plot_solutions(path2json=path2json):
     
@@ -369,7 +390,8 @@ def plot_solutions(path2json=path2json):
         
         if os.path.isdir(path2output) == False:
             print("Create Dictionary...")
-            cmap = colormapping(dic["Technologies"])
+            data5 = pd.read_excel(path_parameter2,"Parameter for Powerplants")
+            cmap = colormapping(data5.tec.values.tolist())
             os.mkdir(path2output)
             print("Created: "+ path2output)
             pickle.dump(cmap, 
@@ -435,4 +457,4 @@ def plot_solutions(path2json=path2json):
     tab_panes(path2output,**kwargs)
 
 #%%
-plot_solutions()
+plot_solutions()            
