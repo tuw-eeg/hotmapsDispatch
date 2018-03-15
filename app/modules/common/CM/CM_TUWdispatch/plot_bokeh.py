@@ -9,12 +9,14 @@ demand_f = 1
 import pickle
 import numpy as np
 import json
+import pandas as pd
 import matplotlib.pylab as plt
 from matplotlib.colors import to_hex
 from bokeh.plotting import figure, show, output_file,save
 from bokeh.models import ColumnDataSource,Legend,LinearAxis, Range1d,Label,LabelSet, DataTable, DateFormatter, TableColumn,CustomJS
-from bokeh.layouts import widgetbox, gridplot,column,row
+from bokeh.layouts import widgetbox, gridplot,column,row, layout
 from bokeh.models.widgets import Panel, Tabs, Button
+from bokeh.core.properties import value
 import os
 import itertools
 from math import pi
@@ -210,7 +212,7 @@ def bar_chart(dic,path2output,decison_var,cmap):
     p.toolbar.logo = None
     p.toolbar_location = None
     legend = list(dic)
-    val = list(dic.values())
+    val = list(dic.values())    
     k = [i for i,x in enumerate(val) if x!=0]
     legend= [legend[i] for i in k]
     val= [val[i] for i in k]
@@ -219,19 +221,74 @@ def bar_chart(dic,path2output,decison_var,cmap):
     text=list(np.round(val,2))
     items = []
     for name,glyph,label in zip(legend,bars,text):
-        items.append((name+": "+str(label)+"",[glyph]))
+        items.append((name+": "+str(("%.3e"%float(label)))+"",[glyph]))
     legend = Legend(items=items,location=(10, 10))    
     p.add_layout(legend, 'right')
     p.legend.click_policy = "mute" # "mute"
-    output_file(path2output+r"\\"+decison_var+"_absolut_bar_chart.html")
+#    output_file(path2output+r"\\"+decison_var+"_absolut_bar_chart.html")
 #    save(p)
     return p
+
+
+def costBarStack_chart(dic,path2output,cmap):
+    bars = ["Annual Investment Cost", "Operational Cost", "Fuel Costs", "Revenue From Electricity"]
+    data = {x: [dic["Annual Investment Cost"][x], dic["Operational Cost"][x],
+                 dic["Fuel Costs"][x], -dic["Revenue From Electricity"][x]] for x in dic["Technologies"]}
+    data["bars"] = bars
+    
+    p = figure(x_range=bars, plot_height=400,
+            tools = "pan,wheel_zoom,box_zoom,reset,save")
+#    p.xaxis.visible = False
+    p.xgrid.visible = False
+    p.grid.minor_grid_line_color = '#eeeeee'
+    p.toolbar.logo = None
+    p.toolbar_location = None
+    
+
+#    p = figure(x_range=bars, plot_height=250, title="Costs",
+#           toolbar_location=None, tools="")
+     
+    source = ColumnDataSource(data=data)
+    
+    p.vbar_stack(dic["Technologies"], x='bars', width=0.9, color=[cmap[x] for x in dic["Technologies"]], 
+                 source=source, legend=[value(x) for x in dic["Technologies"]])
+    
+    
+#    legend = list(dic)
+#    val = list(dic.values())
+#    k = [i for i,x in enumerate(val) if x!=0]
+#    legend= [legend[i] for i in k]
+#    val= [val[i] for i in k]
+#    colors = [cmap[i] for i in legend]
+#    bars = [p.rect(x=5+i*15, y=val[i]/2, width=10, height=val[i], color=colors[i],muted_alpha=0.2) for i in range(len(val))]
+#    text=list(np.round(val,2))
+#    items = []
+#    for name,glyph,label in zip(legend,bars,text):
+#        items.append((name+": "+str(label)+"",[glyph]))
+#    legend = Legend(items=items,location=(10, 10))    
+#    p.add_layout(legend, 'right')
+#    p.legend.click_policy = "mute" # "mute"
+##    output_file(path2output+r"\\"+decison_var+"_absolut_bar_chart.html")
+##    save(p)
+    return p
+
+
 #%%
 def plot_table (decision_vars,dic,path2output):   
-    val = [str(round(dic[decison_var],2)) for decison_var in decision_vars]
+    val = []
+    for decision_var in decision_vars:
+        if type(dic[decision_var]) == dict:
+            val.append(sum(dic[decision_var].values()))
+        else:
+            val.append(dic[decision_var])
+#    val = [str(round(dic[decison_var],2)) for decison_var in decision_vars]
+    formatted_val = []
+    for item in val:
+        formatted_val.append("%.3e"%item)
+    
     data = dict(
             topic = decision_vars,
-            value = val,
+            value = formatted_val,
         )
     source = ColumnDataSource(data)
     columns = [
@@ -242,12 +299,62 @@ def plot_table (decision_vars,dic,path2output):
     output_file(path2output+"\data_table.html") 
 #    save(widgetbox(data_table))
     return widgetbox(data_table)
+
+def plotExtra_table (decision_vars,dic,path2output):   
+    data = []
+    line =[]
+    for decision_var in decision_vars:
+        if type(dic[decision_var]) == dict:
+            formatted_val = []
+            for item in list(dic[decision_var].values()):
+                 formatted_val.append("%.3e"%item)
+                
+            line = [[decision_var] + formatted_val]
+            data = data + line
+    
+    source = ColumnDataSource(pd.DataFrame(data, columns=["topic"]+list(dic["Technologies"])))
+    
+    column0 = [TableColumn(field="topic", title="Topic")]
+    columns = [TableColumn(field=x, title=x) for x in dic["Technologies"]]
+    columns = column0+columns
+    
+    data_table = DataTable(source=source, columns=columns, width=800, height=800)
+    output_file(path2output+"\data_table.html") 
+    return widgetbox(data_table)
+
 #%%
 def tab_panes(path2output,**kwargs):
     output_file(path2output+"\output.html",title="Dispatch output")
     tabs = [Panel(child=p, title=name) for name, p in kwargs.items()]
     tabs = Tabs(tabs=tabs)
     save(tabs)
+    
+#%%
+def dic_capitalCosts(dic,decison_var):
+    out_dic = {}
+    
+    return out_dic
+       
+
+#%% 
+def strFormat(i,s):
+    
+    if abs(i) > 10**12:
+        prefix = 'k'
+        i = i/10**12
+    if abs(i) > 10**9:
+        prefix = 'M'
+        i = i/10**9
+    if abs(i) > 10**6:
+        prefix = 'G'
+        i = i/10**6
+    if abs(i) > 10**3:
+        prefix = 'T'
+        i = i/10**3
+    
+    i =  "{0:.2f}".format(round(i,2))
+    return i+' '+prefix+s
+
 #%%
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
@@ -268,8 +375,6 @@ def plot_solutions(path2json=path2json):
             pickle.dump(cmap, 
                         open(path2output+r'\cmap.spec', 'wb'))
 
-            
-            
     except FileNotFoundError:
         print("\n*********\nThere is no JSON File in this path: "+
               path2json+"\n*********\n")
@@ -291,12 +396,14 @@ def plot_solutions(path2json=path2json):
     p4 = load_duration_curve(t,dic,y3,legend,decison_var,path2output,cmap)    
     decison_var = "Thermal Generation Mix"
     p5 = pie_chart(dic[decison_var],path2output,decison_var,cmap)
+    p10 = bar_chart(dic[decison_var],path2output,decison_var,cmap)
     decison_var = "Installed Capacities"
     p6 = pie_chart(dic[decison_var],path2output,decison_var,cmap)
     p7 = bar_chart(dic[decison_var],path2output,decison_var,cmap)
     decison_var = "Specific Capital Costs of installed Capacities"
-    p8 = bar_chart(dic[decison_var],path2output,decison_var,cmap)
-    decision_vars = ["Electricity Production by CHP",
+    p8 = costBarStack_chart(dic,path2output,cmap)
+    decision_vars = ["total annual costs",
+            "Electricity Production by CHP",
                      "Thermal Production by CHP",
                      "Mean Value Heat Price",
                      "Median Value Heat Price",
@@ -305,44 +412,27 @@ def plot_solutions(path2json=path2json):
                      "Revenue From Electricity",
                      "Ramping Costs",
                      "Operational Cost",
-                     "Invesment Cost",
+                     "Annual Investment Cost",
                      "Electrical Peak Load Costs",
                      "Variable Cost CHP's",
-                     "Total Variable Cost",
-                     "Total Costs"]
+                     "Fuel Costs",
+                     ]
     p9 = plot_table(decision_vars,dic,path2output)
+    
+    l1 = layout([[p5,p10],[p6,p7]])
+    
+    decision_vars = ["Annual Investment Cost", "Operational Cost", "Fuel Costs", "Revenue From Electricity"]
+    p11 = plotExtra_table(decision_vars,dic,path2output)
+    l2 = layout([[p8],[p11]])
     
     kwargs = {"Thermal Power Energymix (TPE)": p3,
               "TPE Winter": p1,
               "TPE Summer": p2,
               "Load Duration Curve": p4,
-              "TPE percentage":p5,
-              "Installed Capacities (IC) percentage": p6,
-              "IC absolute": p7,
-              "Specific Capital Costs of IC":p8,
+              "TPE and Plant Capatcities": l1,
+              "Specific Capital Costs of IC":l2,
               "Results":p9}
     tab_panes(path2output,**kwargs)
-#%%
-input_list= ['name',
- 'installed capacity (MW_th)',
- 'efficiency th',
- 'efficiency el',
- 'investment costs (EUR/MW_th)',
- 'OPEX fix (EUR/MWa)',
- 'OPEX var (EUR/MWh)',
- 'life time',
- 'potential restriction (MW_th)',
- 'renewable factor']
-#plot_solutions()            
-import pandas as pd
-data = pd.read_excel(r"C:\Users\Nesa\Desktop\input.xlsx")
-col = [TableColumn(field=name, title=name) for name in list(data) if name in input_list]
-source = ColumnDataSource(data)
-data_table = DataTable(source=source,columns=col,width=1150, height=800,editable=True)
-output_file(r"C:\Users\Nesa\Desktop\data_table.html") 
 
-code=open(r"C:\Users\Nesa\Desktop\Arbeit EEG\Hotmaps\Dispatch\app\modules\common\CM\CM_TUWdispatch\download.js").read()
-callback = CustomJS(args=dict(source=source), code=code)
-button = Button(label='Download', button_type='success', callback=callback)
-save (widgetbox(button,data_table))      
-#data = pd.read_csv(r"C:\Users\Nesa\Downloads\input.csv")
+#%%
+plot_solutions()

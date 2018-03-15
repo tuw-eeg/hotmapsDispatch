@@ -21,7 +21,7 @@ if path not in sys.path:
 def load_data(path2data = os.path.split(os.path.abspath(__file__))[0]):
 #    print(path2data)
     val = pickle.load(open(path2data+r"\data.dat", "rb"))
-    inv_flag = 1
+    inv_flag = 0
     return val, inv_flag 
 
 

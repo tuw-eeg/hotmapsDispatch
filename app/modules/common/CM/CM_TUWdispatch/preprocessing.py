@@ -11,10 +11,10 @@ class SliceMaker(object):
     return item
 
 #TODO: Adapt to real data
-def preprocessing(data, demand_f = 1, inv_flag = 0):  
+def preprocessing(data, demand_f = , inv_flag = 0):  
     
     select = SliceMaker()     
-    select = select[:]          # [start1:stop1:step1, start2:stop2:step2, ...]
+    select = select[0:1,10:11]          # [start1:stop1:step1, start2:stop2:step2, ...]
     if type(select) == tuple:
         tec = []
         for s in select: 
@@ -36,6 +36,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
     
     #%% Parameter - #TODO: depends on how the input data looks finally
     demand_th_t =           data["demand_th"]
+    
     max_demad =             max(data["demand_th"].values())
     max_installed_caps =    sum([data["P_th_cap"][key] for key in tec])
     delta =                 max_demad*demand_f - max_installed_caps
@@ -117,7 +118,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
     loss_hs =               0.02
     IK_hs =                 30
     cap_hs =                10
-    c_ramp_chp =            10
+    c_ramp_chp =            100
     c_ramp_waste =          100
     alpha_hs =              {"Heat Storage":0}
     
