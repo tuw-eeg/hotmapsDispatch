@@ -239,10 +239,13 @@ def bar_chart(dic,path2output,decison_var,cmap):
     return p
 
 
-def costBarStack_chart(dic,path2output,cmap):
-    bars = ["Annual Investment Cost", "Operational Cost", "Fuel Costs", "Revenue From Electricity"]
-    data = {x: [dic["Annual Investment Cost"][x], dic["Operational Cost"][x],
-                 dic["Fuel Costs"][x], -dic["Revenue From Electricity"][x]] for x in dic["Technologies"]}
+def costBarStack_chart(dic,decison_vars,path2output,cmap):
+    data = {x: [dic["Anual Investment Cost"][x]+dic["Anual Investment Cost (of existing power plants)"][x],
+                dic["Operational Cost"][x],
+                 dic["Fuel Costs"][x], 
+                 -dic["Revenue From Electricity"][x]] for x in dic["Technologies"]}
+    bars = decison_vars.copy()
+    bars.pop(1)
     data["bars"] = bars
     
     p = figure(x_range=bars, plot_height=400, plot_width=900,
@@ -298,6 +301,8 @@ def plot_table (decision_vars,dic,path2output):
     for decision_var in decision_vars:
         if type(dic[decision_var]) == dict:
             val.append(sum(dic[decision_var].values()))
+        elif type(dic[decision_var]) == list:
+            val.append(sum(dic[decision_var]))
         else:
             val.append(dic[decision_var])
 #    val = [str(round(dic[decison_var],2)) for decison_var in decision_vars]
@@ -423,18 +428,21 @@ def plot_solutions(path2json=path2json):
     p6 = pie_chart(dic[decison_var],path2output,decison_var,cmap)
     p7 = bar_chart(dic[decison_var],path2output,decison_var,cmap)
     decison_var = "Specific Capital Costs of installed Capacities"
-    p8 = costBarStack_chart(dic,path2output,cmap)
-    decision_vars = ["total annual costs",
-            "Electricity Production by CHP",
+    
+    decision_vars = ["Anual Total Costs",
+                     "Anual Total Costs (with costs of existing power plants)",
+                     "Electricity Production by CHP",
                      "Thermal Production by CHP",
                      "Mean Value Heat Price",
+                     "Mean Value Heat Price (with costs of existing power plants)",
                      "Median Value Heat Price",
                      "Electrical Consumption of Heatpumps and Power to Heat devices",
                      "Maximum Electrical Load of Heatpumps and Power to Heat devices",
                      "Revenue From Electricity",
                      "Ramping Costs",
                      "Operational Cost",
-                     "Annual Investment Cost",
+                     "Anual Investment Cost",
+                     "Anual Investment Cost (of existing power plants)",
                      "Electrical Peak Load Costs",
                      "Variable Cost CHP's",
                      "Fuel Costs",
@@ -443,7 +451,11 @@ def plot_solutions(path2json=path2json):
     
     l1 = layout([[p5,p10],[p6,p7]])
     
-    decision_vars = ["Annual Investment Cost", "Operational Cost", "Fuel Costs", "Revenue From Electricity"]
+    decision_vars = ["Anual Investment Cost",
+                     "Anual Investment Cost (of existing power plants)", 
+                     "Operational Cost", "Fuel Costs", "Revenue From Electricity"]
+    p8 = costBarStack_chart(dic,decision_vars,path2output,cmap)
+    
     p11 = plotExtra_table(decision_vars,dic,path2output)
     l2 = layout([[p8],[p11]])
     
@@ -457,4 +469,4 @@ def plot_solutions(path2json=path2json):
     tab_panes(path2output,**kwargs)
 
 #%%
-plot_solutions()            
+#plot_solutions()            

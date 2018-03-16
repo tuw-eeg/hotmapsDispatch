@@ -28,15 +28,15 @@ def load_data(path2data = path2data):
     data1 = pd.read_excel(path_parameter,skiprows=[1])
     tec = list(data1.tec.values)
     data1 = data1.set_index("tec").to_dict()
-    data2 = pd.read_excel(path_parameter,"prices and emmision factors",skiprows=[1])
+    data2 = pd.read_excel(path_parameter,"prices and emmision factors",skiprows=[1]).fillna(0)
     data2 = data2.set_index("energy_carrier").to_dict()
-    data3 = pd.read_excel(path_parameter,"financal and other parameteres")
+    data3 = pd.read_excel(path_parameter,"financal and other parameteres").fillna(0)
     data3 = data3.to_dict("records")[0]
     data = {**data1, **data2,**data3}
     
-    data4 = pd.read_excel(path_parameter2,"Data",skiprows=range(2,4))
-    data5 = pd.read_excel(path_parameter2,"Parameter for Powerplants",skiprows=range(21,26))
-    data6 = pd.read_excel(path_parameter2,"prices and emmision factors")
+    data4 = pd.read_excel(path_parameter2,"Data",skiprows=range(2,4)).fillna(0)
+    data5 = pd.read_excel(path_parameter2,"Parameter for Powerplants",skiprows=range(21,26)).fillna(0)
+    data6 = pd.read_excel(path_parameter2,"prices and emmision factors").fillna(0)
     
     dic5 = data5.set_index("name").to_dict()
     data1 = pd.read_excel(path_parameter)[0:1]
