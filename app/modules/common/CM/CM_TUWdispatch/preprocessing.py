@@ -13,7 +13,7 @@ class SliceMaker(object):
 
 #TODO: Adapt to real data
 def preprocessing(data, demand_f = 1, inv_flag = 0):  
-      
+    
     if inv_flag:
         select = SliceMaker()     
         select = select[:]          # [start1:stop1:step1, start2:stop2:step2, ...]
@@ -27,12 +27,14 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
         selection = np.array(list(data["P_th_cap"].values())).nonzero()[0].tolist()
         if not selection:
             print("No Capacities installed !!!")
-            return None
+            return "Error1"
         tec = []
         for s in selection: 
             tec.append(data["tec"][s])
 #TODO: assign to catagories
-        
+
+    
+    
     j =         tec
     j_hp =      [key for key in tec if "heat pump" in key ]
     j_pth =     [key for key in tec if "Power To Heat" in key]
@@ -44,6 +46,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
     j_gt =      [key for key in tec if "Geothermal" in key]
     j_hs =      ["Heat Storage"]
     
+
     #%% Parameter - #TODO: depends on how the input data looks finally
     demand_th_t =           data["demand_th"]
     
@@ -54,7 +57,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
     delta = 5*delta
     if (max_installed_caps <= max_demad*demand_f) and not inv_flag:
         print("The installed capacities are not enough to cover the load")
-        return None
+        return "Error2"
 #        if [key for key in tec if key in data["tec"][5:6]] == []:
 #            print("There ist no Peak Boiler that could be updated with additional capacity")
 #            return None
@@ -66,7 +69,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
 #        for key in data["tec"][5:6]:   
 #            if key in tec:
 #                data["P_th_cap"][key] = data["P_th_cap"][key]  + delta
-            
+      
     radiation_t =           data["radiation"]
     IK_j =                  {key:data["IK"][key] for key in tec}
     OP_fix_j =                  {key:data["OP_fix"][key] for key in tec}
@@ -77,7 +80,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
     Q_min_th_chp =          0
     ratioPMaxFW =           450/700
     ratioPMax =             450/820
-    
+
 #XXX: Calculate MC with electricity price from user               
     mc = {}
     for j in data["tec"]:
@@ -98,7 +101,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
                                  data["em"][data["energy_carrier"][j]]*data["P_co2"] / \
                                   data["n_th"][j]   
 
-        
+   
     mc_jt =                 {(key,t):mc[key,t] for t in range(1,8760+1) for key in tec}
     n_th_j =                {key:data["n_th"][key] for key in tec}
     x_th_cap_j =            {key:data["P_th_cap"][key] for key in tec}
@@ -106,10 +109,10 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
     pot_j =                 {key:data["POT"][key] for key in tec}
     lt_j =                  {key:data["LT"][key] for key in tec}
     el_surcharge =          50  # Taxes for electricity price
-    
+
 #TODO: Calculate alpha with interest rate from user , 
 #      LT complete Data...     
-    ir =                    0.05  # interest Rate
+    ir = data["interest_rate"]  # interest Rate
     q = 1+ir
     alpha = {}
     for ix,val in data["LT"].items():
@@ -120,7 +123,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
                   
     alpha_j =               {key:alpha[key] for key in tec}
     
-    
+
     load_cap_hs =           50 
     unload_cap_hs =         140
     n_hs =                  0.95
@@ -130,16 +133,16 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
     c_ramp_chp =            100
     c_ramp_waste =          100
     alpha_hs =              {"Heat Storage":0}
-    
+
     rf_j = {key:data["RF"][key] for key in tec}
     rf_tot = data["toatl_RF"]
-    
+
     temperature = []
     for idx,val in data["temp"].items():
         temperature.append([val]*24)
-    
+
     temperature = dict(zip(range(1,8760+1),sum(temperature,[])))   
-    
+
     thresh = data["threshold_heatpump"]
 
     args = (tec, j_hp, j_pth, j_st, j_waste, j_chp, j_bp, j_wh, j_gt, j_hs, 

@@ -27,6 +27,17 @@ if __name__ == "__main__":
     data,inv_flag = load_data()   
 #    val = preprocessing(data,1,inv_flag)
     solutions,instance,results = execute(data,inv_flag)
-    if solutions != None:
-        plot_solutions()    
-    print('calculation done')
+    if solutions == "Error1":
+        print( 'No Capacities installed !!!')
+    elif solutions == "Error2":
+        print("The installed capacities are not enough to cover the load !!!" )
+    elif solutions == "Error3":
+        print("Error: Infeasible or Unbounded model !!!")
+    elif solutions == None:
+        print("Error: Something get Wrong")
+    else:
+        print('calculation done')
+        tabs = plot_solutions(show_plot=True)   
+        if solutions == "Error4":
+            print("Error @ Ploting  !!!")
+        

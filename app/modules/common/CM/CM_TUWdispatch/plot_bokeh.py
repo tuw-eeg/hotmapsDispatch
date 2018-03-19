@@ -348,16 +348,15 @@ def plotExtra_table (decision_vars,dic,path2output):
 
 #%%
 def tab_panes(path2output,**kwargs):
-    output_file(path2output+"\output.html",title="Dispatch output")
+#    output_file(path2output+"\output.html",title="Dispatch output")
     tabs = [Panel(child=p, title=name) for name, p in kwargs.items()]
     tabs = Tabs(tabs=tabs)
-    show(tabs)
-    save(tabs)
-    
+#    show(tabs)
+#    save(tabs)
+    return tabs
 #%%
 def dic_capitalCosts(dic,decison_var):
     out_dic = {}
-    
     return out_dic
        
 
@@ -387,86 +386,94 @@ path2json = path+r"\AD\F16_input\Solution\solution.json"
 path2output = path+r"\AD\F16_input\Output_Graphics"
 path_parameter2 = path +  r"\AD\F16_input\DH_technology_cost.xlsx"
 #%%
-def plot_solutions(path2json=path2json):
-    
+def plot_solutions(show_plot=False,path2json=path2json):
     try:
-        with open(path2json) as f:
-            dic = json.load(f)
         
-        if os.path.isdir(path2output) == False:
-            print("Create Dictionary...")
-            data5 = pd.read_excel(path_parameter2,"Parameter for Powerplants")
-            cmap = colormapping(data5.tec.values.tolist())
-            os.mkdir(path2output)
-            print("Created: "+ path2output)
-            pickle.dump(cmap, 
-                        open(path2output+r'\cmap.spec', 'wb'))
-
-    except FileNotFoundError:
-        print("\n*********\nThere is no JSON File in this path: "+
-              path2json+"\n*********\n")
-        return True
+        
+        try:
+            with open(path2json) as f:
+                dic = json.load(f)
+            
+            if os.path.isdir(path2output) == False:
+                print("Create Dictionary...")
+                data5 = pd.read_excel(path_parameter2,"Parameter for Powerplants")
+                cmap = colormapping(data5.tec.values.tolist())
+                os.mkdir(path2output)
+                print("Created: "+ path2output)
+                pickle.dump(cmap, 
+                            open(path2output+r'\cmap.spec', 'wb'))
     
-    decison_var="Thermal Power Energymix" 
-    legend = list(dic["Thermal Power Energymix"].keys())
-    tw = range(0,350)  
-    ts = range(730*5,730*5+336+1)   
-    t = range(0,8760)
-    y1 = matrix(dic,decison_var,legend,tw)
-    y2 = matrix(dic,decison_var,legend,ts)
-    y3 = matrix(dic,decison_var,legend,t)
-#    cmap = colormapping(dic["Technologies"])
-    cmap = pickle.load(open(path2output+r"\cmap.spec", "rb"))
-    p1 = stack_chart(tw,dic,y1,legend,decison_var,path2output,cmap,"w")
-    p2 = stack_chart(ts,dic,y2,legend,decison_var,path2output,cmap,"s")
-    p3 = stack_chart(t,dic,y3,legend,decison_var,path2output,cmap)    
-    p4 = load_duration_curve(t,dic,y3,legend,decison_var,path2output,cmap)    
-    decison_var = "Thermal Generation Mix"
-    p5 = pie_chart(dic[decison_var],path2output,decison_var,cmap)
-    p10 = bar_chart(dic[decison_var],path2output,decison_var,cmap)
-    decison_var = "Installed Capacities"
-    p6 = pie_chart(dic[decison_var],path2output,decison_var,cmap)
-    p7 = bar_chart(dic[decison_var],path2output,decison_var,cmap)
-    decison_var = "Specific Capital Costs of installed Capacities"
-    
-    decision_vars = ["Anual Total Costs",
-                     "Anual Total Costs (with costs of existing power plants)",
-                     "Electricity Production by CHP",
-                     "Thermal Production by CHP",
-                     "Mean Value Heat Price",
-                     "Mean Value Heat Price (with costs of existing power plants)",
-                     "Median Value Heat Price",
-                     "Electrical Consumption of Heatpumps and Power to Heat devices",
-                     "Maximum Electrical Load of Heatpumps and Power to Heat devices",
-                     "Revenue From Electricity",
-                     "Ramping Costs",
-                     "Operational Cost",
-                     "Anual Investment Cost",
-                     "Anual Investment Cost (of existing power plants)",
-                     "Electrical Peak Load Costs",
-                     "Variable Cost CHP's",
-                     "Fuel Costs",
-                     ]
-    p9 = plot_table(decision_vars,dic,path2output)
-    
-    l1 = layout([[p5,p10],[p6,p7]])
-    
-    decision_vars = ["Anual Investment Cost",
-                     "Anual Investment Cost (of existing power plants)", 
-                     "Operational Cost", "Fuel Costs", "Revenue From Electricity"]
-    p8 = costBarStack_chart(dic,decision_vars,path2output,cmap)
-    
-    p11 = plotExtra_table(decision_vars,dic,path2output)
-    l2 = layout([[p8],[p11]])
-    
-    kwargs = {"Thermal Power Energymix (TPE)": p3,
-              "TPE Winter": p1,
-              "TPE Summer": p2,
-              "Load Duration Curve": p4,
-              "TPE and Plant Capatcities": l1,
-              "Specific Capital Costs of IC":l2,
-              "Results":p9}
-    tab_panes(path2output,**kwargs)
-
+        except FileNotFoundError:
+            print("\n*********\nThere is no JSON File in this path: "+
+                  path2json+"\n*********\n")
+            return True
+        
+        decison_var="Thermal Power Energymix" 
+        legend = list(dic["Thermal Power Energymix"].keys())
+        tw = range(0,350)  
+        ts = range(730*5,730*5+336+1)   
+        t = range(0,8760)
+        y1 = matrix(dic,decison_var,legend,tw)
+        y2 = matrix(dic,decison_var,legend,ts)
+        y3 = matrix(dic,decison_var,legend,t)
+    #    cmap = colormapping(dic["Technologies"])
+        cmap = pickle.load(open(path2output+r"\cmap.spec", "rb"))
+        p1 = stack_chart(tw,dic,y1,legend,decison_var,path2output,cmap,"w")
+        p2 = stack_chart(ts,dic,y2,legend,decison_var,path2output,cmap,"s")
+        p3 = stack_chart(t,dic,y3,legend,decison_var,path2output,cmap)    
+        p4 = load_duration_curve(t,dic,y3,legend,decison_var,path2output,cmap)    
+        decison_var = "Thermal Generation Mix"
+        p5 = pie_chart(dic[decison_var],path2output,decison_var,cmap)
+        p10 = bar_chart(dic[decison_var],path2output,decison_var,cmap)
+        decison_var = "Installed Capacities"
+        p6 = pie_chart(dic[decison_var],path2output,decison_var,cmap)
+        p7 = bar_chart(dic[decison_var],path2output,decison_var,cmap)
+        decison_var = "Specific Capital Costs of installed Capacities"
+        
+        decision_vars = ["Anual Total Costs",
+                         "Anual Total Costs (with costs of existing power plants)",
+                         "Electricity Production by CHP",
+                         "Thermal Production by CHP",
+                         "Mean Value Heat Price",
+                         "Mean Value Heat Price (with costs of existing power plants)",
+                         "Median Value Heat Price",
+                         "Electrical Consumption of Heatpumps and Power to Heat devices",
+                         "Maximum Electrical Load of Heatpumps and Power to Heat devices",
+                         "Revenue From Electricity",
+                         "Ramping Costs",
+                         "Operational Cost",
+                         "Anual Investment Cost",
+                         "Anual Investment Cost (of existing power plants)",
+                         "Electrical Peak Load Costs",
+                         "Variable Cost CHP's",
+                         "Fuel Costs",
+                         ]
+        p9 = plot_table(decision_vars,dic,path2output)
+        
+        l1 = layout([[p5,p10],[p6,p7]])
+        
+        decision_vars = ["Anual Investment Cost",
+                         "Anual Investment Cost (of existing power plants)", 
+                         "Operational Cost", "Fuel Costs", "Revenue From Electricity"]
+        p8 = costBarStack_chart(dic,decision_vars,path2output,cmap)
+        
+        p11 = plotExtra_table(decision_vars,dic,path2output)
+        l2 = layout([[p8],[p11]])
+        
+        kwargs = {"Thermal Power Energymix (TPE)": p3,
+                  "TPE Winter": p1,
+                  "TPE Summer": p2,
+                  "Load Duration Curve": p4,
+                  "TPE and Plant Capatcities": l1,
+                  "Specific Capital Costs of IC":l2,
+                  "Results":p9}
+        tabs = tab_panes(path2output,**kwargs)
+        output_file(path2output+"\output.html",title="Dispatch output")
+        save(tabs)
+        if show_plot:
+            show(tabs)
+        return tabs.tabs
+    except:
+        return "Error4"
 #%%
-#plot_solutions()            
+#plot_solutions(show_plot=True)            

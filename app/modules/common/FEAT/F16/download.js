@@ -1,5 +1,4 @@
-//window.location="upload.js";
-
+//window.location="C:/Users/Nesa/Desktop/loader.html";
 /*
 var data = source.data;                  
 var filetext = ['name',

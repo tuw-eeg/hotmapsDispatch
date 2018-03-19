@@ -19,15 +19,15 @@ def main(data,inv_flag,demand_f):
     
     instance,results = simpel_dispatch.run(data,inv_flag,demand_f)
     
-    if instance == None or results == None:
+
+    if instance == "Error1" or instance == "Error2":
+        return instance,None,None
+    elif instance == None or results == None:
         return None,None,None
-    
-    try:
-        solutions = save_sol_to_json(instance,results,inv_flag)
-    except:
-        print("Error in Saving Solution to JSON")
-        print("Cause: infeasible or unbounded model")
-        solutions = None
+
+    solutions = save_sol_to_json(instance,results,inv_flag)
+    if solutions == "Error3":
+        return solutions,instance,results 
         
     return solutions,instance,results 
 

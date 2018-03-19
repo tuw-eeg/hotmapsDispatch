@@ -1,0 +1,59 @@
+<div class="text">
+Dispatch in progress, please wait ...
+</div>
+<div class="spinner"></div>
+<style scoped>
+.text{
+@import url("https://fonts.googleapis.com/css?family=Amatic+SC");
+width: 400px;
+margin-top: 10px auto;
+text-align:center;
+font-family: 'Amatic SC';
+font-size: 2vh;
+color: #006699;
+opacity: .75;
+animation: pulse 2.5s linear infinite;
+}
+@keyframes pulse {
+  0% {
+    transform: scale(1, 1);
+    opacity: .25;
+  }
+  50% {
+    transform: scale(0.99,0.99);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1, 1);
+    opacity: .25;
+  }
+}
+.spinner {
+width: 40px;
+height: 40px;
+background-color: #2e73b8;
+
+margin: 20px auto;
+-webkit-animation: sk-rotateplane 1.2s infinite ease-in-out;
+animation: sk-rotateplane 1.2s infinite ease-in-out;
+}
+
+@-webkit-keyframes sk-rotateplane {
+0% { -webkit-transform: perspective(120px) }
+50% { -webkit-transform: perspective(120px) rotateY(180deg) }
+100% { -webkit-transform: perspective(120px) rotateY(180deg)  rotateX(180deg) }
+}
+
+@keyframes sk-rotateplane {
+0% { 
+transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+-webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg) 
+} 50% { 
+transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+-webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg) 
+} 100% { 
+transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+-webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+}
+}
+</style>

@@ -30,30 +30,42 @@ def load_data(path2data = path2data):
     data1 = data1.set_index("tec").to_dict()
     data2 = pd.read_excel(path_parameter,"prices and emmision factors",skiprows=[1]).fillna(0)
     data2 = data2.set_index("energy_carrier").to_dict()
-    data3 = pd.read_excel(path_parameter,"financal and other parameteres").fillna(0)
+    data3 = pd.read_excel(path_parameter,"financal and other parameteres",skiprows=[1]).fillna(0)
     data3 = data3.to_dict("records")[0]
     data = {**data1, **data2,**data3}
     
-    data4 = pd.read_excel(path_parameter2,"Data",skiprows=range(2,4)).fillna(0)
+    try:
+        data4 = pd.read_excel(path_parameter2,"Data",skiprows=range(3,5)).fillna(0)
+    except:
+        data4 = pd.read_excel(path_parameter2,"Data").fillna(0)
     data5 = pd.read_excel(path_parameter2,"Parameter for Powerplants",skiprows=range(21,26)).fillna(0)
     data6 = pd.read_excel(path_parameter2,"prices and emmision factors").fillna(0)
     
-    dic5 = data5.set_index("name").to_dict()
+   
+    
     data1 = pd.read_excel(path_parameter)[0:1]
     input_list_mapper = dict(zip(data1.values[0].tolist(),list(data1)))
+    data2 = pd.read_excel(path_parameter,"prices and emmision factors")[0:1]
+    input_price_list_mapper = dict(zip(data2.values[0].tolist(),list(data2)))
+    data3 = pd.read_excel(path_parameter,"financal and other parameteres")[0:1]
+    parameter_list_mapper = dict(zip(data3.values[0].tolist(),list(data3)))
+    
+    dic5 = data5.set_index("name").to_dict()
     for key in list(dic5):
         data[input_list_mapper[key]]=dic5[key]
         
-    dic6=data6.set_index("energy_carrier").to_dict()
+    dic6=data6.set_index("energy carrier").to_dict()
     for key in list(dic6):
-        data[key]=dic6[key]
-    
+        data[input_price_list_mapper[key]] = dic6[key]
+        
     for key in list(data4):
-        data[key]= data4[key].values[0]
+        data[parameter_list_mapper[key]]= data4[key].values[0]
+        
         
     demand = np.array(list(val["demand_th"].values()))
     sum_demand = sum(demand)
-    demand_neu = demand / sum_demand * float(data4.total_demand.values[0])
+#    print(max(demand / sum_demand))
+    demand_neu = demand / sum_demand * float(data4["Total Demand[ MWh]"].values[0])
     
     
     data["demand_th"] = dict(zip(range(1,len(demand_neu)+1),demand_neu.tolist()))

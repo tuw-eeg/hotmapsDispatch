@@ -34,8 +34,8 @@ def run(data,inv_flag,demand_f=1):
     #%% Sets - TODO: depends on how the input data looks finally
     val = preprocessing(data,demand_f,inv_flag)
         
-    if val == None:
-        return None,None
+    if val == "Error1" or val == "Error2":
+        return (val,None)
     
     m.t = pe.RangeSet(1,8760)
     m.j = pe.Set(initialize = val[0])
@@ -245,18 +245,23 @@ def run(data,inv_flag,demand_f=1):
     m.ramping_j_waste_t = pe.Constraint(m.j_waste,m.t,rule=ramp_j_waste_t_rule)
     
     def renewable_factor_j_rule (m):
+        if (sum(m.rf_j[j] for j in m.j) == 0):
+            return pe.Constraint.Skip
         rule = sum([sum([(m.x_th_jt[j,t]+m.x_el_jt[j,t]) for t in m.t])*m.rf_j[j] for j in m.j]) >=  m.rf_tot * sum([sum([(m.x_th_jt[j,t]+m.x_el_jt[j,t]) for t in m.t])for j in m.j])        
         return rule 
     
     m.renewable_factor = pe.Constraint(rule=renewable_factor_j_rule)
+
         
     #%% Zielfunktion
     def cost_rule(m): 
         if inv_flag:
             c_inv = sum([(m.Cap_j[j] - m.x_th_cap_j[j])  * m.IK_j[j] * m.alpha_j[j] for j in m.j]) + sum([m.Cap_hs[hs]*m.IK_hs[hs]* m.alpha_hs[hs] for hs in m.j_hs])
+            c_op_fix = sum([(m.Cap_j[j]+m.x_th_cap_j[j]) * m.OP_fix_j[j] for j in m.j])
         else:
             c_inv = 0
-        c_op_fix = sum([m.Cap_j[j] * m.OP_fix_j[j] for j in m.j])
+            c_op_fix = sum([m.Cap_j[j] * m.OP_fix_j[j] for j in m.j])
+			
         c_op_var = sum([m.x_th_jt[j,t]* m.OP_var_j[j] for j in m.j for t in m.t])
         c_var= sum([m.mc_jt[j,t] * m.x_th_jt[j,t] for j in m.j for t in m.t  if j not in m.j_chp])  # 
         sv_chp = (m.ratioPMaxFW - m.ratioPMax) / (m.ratioPMax*m.ratioPMaxFW)
