@@ -28,11 +28,11 @@ debug_flag = 0
 
 #%%
 
-def run(data,inv_flag,demand_f=1):
+def run(data,inv_flag,selection=[],demand_f=1):
     #%% Creation of a  Model
     m = pe.AbstractModel()
     #%% Sets - TODO: depends on how the input data looks finally
-    val = preprocessing(data,demand_f,inv_flag)
+    val = preprocessing(data,demand_f,inv_flag,selection)
         
     if val == "Error1" or val == "Error2":
         return (val,None)

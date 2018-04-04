@@ -12,23 +12,20 @@ import json
 import pandas as pd
 import matplotlib.pylab as plt
 from matplotlib.colors import to_hex
-from bokeh.plotting import figure, show, output_file,save,curdoc
-from bokeh.models import ColumnDataSource,Legend,LinearAxis, Range1d,Label,LabelSet, DataTable, DateFormatter, TableColumn,CustomJS
-from bokeh.layouts import widgetbox, gridplot,column,row, layout
-from bokeh.models.widgets import Panel, Tabs, Button
+from bokeh.plotting import figure, show, output_file,save
+from bokeh.models import ColumnDataSource,Legend, DataTable,TableColumn
+from bokeh.layouts import widgetbox, gridplot, layout
+from bokeh.models.widgets import Panel, Tabs
 from bokeh.core.properties import value
 import os
 import itertools
 from math import pi
-import pandas as pd
-from subprocess import call
 import sys
-import pandas as pd
+
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
 if path not in sys.path:
     sys.path.append(path)
-#from FEAT.F16.F_16 import execute 
 #%%
 def get_cmap(n, name='tab20'):
     '''Returns a function that maps each index in 0, 1, ..., n-1 to a distinct 
@@ -87,7 +84,7 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     p = figure(title = decison_var+" ".join(name.split(".")[0].split("_")), 
                x_axis_label = "Time in Hours",
                y_axis_label = "MWh_th",
-               tools = "pan,wheel_zoom,box_zoom,hover,reset,save",
+               tools = "pan,wheel_zoom,box_zoom,reset,save",
                toolbar_sticky = False)
     p.grid.minor_grid_line_color = '#eeeeee'
     
@@ -105,13 +102,7 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     electricity = np.array(dic["Electricity Price"])[t]
     
     heat_p = np.array(dic["Heat Price"])[t]
-#    p.extra_y_ranges = {"2nd": Range1d(start=min(electricity)-1, end=max(electricity)+1)}
-#    line2 = p.line(t,list(electricity),color="blue",line_width=0.5,y_range_name="2nd",muted_alpha=0.2)
-#    line3 = p.line(t,list(heat_p),color="green",line_width=0.5,y_range_name="2nd",muted_alpha=0.2)
-#    p.add_layout(LinearAxis(y_range_name="2nd",axis_label='price in €/MWh'), 'right')
     items = [("Heat Demand",   [line] )]
-#             ("Electricity Price",   [line2] ),
-#             ("Heat Price",   [line3] )]
     for label,glyph in zip(legend,areas):
         items.append((label,[glyph]))
     legend = Legend(items=items,location=(10, 10))
@@ -120,7 +111,6 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     p.legend.click_policy = "hide" # "mute"
     output_file(path2output+r"\\"+decison_var+name)
     p.toolbar.logo = None
-#    save(p)
     
     p2 = figure(x_range=p.x_range,title="Electricity Price",
                 x_axis_label = "Time in Hours",
@@ -134,11 +124,8 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     line3 = p3.line(t,list(heat_p),color="red",line_width=0.5,muted_alpha=0.2)
     p3.toolbar.logo = None
     p3.grid.minor_grid_line_color = '#eeeeee'
-#    s = column(p, p2, p3)
     s = gridplot([[p],[p2],[p3]],plot_width=1000, plot_height=300,
                  toolbar_options=dict(logo=None))
-#    s.toolbar.logo = None
-#    save(s)
     return s
 #%%
 def load_duration_curve(t,dic,y,legend,decison_var,path2output,cmap):
@@ -168,10 +155,7 @@ def load_duration_curve(t,dic,y,legend,decison_var,path2output,cmap):
     
     p.add_layout(legend, 'right')
     p.legend.click_policy = "hide" # "mute"
-#    p.legend.location = "top_left"
-    output_file(path2output+r"\\load_duration_curve.html")
     p.toolbar.logo = None
-#    save(p)
     return p
 #%%
 def pie_chart(dic,path2output,decison_var,cmap): 
@@ -207,7 +191,6 @@ def pie_chart(dic,path2output,decison_var,cmap):
     p.add_layout(legend, 'right')
     p.legend.click_policy = "hide" # "mute"
     output_file(path2output+r"\\"+decison_var+"_pie_chart.html")
-#    save(p)
     return p
 #%%
 def bar_chart(dic,path2output,decison_var,cmap):
@@ -234,8 +217,6 @@ def bar_chart(dic,path2output,decison_var,cmap):
     legend = Legend(items=items,location=(10, 10))    
     p.add_layout(legend, 'right')
     p.legend.click_policy = "mute" # "mute"
-#    output_file(path2output+r"\\"+decison_var+"_absolut_bar_chart.html")
-#    save(p)
     return p
 
 
@@ -250,15 +231,11 @@ def costBarStack_chart(dic,decison_vars,path2output,cmap):
     
     p = figure(x_range=bars, plot_height=400, plot_width=900,
             tools = "pan,wheel_zoom,box_zoom,reset,save")
-#    p.xaxis.visible = False
     p.xgrid.visible = False
     p.grid.minor_grid_line_color = '#eeeeee'
     p.toolbar.logo = None
     p.toolbar_location = None
-    
 
-#    p = figure(x_range=bars, plot_height=250, title="Costs",
-#           toolbar_location=None, tools="")
      
     source = ColumnDataSource(data=data)
     
@@ -272,26 +249,6 @@ def costBarStack_chart(dic,decison_vars,path2output,cmap):
     p.legend[0].plot = None
     p.add_layout(new_legend, 'right')
 
-#    p.vbar_stack(["a"])
-#    
-#    legend = Legend(items=items,location=(10, 10))    
-#    p.add_layout(legend, 'right')
-#    legend = list(dic)
-#    val = list(dic.values())
-#    k = [i for i,x in enumerate(val) if x!=0]
-#    legend= [legend[i] for i in k]
-#    val= [val[i] for i in k]
-#    colors = [cmap[i] for i in legend]
-#    bars = [p.rect(x=5+i*15, y=val[i]/2, width=10, height=val[i], color=colors[i],muted_alpha=0.2) for i in range(len(val))]
-#    text=list(np.round(val,2))
-#    items = []
-#    for name,glyph,label in zip(legend,bars,text):
-#        items.append((name+": "+str(label)+"",[glyph]))
-#    legend = Legend(items=items,location=(10, 10))    
-#    p.add_layout(legend, 'right')
-#    p.legend.click_policy = "mute" # "mute"
-##    output_file(path2output+r"\\"+decison_var+"_absolut_bar_chart.html")
-##    save(p)
     return p
 
 
@@ -305,7 +262,6 @@ def plot_table (decision_vars,dic,path2output):
             val.append(sum(dic[decision_var]))
         else:
             val.append(dic[decision_var])
-#    val = [str(round(dic[decison_var],2)) for decison_var in decision_vars]
     formatted_val = []
     for item in val:
         formatted_val.append("%.3e"%item)
@@ -320,8 +276,6 @@ def plot_table (decision_vars,dic,path2output):
             TableColumn(field="value", title="Value"),
         ]
     data_table = DataTable(source=source, columns=columns, width=800, height=800)
-    output_file(path2output+"\data_table.html") 
-#    save(widgetbox(data_table))
     return widgetbox(data_table)
 
 def plotExtra_table (decision_vars,dic,path2output):   
@@ -331,7 +285,7 @@ def plotExtra_table (decision_vars,dic,path2output):
         if type(dic[decision_var]) == dict:
             formatted_val = []
             for item in list(dic[decision_var].values()):
-                 formatted_val.append("%.3e"%item)
+                formatted_val.append("%.3e"%item)
                 
             line = [[decision_var] + formatted_val]
             data = data + line
@@ -348,11 +302,8 @@ def plotExtra_table (decision_vars,dic,path2output):
 
 #%%
 def tab_panes(path2output,**kwargs):
-#    output_file(path2output+"\output.html",title="Dispatch output")
     tabs = [Panel(child=p, title=name) for name, p in kwargs.items()]
     tabs = Tabs(tabs=tabs)
-#    show(tabs)
-#    save(tabs)
     return tabs
 #%%
 def dic_capitalCosts(dic,decison_var):
@@ -388,8 +339,6 @@ path_parameter2 = path +  r"\AD\F16_input\DH_technology_cost.xlsx"
 #%%
 def plot_solutions(show_plot=False,path2json=path2json):
     try:
-        
-        
         try:
             with open(path2json) as f:
                 dic = json.load(f)
@@ -416,7 +365,6 @@ def plot_solutions(show_plot=False,path2json=path2json):
         y1 = matrix(dic,decison_var,legend,tw)
         y2 = matrix(dic,decison_var,legend,ts)
         y3 = matrix(dic,decison_var,legend,t)
-    #    cmap = colormapping(dic["Technologies"])
         cmap = pickle.load(open(path2output+r"\cmap.spec", "rb"))
         p1 = stack_chart(tw,dic,y1,legend,decison_var,path2output,cmap,"w")
         p2 = stack_chart(ts,dic,y2,legend,decison_var,path2output,cmap,"s")

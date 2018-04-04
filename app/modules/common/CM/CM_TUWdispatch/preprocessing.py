@@ -4,7 +4,6 @@ Created on Tue Jan 23 11:52:40 2018
 
 @author: root
 """
-from time import sleep
 import numpy as np
 
 class SliceMaker(object):
@@ -12,17 +11,12 @@ class SliceMaker(object):
     return item
 
 #TODO: Adapt to real data
-def preprocessing(data, demand_f = 1, inv_flag = 0):  
+def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):  
     
     if inv_flag:
-        select = SliceMaker()     
-        select = select[:]          # [start1:stop1:step1, start2:stop2:step2, ...]
-        if type(select) == tuple:
-            tec = []
-            for s in select: 
-                tec=tec+data["tec"][s]
-        else:
-            tec=data["tec"][select]
+        tec = []
+        for s in selection: 
+            tec.append(data["tec"][s])
     else:
         selection = np.array(list(data["P_th_cap"].values())).nonzero()[0].tolist()
         if not selection:
@@ -31,10 +25,6 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
         tec = []
         for s in selection: 
             tec.append(data["tec"][s])
-#TODO: assign to catagories
-
-    
-    
     j =         tec
     j_hp =      [key for key in tec if "heat pump" in key ]
     j_pth =     [key for key in tec if "Power To Heat" in key]
@@ -44,8 +34,8 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
     j_bp =      [key for key in tec if "boiler" in key]
     j_wh =      [key for key in tec if "Waste Heat" in key]
     j_gt =      [key for key in tec if "Geothermal" in key]
-    j_hs =      ["Heat Storage"]
-    
+    j_hs =      []
+#    j_hs =      ["Heat Storage"]
 
     #%% Parameter - #TODO: depends on how the input data looks finally
     demand_th_t =           data["demand_th"]
@@ -58,17 +48,6 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
     if (max_installed_caps <= max_demad*demand_f) and not inv_flag:
         print("The installed capacities are not enough to cover the load")
         return "Error2"
-#        if [key for key in tec if key in data["tec"][5:6]] == []:
-#            print("There ist no Peak Boiler that could be updated with additional capacity")
-#            return None
-#        print("Additional "+str(round(delta,2))+" MW will be installed to the Peak Boilers")
-#        print("PLease be aware, It can happen that the model can not be solved,")
-#        print("due to the limitations of  other technologies at certain hours or due to certain technology conditions")
-#        sleep(5)
-#        
-#        for key in data["tec"][5:6]:   
-#            if key in tec:
-#                data["P_th_cap"][key] = data["P_th_cap"][key]  + delta
       
     radiation_t =           data["radiation"]
     IK_j =                  {key:data["IK"][key] for key in tec}
@@ -132,7 +111,8 @@ def preprocessing(data, demand_f = 1, inv_flag = 0):
     cap_hs =                10
     c_ramp_chp =            100
     c_ramp_waste =          100
-    alpha_hs =              {"Heat Storage":0}
+    alpha_hs =              {}
+#    alpha_hs =              {"Heat Storage":0}
 
     rf_j = {key:data["RF"][key] for key in tec}
     rf_tot = data["toatl_RF"]
