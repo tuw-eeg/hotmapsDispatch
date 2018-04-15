@@ -59,8 +59,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):
     Q_min_th_chp =          0
     ratioPMaxFW =           450/700
     ratioPMax =             450/820
-
-#XXX: Calculate MC with electricity price from user               
+           
     mc = {}
     for j in data["tec"]:
         if data["n_th"][j]  == 0:

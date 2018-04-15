@@ -4,7 +4,7 @@ Created on Tue Sep 26 11:52:51 2017
 
 @author: root
 """
-#%%ppp
+#%%
 import os
 import sys
 
@@ -25,7 +25,6 @@ def execute(data,inv_flag,selection=[],demand_f=1):
 if __name__ == "__main__":
     print('calculation started')   
     data,inv_flag = load_data()   
-#    val = preprocessing(data,1,inv_flag)
     solutions,instance,results = execute(data,True,selection=[10])
     if solutions == "Error1":
         print( 'No Capacities installed !!!')

@@ -21,7 +21,7 @@ import os
 import itertools
 from math import pi
 import sys
-
+#%%
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
 if path not in sys.path:
@@ -33,11 +33,50 @@ def get_cmap(n, name='tab20'):
     return plt.cm.get_cmap(name, n)
 #%%
 def colormapping(tec):
+    """
+    This function returns a dictionary whoes keys are the name of the tec-list 
+    and its entries are colors specified in HEX format
+    Default colors are from matplotlibs "tab20" colormaps. 
+    
+    Parameters:
+        tec:    list
+                list entries are keys of colormap
+    Returns:
+        colormap:   dict
+                    This will be the dictionary each tec entry is associated 
+                    with a HEX-color
+    Example:
+        colormapping( ["a",1,"b",2] )
+        returns:
+            {1: '#d62728', 2: '#9edae5', 'a': '#1f77b4', 'b': '#f7b6d2'}
+    """
     colors = get_cmap(len(tec))
     color_map = {val:to_hex(colors(i)) for i,val in enumerate(tec)}
     return color_map
 #%%
 def matrix(dic,decison_var,legend,t):
+    """
+    This function return a matrix (numpy array) that contains the data from 
+    the dic[decison_var], each row of the matrix represent the data from a list 
+    entry of legend (i.e. Technology).
+    
+    Parameters:
+        dic:            dict
+                        Dictionary which contains the solution from the model
+                        
+        decison_var:    string
+                        Decciosn variable that should be analyzed from the 
+                        solution
+         
+        legend:         list  (N)-length
+                        contains the list of technologies:
+        
+        t:              list (T)-length  
+                        contains a list of integer, represent a time view 
+                        matrix show the data of this time interval
+    Returns:
+        matrix:     numpy_array  (N,T)-shape
+    """
     y = np.array(dic[decison_var][legend[0]])[t]
     for val_ind in legend[1:]:
         y=np.row_stack((y,np.array(dic[decison_var][val_ind])[t]))
@@ -46,6 +85,31 @@ def matrix(dic,decison_var,legend,t):
     return y 
 #%%
 def create_patch_coordinates(sorted_values,t):
+    """
+    This function returns two lists (x and y).
+    The lists contain the coordinates for the polygons to draw the stackplot.
+    
+    Parameters:
+        sorted_values:      numpy_array (N,T)-shape
+                            sorted matrix by marginal costs of the technologies
+                            
+        
+        t:                  range (T)-legth
+                            This represent the time w
+        
+    Results:
+        x_extended:         list (N,t)-legth 
+                            This contains a list of N-lists , 
+                            each list represent the x coordinates of N-th polygon
+                            and has T-entries 
+                            
+        
+        
+        y_extended:         list (N,t)-legth
+                            This contains a list of N-lists , 
+                            each list represent the y coordinates of N-th polygon
+                            and has T-entries 
+    """
     area = np.zeros(sorted_values.shape)
     for i,y in enumerate(sorted_values):
         if i!=0:
@@ -56,6 +120,7 @@ def create_patch_coordinates(sorted_values,t):
     front = np.append(np.array([0]),area[:-1,0]).reshape(area.shape[0],1)
     back = np.append(np.array([0]),area[:-1,-1]).reshape(area.shape[0],1)
     area = np.hstack((front,area,back))
+    
     t = list(t)
     t.insert(0,t[0])
     t.append(t[-1])
@@ -72,10 +137,62 @@ def create_patch_coordinates(sorted_values,t):
         else:
             y_extended[i] = y[i]
             x_extended[i] = x[i]
-            
     return x_extended,y_extended
 #%%
 def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
+    """
+    This function returns a bokeh gridplot, with three collumns. 
+    
+    -   The first column contains a bokeh figure of the Thermal Generation Mix
+        It is represented by a stackplot, that is sorted by the marginal costs 
+        of the technologies
+        This figure has also an interactive legend. 
+        i.e: by clicking you can hide or show the lines and areas 
+
+    -   The second column contains a bokeh figure of the electricity price 
+        represented by a line
+        
+    -   The third column contains a bokeh figure of the heat price 
+        represented by a line
+
+    All figures share the same x-axes, i.e: zooming the x-axes of one figure 
+                                            effects also the other figures
+    
+    Parameters:
+        t:              range
+                        change this paramter to change the time view that the 
+                        figure show
+                        i.e.: slices in the interval [0,8760] can be selected
+                        
+        dic:            dict
+                        Dictionary that contains the solution of the model
+                        
+        y:              numpy_array  (N,T)-shape
+                        This contain the data that will represented by the first 
+                        collumn as a stackplot
+                        
+        legend:         list
+                        This contains a list of the names of the technologies
+                        
+        decison_var:    string
+                        Decciosn variable that should be analyzed from the 
+                        solution
+                        
+        path2output:    string
+                        path where the gridplot should be saved (obsolete)
+        
+        cmap:           dict
+                        colormaping table to assign each techology (entry of legend)
+                        to a color
+                        
+        flag:           string
+                        a file name for the output plot (obsolete)
+                        "s"..."_summer.html"
+                        "w"..."_winter.html"
+                        else "_over_year.html"
+    Returns:
+        gridplot:       bokeh.layouts.gridplot                       
+    """
     name = "_over_year.html"
     if flag =="s":
         name= "_summer.html"
@@ -129,6 +246,41 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     return s
 #%%
 def load_duration_curve(t,dic,y,legend,decison_var,path2output,cmap):
+    """
+    This function returns a bokeh figure with the load duration curve
+    (areas are sorted by marginal costs). 
+    This figure has also an interactive legend. 
+    i.e: by clicking you can hide or show the areas of the clicked technologies 
+    
+    Parameters:
+        t:              range
+                        change this paramter to change the time view that the 
+                        figure show
+                        i.e.: slices in the interval [0,8760] can be selected
+                        
+        dic:            dict
+                        Dictionary that contains the solution of the model
+                        
+        y:              numpy_array  (N,T)-shape
+                        This contain the data that will represented by the first 
+                        collumn as a stackplot
+                        
+        legend:         list
+                        This contains a list of the names of the technologies
+                        
+        decison_var:    string
+                        Decciosn variable that should be analyzed from the 
+                        solution
+                        
+        path2output:    string
+                        path where the figure should be saved (obsolete)
+        
+        cmap:           dict
+                        colormaping table to assign each techology (entry of legend)
+                        to a color
+    Returns:
+        figure:       bokeh.plotting.figure                       
+    """
     p = figure(title = "Load Duration Curve", 
            x_axis_label = "Time in Hours",
            y_axis_label = "MWh_th",
@@ -158,7 +310,29 @@ def load_duration_curve(t,dic,y,legend,decison_var,path2output,cmap):
     p.toolbar.logo = None
     return p
 #%%
-def pie_chart(dic,path2output,decison_var,cmap): 
+def pie_chart(dic,path2output,decison_var,cmap):
+    """
+    This function returns a bokeh figure that shows the data from 
+    dic[decison_var] as a pie chart.
+    This figure has also an interactive legend. 
+    i.e: by clicking you can hide or show the areas of the clicked technologies 
+        
+    Parameters:
+        dic:            dict
+                        Dictionary that contains the solution of the model
+                        
+        path2output:    string
+                        path where the figure should be saved (obsolete)     
+                        
+        decison_var:    string
+                        Decciosn variable that should be analyzed from the 
+                        solution      
+                        
+        cmap:           dict
+                        colormaping table to assign each techology to a color
+    Returns:
+        pie_chart:      bokeh.plotting.figure
+    """
     p = figure(title = decison_var,
        plot_width=700, 
        plot_height=400)
@@ -194,6 +368,28 @@ def pie_chart(dic,path2output,decison_var,cmap):
     return p
 #%%
 def bar_chart(dic,path2output,decison_var,cmap):
+    """
+    This function returns a bokeh figure that shows the data from 
+    dic[decison_var] as a bar chart.
+    This figure has also an interactive legend. 
+    i.e: by clicking you can hide or show the bars of the clicked technologies 
+        
+    Parameters:
+        dic:            dict
+                        Dictionary that contains the solution of the model
+                        
+        path2output:    string
+                        path where the figure should be saved (obsolete)     
+                        
+        decison_var:    string
+                        Decciosn variable that should be analyzed from the 
+                        solution      
+                        
+        cmap:           dict
+                        colormaping table to assign each technology to a color
+    Returns:
+        bar_chart:      bokeh.plotting.figure
+    """
     p = figure(title = decison_var,
            plot_width=700, 
            plot_height=400,
@@ -221,6 +417,31 @@ def bar_chart(dic,path2output,decison_var,cmap):
 
 
 def costBarStack_chart(dic,decison_vars,path2output,cmap):
+    """
+    This function returns a bokeh figure that shows the costs as a bar chart.
+    Follwing costs are shown:
+        - Anual Investment Cost
+        - Anual Investment Cost (of existing power plants)
+        - Operational Cost
+        - Fuel Costs
+        - Revenue From Electricity
+        
+    Parameters:
+        dic:            dict
+                        Dictionary that contains the solution of the model
+                        
+        path2output:    string
+                        path where the figure should be saved (obsolete)     
+                        
+        decison_var:    list
+                        Each list entry is a decison variable that should be 
+                        analyzed from the solution        
+                        
+        cmap:           dict
+                        colormaping table to assign each technology to a color
+    Returns:
+        bar chart:      bokeh.plotting.figure
+    """
     data = {x: [dic["Anual Investment Cost"][x]+dic["Anual Investment Cost (of existing power plants)"][x],
                 dic["Operational Cost"][x],
                  dic["Fuel Costs"][x], 
@@ -236,7 +457,6 @@ def costBarStack_chart(dic,decison_vars,path2output,cmap):
     p.toolbar.logo = None
     p.toolbar_location = None
 
-     
     source = ColumnDataSource(data=data)
     
     p.vbar_stack(dic["Technologies"], x='bars', width=0.9, color=[cmap[x] for x in dic["Technologies"]], 
@@ -253,7 +473,25 @@ def costBarStack_chart(dic,decison_vars,path2output,cmap):
 
 
 #%%
-def plot_table (decision_vars,dic,path2output):   
+def plot_table (decision_vars,dic,path2output):
+    """
+    This function returns a widgetbox that contains a table with some results 
+    defined in decision_vars
+    
+    Parameters:
+        decison_var:        list
+                            Each list entry is a decison variable that should 
+                            be analyzed from the solution  
+                            
+        dic:                dict
+                            Dictionary that contains the solution of the model
+                            
+        path2output:        string
+                            path where the widgetbox should be saved (obsolete)
+                            
+    Results:
+        table:              bokeh.layouts.widgetbox
+    """
     val = []
     for decision_var in decision_vars:
         if type(dic[decision_var]) == dict:
@@ -278,7 +516,25 @@ def plot_table (decision_vars,dic,path2output):
     data_table = DataTable(source=source, columns=columns, width=800, height=800)
     return widgetbox(data_table)
 
-def plotExtra_table (decision_vars,dic,path2output):   
+def plotExtra_table (decision_vars,dic,path2output): 
+    """
+    This function returns a widgetbox that contains a table with the costs of 
+    each technology
+    
+    Parameters:
+        decison_var:        list
+                            Each list entry is a decison variable that should 
+                            be analyzed from the solution  
+                            
+        dic:                dict
+                            Dictionary that contains the solution of the model
+                            
+        path2output:        string
+                            path where the widgetbox should be saved (obsolete)
+                            
+    Results:
+        table:              bokeh.layouts.widgetbox
+    """
     data = []
     line =[]
     for decision_var in decision_vars:
@@ -297,23 +553,45 @@ def plotExtra_table (decision_vars,dic,path2output):
     columns = column0+columns
     
     data_table = DataTable(source=source, columns=columns, width=800, height=800)
-    output_file(path2output+"\data_table.html") 
+#    output_file(path2output+"\data_table.html") 
     return widgetbox(data_table)
 
 #%%
 def tab_panes(path2output,**kwargs):
+    """
+    This function returns a Tabs-Panel that collects bokeh widgets,figures etc.
+
+    Parameters:
+        kwargs:             dict
+                            {name of tab: content of tab}
+                            This is a dictionary: each key is the name of
+                            the tab that is shown and the value is a bokeh figure 
+                            bokeh widget or bokeh layout. 
+        
+        path2output:        string
+                            path where the tabs should be saved (obsolete)                     
+    Results:
+        Tabs:               bokeh.models.widgets.panels.Tabs
+    """
     tabs = [Panel(child=p, title=name) for name, p in kwargs.items()]
     tabs = Tabs(tabs=tabs)
-    return tabs
-#%%
-def dic_capitalCosts(dic,decison_var):
-    out_dic = {}
-    return out_dic
-       
+    return tabs     
 
 #%% 
 def strFormat(i,s):
+    """
+    Description
     
+    Parameters:
+        i:                  float          
+            
+            
+        s:                  string
+            
+            
+    Results
+        formated_string:    string
+    """
     if abs(i) > 10**12:
         prefix = 'k'
         i = i/10**12
@@ -330,7 +608,7 @@ def strFormat(i,s):
     i =  "{0:.2f}".format(round(i,2))
     return i+' '+prefix+s
 
-#%%
+#%% Setting Global default paramters and default paths
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
 path2json = path+r"\AD\F16_input\Solution\solution.json"
@@ -338,6 +616,127 @@ path2output = path+r"\AD\F16_input\Output_Graphics"
 path_parameter2 = path +  r"\AD\F16_input\DH_technology_cost.xlsx"
 #%%
 def plot_solutions(show_plot=False,path2json=path2json):
+    """
+    This function geneartes a HTML file representeing the results of the model
+    and saves it in "\AD\F16_input\Output_Graphics" as "output.html". 
+
+    If <show_plot> is True then the function shows the output in the browser.
+    If <show_plot> is False then the function returns the tabs with the output.
+    
+    The output contains seven tabs:
+        - Tab1: 
+            Name:       Thermal Power Energymix (TPE)
+            Content:    Three rows with three bokeh glyphs. All figures share 
+                        the same x-axes, i.e: zooming the x-axes of one figure 
+                        effects also the other figures
+                        
+                            - row1: a stackplot of the geneartion mix of the 
+                                    whole year t=[0 8760)
+                                    This figure has also an interactive legend. 
+                                    i.e: by clicking you can hide or show the 
+                                          areas of the clicked technologies  
+                                          
+                            - row2: a lineplot of the electricity price over 
+                                    a whole year t=[0 8760)
+                                    
+                            - row3: a lineplot of the heat price over 
+                                    a whole year t=[0 8760)                        
+        - Tab2: 
+            Name:       TPE Winter
+            Content:    Three rows with three bokeh glyphs. All figures share 
+                        the same x-axes, i.e: zooming the x-axes of one figure 
+                        effects also the other figures
+                        
+                            - row1: a stackplot of the geneartion mix over a
+                                    slected time horizon t=[0 350)
+                                    This figure has also an interactive legend. 
+                                    i.e: by clicking you can hide or show the 
+                                          areas of the clicked technologies  
+                                          
+                            - row2: a lineplot of the electricity price over 
+                                    slected time horizont=[0 350)
+                                    
+                            - row3: a lineplot of the heat price over 
+                                    slected time horizonr t=[0 350)               
+        - Tab3: 
+            Name:       TPE Summer
+            Content:    Three rows with three bokeh glyphs. All figures share 
+                        the same x-axes, i.e: zooming the x-axes of one figure 
+                        effects also the other figures
+                        
+                            - row1: a stackplot of the geneartion mix over a
+                                    slected time horizon t=[3750 3987)
+                                    This figure has also an interactive legend. 
+                                    i.e: by clicking you can hide or show the 
+                                          areas of the clicked technologies  
+                                          
+                            - row2: a lineplot of the electricity price over 
+                                    slected time horizon t=[3750 3987)
+                                    
+                            - row3: a lineplot of the heat price over 
+                                    slected time horizonr t=[3750 3987)             
+        - Tab4: 
+            Name:       Load Duration Curve 
+            Content:    Shows the Load Duration Curve as a sorted (by marginal
+                        costs) stackplot with an interactive legend          
+        - Tab5: 
+            Name:       TPE and Plant Capatcities
+            Content:    shows the Thermal Generation Mix as a pie chart and bar
+                        chart (first column) and  shows also the installed 
+                        capacities as a pie chart and bar chart (second column)
+                        All figures have an interactive legend 
+        - Tab6: 
+            Name:       Specific Capital Costs of IC
+            Content:    Shows a bar chart and an table of the costs for each 
+                        technology.Follwing costs are shown:
+                            - Anual Investment Cost
+                            - Anual Investment Cost (of existing power plants)
+                            - Operational Cost
+                            - Fuel Costs
+                            - Revenue From Electricity
+        - Tab7: 
+            Name:       Results
+            Content:    Shows a table with specific results:
+                            - Anual Total Costs
+                            - Anual Total Costs (with costs of existing power
+                                                   plants)
+                            - Electricity Production by CHP
+                            - Thermal Production by CHP
+                            - Mean Value Heat Price
+                            - Mean Value Heat Price (with costs of existing 
+                                                      power plants)
+                            - Median Value Heat Price
+                            - Electrical Consumption of Heatpumps and Power to 
+                              Heat devices
+                            - Maximum Electrical Load of Heatpumps and Power to 
+                              Heat devices
+                            - Revenue From Electricity
+                            - Ramping Costs
+                            - Operational Cost
+                            - Anual Investment Cost
+                            - Anual Investment Cost (of existing power plants)
+                            - Electrical Peak Load Costs
+                            - Variable Cost CHP's
+                            - Fuel Costs                       
+    
+    Parameters:
+        show_plot:      bool
+                        determines if the function should show the output in 
+                        the broswer.
+                            True... function returns nothing but shows the 
+                                    results(Tabs) in the browser
+                            False...function returns the results(Tabs) 
+                            
+                        default:    False 
+                                 
+        path2json:      string
+                        Path to JSON-File that contain the solution of the model
+                        default:    "\AD\F16_input\Solution\solution.json"
+    Returns:
+        results:       bokeh.models.widgets.panels.Tabs  if show_plot=False
+                       < nothing  if show_plot=True >
+                       < Error4 > if an error occure >                    
+    """
     try:
         try:
             with open(path2json) as f:
@@ -424,4 +823,8 @@ def plot_solutions(show_plot=False,path2json=path2json):
     except:
         return "Error4"
 #%%
-#plot_solutions(show_plot=True)            
+if __name__ == "__main__":
+    print('Plot Results...')
+    plot_solutions(show_plot=True)    
+    print('Plot Results done')
+        

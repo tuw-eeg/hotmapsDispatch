@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from bokeh.application.handlers import FunctionHandler
 from bokeh.application import Application
-from bokeh.layouts import widgetbox,layout,row
+from bokeh.layouts import widgetbox,layout,row,column
 from bokeh.models import ColumnDataSource,TableColumn,DataTable,CustomJS,TextInput
 from bokeh.server.server import Server
 from bokeh.models.widgets import Panel, Tabs, Button,Div,Toggle,Select
@@ -28,7 +28,7 @@ from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
 import CM.CM_TUWdispatch.run_cm as dispatch
 
 
-#%%
+#%% Setting Global default paramters and default paths
 path_parameter = path+r"\AD\F16_input\DH_technology_cost.xlsx"
 path2data = path+r"\AD\F16_input"
 path_download_js = "download.js"
@@ -40,19 +40,14 @@ path_spinner_html = "spinner2.html"
 def invert_dict(d):
     return dict([ (v, k) for k, v in d.items() ])
 
-cty = pickle.load(open(path2data+r"\cnty_map.dat","rb"))
-cty_inv = invert_dict(cty)
+price_name_map = pickle.load(open(path2data+r"\price_name_map.dat","rb"))
+price_name_map_inv = invert_dict(price_name_map)
+
+load_name_map = pickle.load(open(path2data+r"\load_name_map.dat","rb"))
+load_name_map_inv = invert_dict(load_name_map)
 
 load_profiles = pickle.load(open(path2data+r"\load_profiles.dat","rb"))
 prices = pickle.load(open(path2data+r"\prices.dat","rb"))
-
-
-cty_loads = [cty[i[0]]+"-"+str(i[1]) for i in list(load_profiles)]
-cty_loads = list(set(cty_loads))
-
-cty_prices = [cty[i[0]]+"-"+str(i[1]) for i in list(prices)]
-cty_prices = list(set(cty_prices))
-
 
 #%%
 io_loop = IOLoop.current()
@@ -88,19 +83,19 @@ def execute(data,inv_flag,selection=[],demand_f=1):
     val = dispatch.main(data,inv_flag,selection,demand_f) 
     return val
 
-def drop_down(dic):
-    options =  list(set([cty[i[0]]+"-"+str(i[1]) for i in list(dic)]))
-    return Select(title="Country-Year:", value="Wien-2016", options=options)
+def drop_down(dic,map_dic):
+    options =  list(set([map_dic[i[0]]+"_"+str(i[1]) for i in list(dic)]))
+    return Select(title="Country-Year:", value="Wien_2016", options=options)
 
-def cds(dd,dic):
-    c,y = dd.value.split("-")
-    y = dic[cty_inv[c],int(y)]
+def cds(dd,dic,map_dic_inv):
+    c,y = dd.value.split("_")
+    y = dic[map_dic_inv[c],int(y)]
     x = np.arange(len(y))
     return ColumnDataSource(data=dict(x=x, y=y))
 
-def init_load(select_load,data_table_data,load_profiles,source_load):
-    c,year = select_load.value.split("-")
-    y = float(data_table_data.source.data[parameter_list[3]][0])*load_profiles[cty_inv[c],int(year)]
+def init_load(select_load,data_table_data,load_profiles,source_load,map_dic_inv):
+    c,year = select_load.value.split("_")
+    y = float(data_table_data.source.data[parameter_list[3]][0])*load_profiles[map_dic_inv[c],int(year)]
     x = np.arange(len(y))
     source_load.data = dict(x=x, y=y)
     
@@ -131,9 +126,9 @@ def modify_doc(doc):
 
         
         
-    select_load = drop_down(load_profiles)
-    source_load = cds(select_load,load_profiles)
-    init_load(select_load,data_table_data,load_profiles,source_load)
+    select_load = drop_down(load_profiles,load_name_map)
+    source_load = cds(select_load,load_profiles,load_name_map)
+    init_load(select_load,data_table_data,load_profiles,source_load,load_name_map_inv)
     
     
     plot_load = figure(tools="pan,wheel_zoom,box_zoom,reset,save")
@@ -142,8 +137,8 @@ def modify_doc(doc):
     
     def load_callback(attrname, old, new):
         global f
-        c,year = new.split("-")
-        y = float(data_table_data.source.data[parameter_list[3]][0])*load_profiles[cty_inv[c],int(year)]
+        c,year = new.split("_")
+        y = float(data_table_data.source.data[parameter_list[3]][0])*load_profiles[load_name_map_inv[c],int(year)]
         x = np.arange(len(y))
         f = max(y / sum(y))
         source_load.data = dict(x=x, y=y)
@@ -162,21 +157,21 @@ def modify_doc(doc):
     select_load.on_change('value', load_callback)
     
     
-    select_price = drop_down(prices)
-    source_price = cds(select_price,prices)
+    select_price = drop_down(prices,price_name_map)
+    source_price = cds(select_price,prices,price_name_map)
     plot_price = figure(tools="pan,wheel_zoom,box_zoom,reset,save")
     plot_price.line('x', 'y', source=source_price, line_alpha=0.6)
     plot_price.toolbar.logo = None
     def price_callback(attrname, old, new):
-        c,year = new.split("-")
-        y = prices[cty_inv[c],int(year)]
+        c,year = new.split("_")
+        y = prices[price_name_map_inv[c],int(year)]
         x = np.arange(len(y))
         source_price.data = dict(x=x, y=y)
             
     select_price.on_change('value', price_callback)
     
-    row_load = row(widgetbox(select_load),plot_load)
-    row_price = row(widgetbox(select_price),plot_price)
+    row_load = column(children=[widgetbox(select_load),plot_load])
+    row_price = column(widgetbox(select_price),plot_price)
         
     dic = {"Parameter for Powerplants":data_table,
            "parameters":data_table_data,
@@ -216,8 +211,8 @@ def modify_doc(doc):
         print('calculation started...')
         data,_ = load_data()
         
-        _c,_year = select_price.value.split("-")
-        _y = prices[cty_inv[_c],int(_year)]
+        _c,_year = select_price.value.split("_")
+        _y = prices[price_name_map_inv[_c],int(_year)]
         _x = np.arange(1,len(_y)+1)
         elec = dict(zip(_x,_y))
         
@@ -233,8 +228,8 @@ def modify_doc(doc):
         data_data = data_data.fillna(0)
         
 #        demand = np.array(list(data["demand_th"].values()))
-        _c,_year = select_load.value.split("-")
-        demand = load_profiles[cty_inv[_c],int(_year)]
+        _c,_year = select_load.value.split("_")
+        demand = load_profiles[load_name_map_inv[_c],int(_year)]
         sum_demand = sum(demand)
  
         demand_neu = demand / float(sum_demand) * float(data_data[parameter_list[3]].values[0])
@@ -365,8 +360,8 @@ def modify_doc(doc):
     
 #    _val = pickle.load(open(path2data+r"\data.dat", "rb"))
 #    _demand = np.array(list(_val["demand_th"].values()))
-    _c,_year = select_load.value.split("-")
-    _demand = load_profiles[cty_inv[_c],int(_year)]
+    _c,_year = select_load.value.split("_")
+    _demand = load_profiles[load_name_map_inv[_c],int(_year)]
     _sum_demand = sum(_demand)
     f = max(_demand / _sum_demand)
     _val =  f * float(data_data[parameter_list[3]].values[0])
@@ -384,8 +379,8 @@ def modify_doc(doc):
     
     def data_data_callback(attr, old, new):
         
-        c,year = select_load.value.split("-")
-        y = float(new[parameter_list[3]][0])*load_profiles[cty_inv[c],int(year)]
+        c,year = select_load.value.split("_")
+        y = float(new[parameter_list[3]][0])*load_profiles[load_name_map_inv[c],int(year)]
         x = np.arange(len(y))
         source_load.data = dict(x=x, y=y)
         f = max(y / sum(y))
