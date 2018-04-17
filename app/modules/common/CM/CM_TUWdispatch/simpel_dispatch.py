@@ -15,19 +15,10 @@ path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
 if path not in sys.path:
     sys.path.append(path)
 from CM.CM_TUWdispatch.preprocessing import preprocessing
-#
+
 #import logging
 #logging.getLogger('pyomo.core').setLevel(logging.ERROR)
     
-#%%
-
-# heat demand scale factor
-#demand_f =  1
-# debug flag for 
-debug_flag = 0
-
-#%%
-
 def run(data,inv_flag,selection=[],demand_f=1):
     #%% Creation of a  Model
     m = pe.AbstractModel()
@@ -71,8 +62,7 @@ def run(data,inv_flag,selection=[],demand_f=1):
     m.el_surcharge = pe.Param(m.j,initialize=val[27])  # Taxes for electricity price
     m.ir = pe.Param(initialize=val[28])
     m.alpha_j = pe.Param(m.j,initialize=val[29])
-    
-    
+       
     m.load_cap_hs  = pe.Param(m.j_hs,initialize=val[30])   
     m.unload_cap_hs  = pe.Param(m.j_hs,initialize=val[31])
     m.n_hs = pe.Param(m.j_hs,initialize=val[32])
@@ -83,7 +73,6 @@ def run(data,inv_flag,selection=[],demand_f=1):
     m.c_ramp_waste = pe.Param(initialize=val[37])
     m.alpha_hs = pe.Param(m.j_hs,initialize=val[38])
     
-
     m.rf_j = pe.Param(m.j,initialize=val[39])
     m.rf_tot = pe.Param(initialize=val[40])
     m.OP_var_j = pe.Param(m.j,initialize=val[41])
@@ -125,8 +114,6 @@ def run(data,inv_flag,selection=[],demand_f=1):
         #% ToDo: Define upper bound
         if inv_flag:
             rule = m.Cap_j[j]  <= demand_f*max_demad
-        elif debug_flag:
-            rule = m.Cap_j[j]  == m.pot_j[j]
         else:
             rule = m.Cap_j[j] == m.x_th_cap_j[j]
         return rule 
@@ -203,32 +190,45 @@ def run(data,inv_flag,selection=[],demand_f=1):
         return rule 
     m.chp_geneartion_restriction3_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction3_jt_rule) 
     
-    # The heat storage level results from the previous state from the loading and unloading, minus the losses of the memory.
+    # The heat storage level = old_level + pumping  - turbining
     def storage_state_hs_t_rule(m,hs,t):
         if t == 1:
             return m.store_level_hs_t[hs,t] == 0
         elif t == 8760:
             return m.store_level_hs_t[hs,t] == 0
         else:
-            return m.store_level_hs_t[hs,t] == m.store_level_hs_t[hs,t-1] - m.x_unload_hs_t[hs,t-1] + m.x_load_hs_t[hs,t-1]*m.n_hs[hs] - m.store_level_hs_t[hs,t-1] * m.loss_hs[hs]
+            return m.store_level_hs_t[hs,t] == m.store_level_hs_t[hs,t-1] - m.x_unload_hs_t[hs,t]/m.loss_hs[hs] + m.x_load_hs_t[hs,t-1]*m.n_hs[hs] 
     m.storage_state_hs_t = pe.Constraint(m.j_hs,m.t,rule=storage_state_hs_t_rule) 
     
     # The storage_level is restricted by the installed capcities 
     def storage_state_capacity_restriction_hs_t_rule(m,hs,t):
         if inv_flag:
-            return m.store_level_hs_t[hs,t] <= m.Cap_hs[hs]
+            return m.store_level_hs_t[hs,t] <= (m.Cap_hs[hs] - m.cap_hs[hs])
         else:
-            return m.Cap_hs[hs] == m.cap_hs[hs]
+            return m.store_level_hs_t[hs,t] <= m.cap_hs[hs]
     m.storage_state_capacity_restriction_hs_t = pe.Constraint(m.j_hs,m.t,rule=storage_state_capacity_restriction_hs_t_rule)
     
-    # The discharge and charge amounts are limited by the installed capacity of the storage.
+#    def storage_cap_restriction_hs_rule(m,hs):
+#        if not inv_flag:
+#            return m.Cap_hs[hs] == m.cap_hs[hs]
+#    m.storage_cap_restriction_hs = pe.Constraint(m.j_hs,rule=storage_cap_restriction_hs_rule)
+    
+    # The discharge and charge amounts are limited 
     def load_hs_t_restriction_rule (m,hs,t):
         return m.x_load_hs_t[hs,t] <= m.load_cap_hs[hs]
     m.load_hs_t_restriction = pe.Constraint(m.j_hs,m.t,rule=load_hs_t_restriction_rule)
     
-    def unload_hs_t_restriction_rule (m,hs,t):
-        return m.x_unload_hs_t[hs,t] <= m.unload_cap_hs[hs]
-    m.unload_hs_t_restriction = pe.Constraint(m.j_hs,m.t,rule=unload_hs_t_restriction_rule)
+    def unload_hs_t_restriction_rule (m,hs,t,flag):
+        
+        if flag:
+            return m.x_unload_hs_t[hs,t] <= m.unload_cap_hs[hs]
+        else:
+            if t == 1:
+                return m.x_unload_hs_t[hs,t] <= m.store_level_hs_t[hs,t]              
+            else:
+                return m.x_unload_hs_t[hs,t] <= m.store_level_hs_t[hs,t-1] 
+
+    m.unload_hs_t_restriction = pe.Constraint(m.j_hs,m.t,[True,False],rule=unload_hs_t_restriction_rule)
     #%
     def ramp_j_chp_t_rule (m,j,t):
         if t==1:
@@ -256,7 +256,7 @@ def run(data,inv_flag,selection=[],demand_f=1):
     #%% Zielfunktion
     def cost_rule(m): 
         if inv_flag:
-            c_inv = sum([(m.Cap_j[j] - m.x_th_cap_j[j])  * m.IK_j[j] * m.alpha_j[j] for j in m.j]) + sum([m.Cap_hs[hs]*m.IK_hs[hs]* m.alpha_hs[hs] for hs in m.j_hs])
+            c_inv = sum([(m.Cap_j[j] - m.x_th_cap_j[j])  * m.IK_j[j] * m.alpha_j[j] for j in m.j]) + sum([(m.Cap_hs[hs] - m.cap_hs[hs])*m.IK_hs[hs]* m.alpha_hs[hs] for hs in m.j_hs])
             c_op_fix = sum([(m.Cap_j[j]+m.x_th_cap_j[j]) * m.OP_fix_j[j] for j in m.j])
         else:
             c_inv = 0
@@ -270,7 +270,9 @@ def run(data,inv_flag,selection=[],demand_f=1):
         c_ramp = sum ([m.ramp_j_waste_t[j,t] * m.c_ramp_waste for j in m.j_waste for t in m.t]) + sum ([m.ramp_j_chp_t[j,t] * m.c_ramp_chp for j in m.j_chp for t in m.t])
         c_tot = c_inv + c_var + c_op_fix + c_op_var + c_peak_el + c_ramp
  
-        rev_tot = sum([m.x_el_jt[j,t]*(m.electricity_price_t[t]) for j in m.j for t in m.t])
+        rev_gen_electricity = sum([m.x_el_jt[j,t]*(m.electricity_price_t[t]) for j in m.j for t in m.t])
+        rev_storage = sum([(m.x_unload_hs_t[hs,t] - m.x_load_hs_t[hs,t])*(m.electricity_price_t[t])  for hs in m.j_hs for t in m.t])
+        rev_tot = rev_gen_electricity + rev_storage
         
         rule = c_tot - rev_tot
         return rule

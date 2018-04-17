@@ -232,13 +232,13 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     p2 = figure(x_range=p.x_range,title="Electricity Price",
                 x_axis_label = "Time in Hours",
                 y_axis_label = "€/MWh",)
-    line2 = p2.line(t,list(electricity),color="blue",line_width=0.5,muted_alpha=0.2)
+    line2 = p2.line(t,list(electricity),color="#2171b5",line_width=0.5,muted_alpha=0.2)
     p2.toolbar.logo = None
     p2.grid.minor_grid_line_color = '#eeeeee'
     p3 = figure(x_range=p.x_range,y_range=(np.min(heat_p)-1,np.percentile(heat_p, 90)+1),title="Heat Price",
                 x_axis_label = "Time in Hours",
                 y_axis_label = "€/MWh_th",)
-    line3 = p3.line(t,list(heat_p),color="red",line_width=0.5,muted_alpha=0.2)
+    line3 = p3.line(t,list(heat_p),color="#cb181d",line_width=0.5,muted_alpha=0.2)
     p3.toolbar.logo = None
     p3.grid.minor_grid_line_color = '#eeeeee'
     s = gridplot([[p],[p2],[p3]],plot_width=1000, plot_height=300,

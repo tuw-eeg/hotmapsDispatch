@@ -113,7 +113,7 @@ def load_data():
             the keys of the dictionarys are as as follows generated:
                 ( shorthand symbol <string> , year <int> ), i.e: ("UK",2012)
             
-            in order to distungish between the symbols, each file as a 
+            in order to distungish between the symbols, each file has a 
             mapping table that are established also as "dat" Files: 
               i.e:    1. load_name_map.dat
                       2. price_name_map.dat
@@ -140,7 +140,10 @@ def load_data():
     data1 = data1.set_index("tec").to_dict()
     data2 = pd.read_excel(path_parameter,"prices and emmision factors",skiprows=[1]).fillna(0).set_index("energy_carrier").to_dict()
     data3 = pd.read_excel(path_parameter,"financal and other parameteres",skiprows=[1]).fillna(0).to_dict("records")[0]
-    data = {**data1, **data2,**data3}
+    data_hs = pd.read_excel(path_parameter,"Heat Storage",skiprows=[1]).fillna(0)
+    tec_hs = list(data_hs.hs_name.values)
+    data_hs = data_hs.set_index("hs_name").to_dict()
+    data = {**data1, **data2,**data3, **data_hs}
     
     # Load user input form "\FEAT\F16\input.xlsx"
     try:
@@ -169,6 +172,7 @@ def load_data():
     data["temp"] = return_dict("temperature_profile")
     data["energy_carrier_prices"]["electricity"] = return_dict("prices")
     data["tec"] = tec
+    data["tec_hs"] = tec_hs
     
     # Set investment flag
     inv_flag = 0

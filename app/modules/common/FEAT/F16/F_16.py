@@ -25,7 +25,7 @@ def execute(data,inv_flag,selection=[],demand_f=1):
 if __name__ == "__main__":
     print('calculation started')   
     data,inv_flag = load_data()   
-    solutions,instance,results = execute(data,True,selection=[10])
+    solutions,instance,results = execute(data,inv_flag,selection=[])
     if solutions == "Error1":
         print( 'No Capacities installed !!!')
     elif solutions == "Error2":

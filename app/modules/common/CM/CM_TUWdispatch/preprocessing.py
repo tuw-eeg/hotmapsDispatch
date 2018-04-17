@@ -34,7 +34,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):
     j_bp =      [key for key in tec if "boiler" in key]
     j_wh =      [key for key in tec if "Waste Heat" in key]
     j_gt =      [key for key in tec if "Geothermal" in key]
-    j_hs =      []
+    j_hs =      data["tec_hs"]
 #    j_hs =      ["Heat Storage"]
 
     #%% Parameter - #TODO: depends on how the input data looks finally
@@ -101,17 +101,26 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):
                   
     alpha_j =               {key:alpha[key] for key in tec}
     
+    # Heat Storage
+    load_cap_hs =           {hs: data["load_cap_hs"][hs] for hs in j_hs}
+    unload_cap_hs =         {hs: data["unload_cap_hs"][hs] for hs in j_hs}
+    n_hs =                  {hs: data["n_pump_hs"][hs] for hs in j_hs}
+    loss_hs =               {hs: data["n_turb_hs"][hs] for hs in j_hs}
+    IK_hs =                 {hs: data["IK_cap_hs"][hs] for hs in j_hs}
+    cap_hs =                {hs: data["cap_hs"][hs] for hs in j_hs}
 
-    load_cap_hs =           50 
-    unload_cap_hs =         140
-    n_hs =                  0.95
-    loss_hs =               0.02
-    IK_hs =                 30
-    cap_hs =                10
+    ir = data["interest_rate"]  
+    q = 1+ir
+    alpha_hs =              {hs: ( q**data["LT_hs"][hs] * ir) / ( q**data["LT_hs"][hs] - 1)  for hs in j_hs}
+    
+    
+    # Ramping Costs
     c_ramp_chp =            100
     c_ramp_waste =          100
-    alpha_hs =              {}
-#    alpha_hs =              {"Heat Storage":0}
+    
+    
+
+
 
     rf_j = {key:data["RF"][key] for key in tec}
     rf_tot = data["toatl_RF"]

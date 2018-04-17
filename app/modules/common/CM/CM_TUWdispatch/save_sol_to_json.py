@@ -52,19 +52,7 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         c_tot_inv = instance.cost() + sum ([c_inv_stock[j]  for j in instance.j])
         c_tot = sum(c_var.values())
         c_tot = sum(c_inv.values()) + sum(c_var.values()) + sum(c_op_fix.values()) + sum(c_op_var.values()) + c_peak_el + sum(c_ramp.values())
-    #    c_final = c_tot-sum(rev_tot.values())
-        
-    #    solution = {"c_inv":c_inv,
-    #                "c_op_fix":c_op_fix,
-    #                "c_op_var":c_op_var,
-    #                "c_var":c_var,
-    #                "c_peak_el":c_peak_el,
-    #                "c_ramp":c_ramp,
-    #                "c_tot":c_tot,
-    #                "rev_tot":rev_tot,
-    #                "c_final":c_final,
-    #                }
-    #    
+
         
         solution={ "Thermal Power Energymix":{j:[instance.x_th_jt[(j,t)]() for t in instance.t] for j in instance.j},
                   "Installed Capacities": {j:instance.Cap_j[j]() for j in instance.j},
@@ -109,6 +97,16 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Specific Capital Costs of installed Capacities"] = {j:instance.IK_j[j] * instance.alpha_j[j] for j in solution["Installed Capacities"].keys() if solution["Installed Capacities"][j] !=0 }
         solution["Technologies"] = [j for j in instance.j]
         solution["Marginal Costs"] = [np.mean([instance.mc_jt[j,t] for t in instance.t]) for j in instance.j] 
+        
+        solution["State of Charge"] = {hs:[instance.store_level_hs_t[hs,t]() for t in instance.t] for hs in instance.j_hs}
+        if inv_flag:
+            solution["Installed Heat Storage Capacities"]: {hs:instance.Cap_hs[hs]()+instance.cap_hs[hs] for hs in instance.j_hs }
+        else:
+            solution["Installed Heat Storage Capacities"]: {hs:instance.cap_hs[hs] for hs in instance.j_hs }
+        
+        solution["Turbining Time"] =  {hs:[instance.x_unload_hs_t[hs,t]() for t in instance.t] for hs in instance.j_hs}  
+        solution["Pumping Time"] =  {hs:[instance.x_load_hs_t[hs,t]() for t in instance.t] for hs in instance.j_hs}  
+        solution["Heat Storage Technologies"] = list(instance.j_hs.value)
         
         with open(path2solution+r"\solution.json", "w") as f:
             json.dump(solution, f)
