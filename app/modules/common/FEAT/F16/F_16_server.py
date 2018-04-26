@@ -10,7 +10,7 @@ import numpy as np
 from bokeh.application.handlers import FunctionHandler
 from bokeh.application import Application
 from bokeh.layouts import widgetbox,layout,row,column
-from bokeh.models import ColumnDataSource,TableColumn,DataTable,CustomJS,TextInput
+from bokeh.models import ColumnDataSource,TableColumn,DataTable,CustomJS,TextInput, Slider
 from bokeh.server.server import Server
 from bokeh.models.widgets import Panel, Tabs, Button,Div,Toggle,Select
 import os,sys,io,base64
@@ -21,7 +21,12 @@ path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
 if path not in sys.path:
     sys.path.append(path)
-    
+
+from bokeh import __version__
+if __version__ != '0.12.10':
+    print("Your current bokeh version ist not compatible (Your Version:" +__version__+")")
+    print("Please install bokeh==0.12.10")
+    sys.exit()    
     
 from AD.F16_input.main import load_data 
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
@@ -35,30 +40,36 @@ path_download_js = "download.js"
 path_download_output= path + r"\FEAT\F16\download_input.xlsx"
 path_upload_js = "upload.js"
 path_spinner_html = "spinner2.html" 
-
+#%%
+io_loop = IOLoop.current()
+global data_table,data_table_prices,data_table_data,f
 #%%
 def invert_dict(d):
     return dict([ (v, k) for k, v in d.items() ])
 
-price_name_map = pickle.load(open(path2data+r"\price_name_map.dat","rb"))
-price_name_map_inv = invert_dict(price_name_map)
+def load_extern_data(name):
+    dict_map = pickle.load(open(path2data+"\\"+name+"_name_map.dat","rb"))
+    dict_map_inv = invert_dict(dict_map)
+    dic = pickle.load(open(path2data+"\\"+name+"_profiles.dat","rb"))
+    return dict_map,dict_map_inv,dic
+    
+def mapper(path2excel,worksheet_name=""):
+    if worksheet_name == "":
+        data = pd.read_excel(path2excel)[0:1]
+    else:        
+        data = pd.read_excel(path2excel,worksheet_name)[0:1]
+    return dict(zip(data.values[0].tolist(),list(data)))
+    
+    
+price_name_map,price_name_map_inv,prices = load_extern_data("price")
+load_name_map,load_name_map_inv,load_profiles = load_extern_data("load")
+radiation_name_map, radiation_name_map_inv,radiation = load_extern_data("radiation")
+temperature_name_map, temperature_name_map_inv, temperature = load_extern_data("temperature")
 
-load_name_map = pickle.load(open(path2data+r"\load_name_map.dat","rb"))
-load_name_map_inv = invert_dict(load_name_map)
 
-load_profiles = pickle.load(open(path2data+r"\load_profiles.dat","rb"))
-prices = pickle.load(open(path2data+r"\prices.dat","rb"))
-
-#%%
-io_loop = IOLoop.current()
-global data_table,input_list,data_table_prices,data_table_data,f
-#%%
-data1 = pd.read_excel(path_parameter)[0:1]
-input_list_mapper = dict(zip(data1.values[0].tolist(),list(data1)))
-data2 = pd.read_excel(path_parameter,"prices and emmision factors")[0:1]
-input_price_list_mapper = dict(zip(data2.values[0].tolist(),list(data2)))
-data3 = pd.read_excel(path_parameter,"financal and other parameteres")[0:1]
-parameter_list_mapper = dict(zip(data3.values[0].tolist(),list(data3)))
+input_list_mapper = mapper(path_parameter)
+input_price_list_mapper = mapper(path_parameter,"prices and emmision factors")
+parameter_list_mapper = mapper(path_parameter,"financal and other parameteres")
 
 input_list= ['name',
  'installed capacity (MW_th)',
@@ -77,7 +88,6 @@ parameter_list = ['CO2 Price',
  'Total Demand[ MWh]']
 
 #%%   
-
 
 def execute(data,inv_flag,selection=[],demand_f=1):
     val = dispatch.main(data,inv_flag,selection,demand_f) 
@@ -99,53 +109,69 @@ def init_load(select_load,data_table_data,load_profiles,source_load,map_dic_inv)
     x = np.arange(len(y))
     source_load.data = dict(x=x, y=y)
     
+def genearte_selection(dic,dict_key_map):
+    """
+    This function returns three objects:
+        1. A Drop down menu
+        2. A colum data source
+        3. A Figure
     
+    Parameters:
+        dictionary:     dict
+                        The data that should be ploted and selected,
+                        
+        dict_key_map:   dict
+                        Mapping table, that maps the keys to a name
+                        for example {AT:Austria}
+        
+        returns:        tuple
+                        (dropdown,columDataSource,figure)
+    """
+    select = drop_down(dic,dict_key_map)
+    source = cds(select,dic,invert_dict(dict_key_map))
+    fig = figure(tools="pan,wheel_zoom,box_zoom,reset,save")
+    fig.line('x', 'y', source=source, line_alpha=0.6)
+    fig.toolbar.logo = None
+    
+    return select,source,fig
+
+
+def generate_tables(columns,name="",):
+    if name == "":
+        data = pd.read_excel(path_parameter,skiprows=[0])
+    else:
+        data = pd.read_excel(path_parameter,name,skiprows=[0])
+        
+    col = [TableColumn(field=name, title=name) for name in columns]
+    source = ColumnDataSource(data)
+    table = DataTable(source=source,columns=col,width=1550,height=800,
+                           editable=True,row_headers =True)  
+    
+    return table  
+  
 #%%
 def modify_doc(doc):      
-   
-    data = pd.read_excel(path_parameter,skiprows=[0])
-    col = [TableColumn(field=name, title=name) for name in input_list]
-    source = ColumnDataSource(data)
-    data_table = DataTable(source=source,columns=col,width=1550, 
-                           height=800,editable=True)
     
-    data_prices = pd.read_excel(path_parameter,"prices and emmision factors",
-                                skiprows=[0])
-    col_prices = [TableColumn(field=name, title=name) for name in input_price_list]
-    source_prices = ColumnDataSource(data_prices)
-    data_table_prices = DataTable(source=source_prices,columns=col_prices,
-                                  width=800, height=800,editable=True)
+    data_table = generate_tables(input_list)
+    data_table_prices = generate_tables(input_price_list,"prices and emmision factors") 
+    data_table_data = generate_tables(parameter_list,"financal and other parameteres") 
     
-    data_data = pd.read_excel(path_parameter,"financal and other parameteres",
-                              skiprows=[0])
-    col_data = [TableColumn(field=name, title=name) for name in parameter_list]
-    source_data = ColumnDataSource(data_data)
-    data_table_data = DataTable(source=source_data,columns=col_data,
-                                  width=800, height=800,editable=True)
+    scale_load = Slider(start=0, end=10, value=1, step=.1,title="Scale Demand")
+    scale_price = Slider(start=0, end=10, value=1, step=.1,title="Scale Price")
+    scale_radiation = Slider(start=0, end=10, value=1, step=.1,title="Scale Radiation") 
+    scale_temperature = Slider(start=0, end=10, value=1, step=.1,title="Scale Temperature")  
     
 
-        
-        
-    select_load = drop_down(load_profiles,load_name_map)
-    source_load = cds(select_load,load_profiles,load_name_map)
+    select_load, source_load, plot_load = genearte_selection(load_profiles,load_name_map)    
     init_load(select_load,data_table_data,load_profiles,source_load,load_name_map_inv)
-    
-    
-    plot_load = figure(tools="pan,wheel_zoom,box_zoom,reset,save")
-    plot_load.toolbar.logo = None
-    plot_load.line('x', 'y', source=source_load, line_alpha=0.6)
+    total_demand = TextInput(value=str(data_table_data.source.data[parameter_list[3]][0]), title="Total Demand [MWh]")  
     
     def load_callback(attrname, old, new):
-        global f
-        c,year = new.split("_")
-        y = float(data_table_data.source.data[parameter_list[3]][0])*load_profiles[load_name_map_inv[c],int(year)]
-        x = np.arange(len(y))
-        f = max(y / sum(y))
-        source_load.data = dict(x=x, y=y)
-
-        _val =  f * float(data_table_data.source.data[parameter_list[3]][0])
-        pmax.value = str(_val)
-        
+        total_demand.value = str(data_table_data.source.data[parameter_list[3]][0])
+        c,year = select_load.value.split("_")
+        y = float(data_table_data.source.data[parameter_list[3]][0])*load_profiles[load_name_map_inv[c],int(year)]*scale_load.value
+        source_load.data["y"] = y.tolist() 
+        pmax.value = str(max(y))        
         _data1= pd.DataFrame(data_table.source.data)[input_list[1]].apply(pd.to_numeric, errors='ignore')
         _data1 = _data1.fillna(0)
         x = float(pmax.value) - sum(_data1)
@@ -155,29 +181,78 @@ def modify_doc(doc):
             to_install.value = "0"
             
     select_load.on_change('value', load_callback)
+    scale_load.on_change('value', load_callback)
     
+    def load_callback2(attrname, old, new):
+        data_table_data.source.data[parameter_list[3]] = [new]
+        load_callback(None,None,None)
+        
+    total_demand.on_change("value",load_callback2)
     
-    select_price = drop_down(prices,price_name_map)
-    source_price = cds(select_price,prices,price_name_map)
-    plot_price = figure(tools="pan,wheel_zoom,box_zoom,reset,save")
-    plot_price.line('x', 'y', source=source_price, line_alpha=0.6)
-    plot_price.toolbar.logo = None
+    select_price, source_price, plot_price = genearte_selection(prices,price_name_map)
+    feed_in_tarif = TextInput(value="0", title="FiT- Feed in Tarif:")
+    const_price = TextInput(value="0", title="Constant- Flat Price:")
+    
     def price_callback(attrname, old, new):
-        c,year = new.split("_")
-        y = prices[price_name_map_inv[c],int(year)]
-        x = np.arange(len(y))
-        source_price.data = dict(x=x, y=y)
+        
+        if feed_in_tarif.value =="":
+            feed_in_tarif.value = "0"
+        if const_price.value =="":
+            const_price.value = "0"
+        if float(const_price.value) == 0 :
+            c,year = select_price.value.split("_")
+            source_price.data["y"] = (np.array(prices[price_name_map_inv[c],int(year)]) * scale_price.value + float(feed_in_tarif.value)).tolist()          
+        else:
+            source_price.data["y"] = (np.array([float(feed_in_tarif.value)+float(const_price.value)]*8760) * scale_price.value ).tolist() 
             
     select_price.on_change('value', price_callback)
+    feed_in_tarif.on_change("value", price_callback)
+    const_price.on_change("value", price_callback)   
+    scale_price.on_change('value', price_callback)
     
-    row_load = column(children=[widgetbox(select_load),plot_load])
-    row_price = column(widgetbox(select_price),plot_price)
+    
+    select_radiation,source_radiation,plot_radiation = genearte_selection(radiation,radiation_name_map)
+    select_temperature, source_temperature, plot_temperature = genearte_selection(temperature,temperature_name_map)
+    
+    def temperature_callback(attrname, old, new):
+        c,year = select_temperature.value.split("_")
+        y = temperature[temperature_name_map_inv[c],int(year)]*scale_temperature.value
+        source_temperature.data["y"] = y.tolist() 
+    
+    select_temperature.on_change('value', temperature_callback)
+    scale_temperature.on_change('value', temperature_callback)
         
-    dic = {"Parameter for Powerplants":data_table,
-           "parameters":data_table_data,
-           "prices & emission factors":data_table_prices,
+    def radiation_callback(attrname, old, new):
+        c,year = select_radiation.value.split("_")
+        y = radiation[radiation_name_map_inv[c],int(year)]*scale_radiation.value
+        source_radiation.data["y"] = y.tolist() 
+        
+    scale_radiation.on_change('value', radiation_callback)
+    select_radiation.on_change('value', radiation_callback)
+    
+    row_load = row(column(widgetbox(select_load),plot_load),
+                    column(widgetbox(scale_load),widgetbox(total_demand))
+                    )
+ 
+    row_temp = row(column(widgetbox(select_temperature),plot_temperature),
+                    column(widgetbox(scale_temperature))
+                    )
+    
+    row_rad = row(column(widgetbox(select_radiation),plot_radiation),
+                    column(widgetbox(scale_radiation))
+                    )
+    
+    row_price = row(column(widgetbox(select_price),plot_price),
+                    column(widgetbox(feed_in_tarif),widgetbox(const_price),widgetbox(scale_price))
+                    )
+    
+    dic = {"Heat Generators":data_table,
+           "Parameters":data_table_data,
+           "Prices & Emission factors":data_table_prices,
            "Head Demand":row_load,
-           "Electricity price":row_price}
+           "Electricity price":row_price,
+           "Temperature":row_temp,
+           "Radiation":row_rad}
     
     tabs_liste = [Panel(child=p, title=name) for name, p in dic.items()]
     
@@ -192,7 +267,7 @@ def modify_doc(doc):
         df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
 #        df = df.fillna(0)
         writer = pd.ExcelWriter(path_download_output)  
-        df.to_excel(writer,'Parameter for Powerplants')
+        df.to_excel(writer,'Heat Generators')
         
         data_prices_df = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore')
 #        data_prices_df = data_prices_df.fillna(0)
@@ -215,9 +290,7 @@ def modify_doc(doc):
         _y = prices[price_name_map_inv[_c],int(_year)]
         _x = np.arange(1,len(_y)+1)
         elec = dict(zip(_x,_y))
-        
-#        elec = data["energy_carrier_prices"]["electricity"]
-        
+                
         data1= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
         data1 = data1.fillna(0)
    
@@ -227,13 +300,8 @@ def modify_doc(doc):
         data_data = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore')
         data_data = data_data.fillna(0)
         
-#        demand = np.array(list(data["demand_th"].values()))
-        _c,_year = select_load.value.split("_")
-        demand = load_profiles[load_name_map_inv[_c],int(_year)]
-        sum_demand = sum(demand)
- 
-        demand_neu = demand / float(sum_demand) * float(data_data[parameter_list[3]].values[0])
-        data["demand_th"] = dict(zip(range(1,len(demand_neu)+1),demand_neu.tolist()))
+
+        data["demand_th"] = dict(zip(range(1,len(source_load.data["y"])+1),source_load.data["y"]))
         dic1 = data1.set_index("name").to_dict()
         for key in list(dic1):
             data[input_list_mapper[key]] = dic1[key]
@@ -327,9 +395,10 @@ def modify_doc(doc):
         div_spinner.text = """<strong style="color: green;">Upload done</strong>"""
     #%%
     
-    download_code=open(path_download_js).read()
-    download_callback_js = CustomJS(args=dict(source=source), code=download_code)
-    download_button = Button(label='Download Power Plant Parameters', button_type='success', callback=download_callback_js)
+#    download_code=open(path_download_js).read()
+#    download_callback_js = CustomJS(args=dict(source=source), code=download_code)
+#    download_button = Button(label='Download Power Plant Parameters', button_type='success', callback=download_callback_js)
+    download_button = Button(label='Download Power Plant Parameters', button_type='success')
     download_button.on_click(download_callback)
     
     file_source = ColumnDataSource({'file_contents':[], 'file_name':[]})
@@ -358,15 +427,9 @@ def modify_doc(doc):
     pmax = TextInput(title="Pmax [MW]")
     to_install = TextInput(title="Missing Capacities [MW]")
     
-#    _val = pickle.load(open(path2data+r"\data.dat", "rb"))
-#    _demand = np.array(list(_val["demand_th"].values()))
-    _c,_year = select_load.value.split("_")
-    _demand = load_profiles[load_name_map_inv[_c],int(_year)]
-    _sum_demand = sum(_demand)
-    f = max(_demand / _sum_demand)
-    _val =  f * float(data_data[parameter_list[3]].values[0])
-    pmax.value = str(_val)
-    
+
+
+    pmax.value = str(max(source_load.data["y"]))
     _data1= pd.DataFrame(data_table.source.data)[input_list[1]].apply(pd.to_numeric, errors='ignore')
     _data1 = _data1.fillna(0)
     x = float(pmax.value) - sum(_data1)
@@ -375,40 +438,8 @@ def modify_doc(doc):
     else:
         to_install.value = "0"
     
-    
-    
-    def data_data_callback(attr, old, new):
-        
-        c,year = select_load.value.split("_")
-        y = float(new[parameter_list[3]][0])*load_profiles[load_name_map_inv[c],int(year)]
-        x = np.arange(len(y))
-        source_load.data = dict(x=x, y=y)
-        f = max(y / sum(y))
-        
-        _val =  f * float(new[parameter_list[3]][0])
-        pmax.value = str(_val)
-        _data1= pd.DataFrame(data_table.source.data)[input_list[1]].apply(pd.to_numeric, errors='ignore')
-        _data1 = _data1.fillna(0)
-        x = float(pmax.value) - sum(_data1)
-        if x>=0 :
-            to_install.value = str(x)
-        else:
-            to_install.value = "0"
-        
-
-            
-    
-    def data_tabel_callback(attr, old, new):
-        _data1= pd.DataFrame(new)[input_list[1]].apply(pd.to_numeric, errors='ignore')
-        _data1 = _data1.fillna(0)
-        x = float(pmax.value) - sum(_data1)
-        if x>=0 :
-            to_install.value = str(x)
-        else:
-            to_install.value = "0"
-    
-    data_table_data.source.on_change("data",data_data_callback)
-    data_table.source.on_change("data",data_tabel_callback)
+    data_table_data.source.on_change("data",load_callback)
+    data_table.source.on_change("data",load_callback)
     
     invest = Toggle(label="Invest", button_type="default")
     

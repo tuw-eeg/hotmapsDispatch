@@ -33,7 +33,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):
     j_chp =     [key for key in tec if "CHP" in key]
     j_bp =      [key for key in tec if "boiler" in key]
     j_wh =      [key for key in tec if "Waste Heat" in key]
-    j_gt =      [key for key in tec if "Geothermal" in key]
+    j_gt =      [key for key in tec if "Geo Thermal" in key]
     j_hs =      data["tec_hs"]
 #    j_hs =      ["Heat Storage"]
 
@@ -79,7 +79,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):
                                  data["em"][data["energy_carrier"][j]]*data["P_co2"] / \
                                   data["n_th"][j]   
 
-   
+        
     mc_jt =                 {(key,t):mc[key,t] for t in range(1,8760+1) for key in tec}
     n_th_j =                {key:data["n_th"][key] for key in tec}
     x_th_cap_j =            {key:data["P_th_cap"][key] for key in tec}
@@ -88,8 +88,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):
     lt_j =                  {key:data["LT"][key] for key in tec}
     el_surcharge =          50  # Taxes for electricity price
 
-#TODO: Calculate alpha with interest rate from user , 
-#      LT complete Data...     
+   
     ir = data["interest_rate"]  # interest Rate
     q = 1+ir
     alpha = {}
@@ -109,21 +108,18 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):
     IK_hs =                 {hs: data["IK_cap_hs"][hs] for hs in j_hs}
     cap_hs =                {hs: data["cap_hs"][hs] for hs in j_hs}
 
-    ir = data["interest_rate"]  
-    q = 1+ir
-    alpha_hs =              {hs: ( q**data["LT_hs"][hs] * ir) / ( q**data["LT_hs"][hs] - 1)  for hs in j_hs}
+    ir =    	              data["interest_rate"]  
+    q =                     1+ir
+    alpha_hs =              {hs: ( q**data["LT_hs"][hs] * ir) / \
+                             ( q**data["LT_hs"][hs] - 1)  for hs in j_hs}
     
     
     # Ramping Costs
     c_ramp_chp =            100
     c_ramp_waste =          100
     
-    
-
-
-
-    rf_j = {key:data["RF"][key] for key in tec}
-    rf_tot = data["toatl_RF"]
+    rf_j =                  {key:data["RF"][key] for key in tec}
+    rf_tot =                data["toatl_RF"]
 
     temperature = []
     for idx,val in data["temp"].items():

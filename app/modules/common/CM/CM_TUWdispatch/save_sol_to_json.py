@@ -87,8 +87,8 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Anual Total Costs (with costs of existing power plants)"] = c_tot_inv
         if inv_flag:
             solution["Anual Investment Cost"] = {j:(instance.Cap_j[j]() - instance.x_th_cap_j[j])  * instance.IK_j[j] * instance.alpha_j[j] for j in instance.j}
-            for hs in instance.j_hs:
-                solution["Anual Investment Cost"][hs] = instance.Cap_hs[hs]()*instance.IK_hs[hs]* instance.alpha_hs[hs]
+#            for hs in instance.j_hs:
+#                solution["Anual Investment Cost"][hs] = instance.Cap_hs[hs]()*instance.IK_hs[hs]* instance.alpha_hs[hs]
         else:
             solution["Anual Investment Cost"] =  {j:0 for j in instance.j}                                                                                      
         
@@ -107,6 +107,13 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Turbining Time"] =  {hs:[instance.x_unload_hs_t[hs,t]() for t in instance.t] for hs in instance.j_hs}  
         solution["Pumping Time"] =  {hs:[instance.x_load_hs_t[hs,t]() for t in instance.t] for hs in instance.j_hs}  
         solution["Heat Storage Technologies"] = list(instance.j_hs.value)
+#XXX: needed?        
+        solution["TEC"] =  solution["Technologies"] + solution["Heat Storage Technologies"]
+        
+        solution["TPE"] = {**solution["Thermal Power Energymix"], 
+                                        **solution["Turbining Time"]}
+        
+        solution["Marginal Costs"] += [1e100]
         
         with open(path2solution+r"\solution.json", "w") as f:
             json.dump(solution, f)

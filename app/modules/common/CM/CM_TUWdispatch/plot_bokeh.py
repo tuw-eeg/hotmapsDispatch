@@ -21,11 +21,16 @@ import os
 import itertools
 from math import pi
 import sys
+
 #%%
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
 if path not in sys.path:
     sys.path.append(path)
+    
+#%%
+from CM.CM_TUWdispatch.eng_format import EngNumber,EngUnit
+    
 #%%
 def get_cmap(n, name='tab20'):
     '''Returns a function that maps each index in 0, 1, ..., n-1 to a distinct 
@@ -500,10 +505,10 @@ def plot_table (decision_vars,dic,path2output):
             val.append(sum(dic[decision_var]))
         else:
             val.append(dic[decision_var])
-    formatted_val = []
-    for item in val:
-        formatted_val.append("%.3e"%item)
-    
+#    formatted_val = []
+#    for item in val:
+#        formatted_val.append("%.3e"%item)
+    formatted_val = [str(EngNumber(item)) for item in val]
     data = dict(
             topic = decision_vars,
             value = formatted_val,
@@ -545,7 +550,6 @@ def plotExtra_table (decision_vars,dic,path2output):
                 
             line = [[decision_var] + formatted_val]
             data = data + line
-    
     source = ColumnDataSource(pd.DataFrame(data, columns=["topic"]+list(dic["Technologies"])))
     
     column0 = [TableColumn(field="topic", title="Topic")]
@@ -577,40 +581,7 @@ def tab_panes(path2output,**kwargs):
     tabs = Tabs(tabs=tabs)
     return tabs     
 
-#%% 
-def strFormat(i,s):
-    """
-    Description
-    
-    Parameters:
-        i:                  float          
-            
-            
-        s:                  string
-            
-            
-    Results
-        formated_string:    string
-    """
-    if abs(i) > 10**12:
-        prefix = 'k'
-        i = i/10**12
-    if abs(i) > 10**9:
-        prefix = 'M'
-        i = i/10**9
-    if abs(i) > 10**6:
-        prefix = 'G'
-        i = i/10**6
-    if abs(i) > 10**3:
-        prefix = 'T'
-        i = i/10**3
-    
-    i =  "{0:.2f}".format(round(i,2))
-    return i+' '+prefix+s
-
 #%% Setting Global default paramters and default paths
-path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
-                                                       abspath(__file__))))
 path2json = path+r"\AD\F16_input\Solution\solution.json"
 path2output = path+r"\AD\F16_input\Output_Graphics"
 path_parameter2 = path +  r"\AD\F16_input\DH_technology_cost.xlsx"
@@ -744,27 +715,32 @@ def plot_solutions(show_plot=False,path2json=path2json):
             
             if os.path.isdir(path2output) == False:
                 print("Create Dictionary...")
-                data5 = pd.read_excel(path_parameter2,"Parameter for Powerplants")
+                data5 = pd.read_excel(path_parameter2)
                 cmap = colormapping(data5.tec.values.tolist())
                 os.mkdir(path2output)
                 print("Created: "+ path2output)
                 pickle.dump(cmap, 
                             open(path2output+r'\cmap.spec', 'wb'))
-    
+     
         except FileNotFoundError:
             print("\n*********\nThere is no JSON File in this path: "+
                   path2json+"\n*********\n")
             return True
         
+# XXX: caution       
         decison_var="Thermal Power Energymix" 
-        legend = list(dic["Thermal Power Energymix"].keys())
+        legend = list(dic[decison_var].keys())
+#        decison_var="TPE" 
+        legend = list(dic[decison_var].keys())
         tw = range(0,350)  
         ts = range(730*5,730*5+336+1)   
         t = range(0,8760)
         y1 = matrix(dic,decison_var,legend,tw)
         y2 = matrix(dic,decison_var,legend,ts)
         y3 = matrix(dic,decison_var,legend,t)
+#XXX: caution
         cmap = pickle.load(open(path2output+r"\cmap.spec", "rb"))
+#        cmap = colormapping(dic["TEC"])
         p1 = stack_chart(tw,dic,y1,legend,decison_var,path2output,cmap,"w")
         p2 = stack_chart(ts,dic,y2,legend,decison_var,path2output,cmap,"s")
         p3 = stack_chart(t,dic,y3,legend,decison_var,path2output,cmap)    
@@ -815,11 +791,19 @@ def plot_solutions(show_plot=False,path2json=path2json):
                   "Specific Capital Costs of IC":l2,
                   "Results":p9}
         tabs = tab_panes(path2output,**kwargs)
-        output_file(path2output+"\output.html",title="Dispatch output")
+        
+        i=0
+        while os.path.exists(path2output+"\output%s.html" % i):
+            i += 1
+        
+        output_file(path2output+"\output%s.html" % i,title="Dispatch output")
         save(tabs)
+        
+        
         if show_plot:
             show(tabs)
         return tabs.tabs
+    
     except:
         return "Error4"
 #%%

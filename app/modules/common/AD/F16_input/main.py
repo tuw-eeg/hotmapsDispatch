@@ -69,7 +69,7 @@ def return_mapper(sheet_name="",path2file=path_parameter):
 def overwrite(old,new,value,mapper):
     """
     This function overwrite the inital data values of the model with the user 
-    input data, that are specified in the "\FEAT\F16\input.xlsx"
+    input data, that are specified in the "\FEAT\F16\input.xlsx" file
     
     Parameters:
         old:        dict
@@ -135,24 +135,24 @@ def load_data():
                               1 or True for Dispacth with investment
     """
     # Load Initial Data from "DH_technology_cost.xls"
-    data1 = pd.read_excel(path_parameter,skiprows=[1])
-    tec = list(data1.tec.values)
-    data1 = data1.set_index("tec").to_dict()
-    data2 = pd.read_excel(path_parameter,"prices and emmision factors",skiprows=[1]).fillna(0).set_index("energy_carrier").to_dict()
-    data3 = pd.read_excel(path_parameter,"financal and other parameteres",skiprows=[1]).fillna(0).to_dict("records")[0]
+    data_hg = pd.read_excel(path_parameter,skiprows=[1])
+    tec = list(data_hg.tec.values)
+    data_hg = data_hg.set_index("tec").to_dict()
+    data_prices_ef = pd.read_excel(path_parameter,"prices and emmision factors",skiprows=[1]).fillna(0).set_index("energy_carrier").to_dict()
+    data_params = pd.read_excel(path_parameter,"financal and other parameteres",skiprows=[1]).fillna(0).to_dict("records")[0]
     data_hs = pd.read_excel(path_parameter,"Heat Storage",skiprows=[1]).fillna(0)
     tec_hs = list(data_hs.hs_name.values)
     data_hs = data_hs.set_index("hs_name").to_dict()
-    data = {**data1, **data2,**data3, **data_hs}
+    data = {**data_hg, **data_prices_ef,**data_params, **data_hs}
     
     # Load user input form "\FEAT\F16\input.xlsx"
     try:
-        data4 = pd.read_excel(path_parameter2,"Data",skiprows=range(3,5)).fillna(0).drop([np.nan])
+        data_input_params = pd.read_excel(path_parameter2,"Data",skiprows=range(3,5)).fillna(0).drop([np.nan])
     except:
-        data4 = pd.read_excel(path_parameter2,"Data").fillna(0)
+        data_input_params = pd.read_excel(path_parameter2,"Data").fillna(0)
     
-    data5 = pd.read_excel(path_parameter2,"Parameter for Powerplants",skiprows=range(21,26)).fillna(0)
-    data6 = pd.read_excel(path_parameter2,"prices and emmision factors").fillna(0)
+    data_input_hg = pd.read_excel(path_parameter2,"Heat Generators",skiprows=range(22,26)).fillna(0)
+    data_input_prices_ef = pd.read_excel(path_parameter2,"prices and emmision factors").fillna(0)
     
     # Generate Mapping tables to distinguish the input data
     input_list_mapper = return_mapper()
@@ -160,17 +160,45 @@ def load_data():
     parameter_list_mapper = return_mapper("financal and other parameteres")
     
      # Overwrite default values with user input data 
-    overwrite(data,data5,"name",input_list_mapper)
-    overwrite(data,data6,"energy carrier",input_price_list_mapper)
-    overwrite(data,data4,"",parameter_list_mapper)
+    overwrite(data,data_input_hg,"name",input_list_mapper)
+    overwrite(data,data_input_prices_ef,"energy carrier",input_price_list_mapper)
+    overwrite(data,data_input_params,"",parameter_list_mapper)
 
     # Load externel data like demand, radiation,temperature, electricity price     
     demand = pickle.load(open(path2data+r"\load_profiles.dat", "rb"))[init_data]    
-    demand_neu = demand / sum(demand) * float(data4["Total Demand[ MWh]"].values[0])
+    demand_neu = demand / sum(demand) * float(data_input_params["Total Demand[ MWh]"].values[0])
     data["demand_th"] = dict(zip(range(1,len(demand_neu)+1),demand_neu.tolist()))
     data["radiation"] = return_dict("radiation_profiles")
-    data["temp"] = return_dict("temperature_profile")
-    data["energy_carrier_prices"]["electricity"] = return_dict("prices")
+    data["temp"] = return_dict("temperature_profiles")
+    
+    # %%
+    feed_in_tarif = 0
+    fix_price = 0
+    if data["energy_carrier_prices"]["electricity"] !=0:
+        for string in data["energy_carrier_prices"]["electricity"].split("+"):
+            string = string.strip()
+            if string == "":
+                continue
+            elif string[-1] == 'f':
+                try:
+                    feed_in_tarif = float(string[:-1])
+                except:
+                    print("User Input for FiT is wrong,...assuming 0 ")
+                    feed_in_tarif = 0
+            elif string[-1] == 'h':
+                try:
+                    fix_price = float(string[:-1])
+                except:
+                    print("User Input for constant hourly price is wrong,... using variable prices")
+                    fix_price = 0
+            else:
+                print("User Input for electricity is wrong")
+                sys.exit()
+    if fix_price == 0:    
+        data["energy_carrier_prices"]["electricity"] = dict(zip(range(1,8760+1),(np.array(list(return_dict("price_profiles").values()))+feed_in_tarif).tolist()))
+    else:
+        data["energy_carrier_prices"]["electricity"] = dict(zip(range(1,8760+1),[feed_in_tarif+fix_price]*8760))
+    #%%
     data["tec"] = tec
     data["tec_hs"] = tec_hs
     
