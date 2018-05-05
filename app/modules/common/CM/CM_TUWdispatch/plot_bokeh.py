@@ -584,7 +584,7 @@ def tab_panes(path2output,**kwargs):
 #%% Setting Global default paramters and default paths
 path2json = path+r"\AD\F16_input\Solution\solution.json"
 path2output = path+r"\AD\F16_input\Output_Graphics"
-path_parameter2 = path +  r"\AD\F16_input\DH_technology_cost.xlsx"
+path_parameter = path +  r"\AD\F16_input\DH_technology_cost.xlsx"
 #%%
 def plot_solutions(show_plot=False,path2json=path2json):
     """
@@ -715,7 +715,7 @@ def plot_solutions(show_plot=False,path2json=path2json):
             
             if os.path.isdir(path2output) == False:
                 print("Create Dictionary...")
-                data5 = pd.read_excel(path_parameter2)
+                data5 = pd.read_excel(path_parameter)
                 cmap = colormapping(data5.tec.values.tolist())
                 os.mkdir(path2output)
                 print("Created: "+ path2output)

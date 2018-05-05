@@ -12,7 +12,7 @@ from bokeh.application import Application
 from bokeh.layouts import widgetbox,layout,row,column
 from bokeh.models import ColumnDataSource,TableColumn,DataTable,CustomJS,TextInput, Slider
 from bokeh.server.server import Server
-from bokeh.models.widgets import Panel, Tabs, Button,Div,Toggle,Select
+from bokeh.models.widgets import Panel, Tabs, Button,Div,Toggle,Select,CheckboxGroup
 import os,sys,io,base64
 import pickle
 from bokeh.plotting import figure
@@ -148,7 +148,16 @@ def generate_tables(columns,name="",):
                            editable=True,row_headers =True)  
     
     return table  
-  
+
+def update_pmax(pmax,source_load,data_table,to_install):
+    pmax.value = str(max(source_load.data["y"]))        
+    _data1= pd.DataFrame(data_table.source.data)[input_list[1]].apply(pd.to_numeric, errors='ignore')
+    _data1 = _data1.fillna(0)
+    x = float(pmax.value) - sum(_data1)
+    if x>=0 :
+        to_install.value = str(x)
+    else:
+        to_install.value = "0"  
 #%%
 def modify_doc(doc):      
     
@@ -171,14 +180,7 @@ def modify_doc(doc):
         c,year = select_load.value.split("_")
         y = float(data_table_data.source.data[parameter_list[3]][0])*load_profiles[load_name_map_inv[c],int(year)]*scale_load.value
         source_load.data["y"] = y.tolist() 
-        pmax.value = str(max(y))        
-        _data1= pd.DataFrame(data_table.source.data)[input_list[1]].apply(pd.to_numeric, errors='ignore')
-        _data1 = _data1.fillna(0)
-        x = float(pmax.value) - sum(_data1)
-        if x>=0 :
-            to_install.value = str(x)
-        else:
-            to_install.value = "0"
+        update_pmax(pmax,source_load,data_table,to_install)
             
     select_load.on_change('value', load_callback)
     scale_load.on_change('value', load_callback)
@@ -190,26 +192,30 @@ def modify_doc(doc):
     total_demand.on_change("value",load_callback2)
     
     select_price, source_price, plot_price = genearte_selection(prices,price_name_map)
-    feed_in_tarif = TextInput(value="0", title="FiT- Feed in Tarif:")
-    const_price = TextInput(value="0", title="Constant- Flat Price:")
+    feed_in_tarif = TextInput(value="0", title="Offset- FiT ( Feed in Tarif) :")
+    const_price = TextInput(value="0", title="Constant - Flat Price:")
+    mean_price = CheckboxGroup(labels=["use mean electricity price"])
     
     def price_callback(attrname, old, new):
-        
-        if feed_in_tarif.value =="":
-            feed_in_tarif.value = "0"
-        if const_price.value =="":
-            const_price.value = "0"
-        if float(const_price.value) == 0 :
+        if mean_price.active != []:
             c,year = select_price.value.split("_")
-            source_price.data["y"] = (np.array(prices[price_name_map_inv[c],int(year)]) * scale_price.value + float(feed_in_tarif.value)).tolist()          
+            source_price.data["y"] = [np.mean(prices[price_name_map_inv[c],int(year)])]*8760       
         else:
-            source_price.data["y"] = (np.array([float(feed_in_tarif.value)+float(const_price.value)]*8760) * scale_price.value ).tolist() 
+            if feed_in_tarif.value =="":
+                feed_in_tarif.value = "0"
+            if const_price.value =="":
+                const_price.value = "0"
+            if float(const_price.value) == 0 :
+                c,year = select_price.value.split("_")
+                source_price.data["y"] = (np.array(prices[price_name_map_inv[c],int(year)]) * scale_price.value + float(feed_in_tarif.value)).tolist()          
+            else:
+                source_price.data["y"] = (np.array([float(feed_in_tarif.value)+float(const_price.value)]*8760) * scale_price.value ).tolist() 
             
     select_price.on_change('value', price_callback)
     feed_in_tarif.on_change("value", price_callback)
     const_price.on_change("value", price_callback)   
     scale_price.on_change('value', price_callback)
-    
+    mean_price.on_change('active', price_callback)
     
     select_radiation,source_radiation,plot_radiation = genearte_selection(radiation,radiation_name_map)
     select_temperature, source_temperature, plot_temperature = genearte_selection(temperature,temperature_name_map)
@@ -243,7 +249,8 @@ def modify_doc(doc):
                     )
     
     row_price = row(column(widgetbox(select_price),plot_price),
-                    column(widgetbox(feed_in_tarif),widgetbox(const_price),widgetbox(scale_price))
+                    column(widgetbox(feed_in_tarif),widgetbox(const_price),
+                           widgetbox(scale_price),widgetbox(mean_price))
                     )
     
     dic = {"Heat Generators":data_table,
@@ -286,10 +293,6 @@ def modify_doc(doc):
         print('calculation started...')
         data,_ = load_data()
         
-        _c,_year = select_price.value.split("_")
-        _y = prices[price_name_map_inv[_c],int(_year)]
-        _x = np.arange(1,len(_y)+1)
-        elec = dict(zip(_x,_y))
                 
         data1= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
         data1 = data1.fillna(0)
@@ -301,7 +304,7 @@ def modify_doc(doc):
         data_data = data_data.fillna(0)
         
 
-        data["demand_th"] = dict(zip(range(1,len(source_load.data["y"])+1),source_load.data["y"]))
+
         dic1 = data1.set_index("name").to_dict()
         for key in list(dic1):
             data[input_list_mapper[key]] = dic1[key]
@@ -311,15 +314,16 @@ def modify_doc(doc):
         for key in list(dic2):
             data[key] = dic2[key]
 
+
         data["P_co2"] = float(data_data[parameter_list[0]].values[0])
-
         data["interest_rate"] = float(data_data[parameter_list[1]].values[0])
-
         data["toatl_RF"] = float(data_data[parameter_list[2]].values[0])
-
         data["total_demand"] = float(data_data[parameter_list[3]].values[0])
         
-        data["energy_carrier_prices"]["electricity"] = elec
+        data["demand_th"] = dict(zip(range(1,len(source_load.data["y"])+1),source_load.data["y"]))
+        data["energy_carrier_prices"]["electricity"] = dict(zip(range(1,len(source_price.data["y"])+1),source_price.data["y"]))
+        data["radiation"] = dict(zip(range(1,len(source_radiation.data["y"])+1),source_radiation.data["y"]))
+        data["temp"] = dict(zip(range(1,len(source_temperature.data["y"])+1),source_temperature.data["y"]))
         
         solutions = None
         selection = []
@@ -427,16 +431,7 @@ def modify_doc(doc):
     pmax = TextInput(title="Pmax [MW]")
     to_install = TextInput(title="Missing Capacities [MW]")
     
-
-
-    pmax.value = str(max(source_load.data["y"]))
-    _data1= pd.DataFrame(data_table.source.data)[input_list[1]].apply(pd.to_numeric, errors='ignore')
-    _data1 = _data1.fillna(0)
-    x = float(pmax.value) - sum(_data1)
-    if x>=0 :
-        to_install.value = str(x)
-    else:
-        to_install.value = "0"
+    update_pmax(pmax,source_load,data_table,to_install)    
     
     data_table_data.source.on_change("data",load_callback)
     data_table.source.on_change("data",load_callback)
@@ -461,14 +456,10 @@ def modify_doc(doc):
 
     doc.add_root(l)
     
-
-
-bokeh_app = Application(FunctionHandler(modify_doc))
-
-server = Server({'/': bokeh_app}, io_loop=io_loop)
-server.start()
-
 if __name__ == '__main__':
+    bokeh_app = Application(FunctionHandler(modify_doc))
+    server = Server({'/': bokeh_app}, io_loop=io_loop)
+    server.start()
     print('Opening Dispath Application on http://localhost:5006/')
     io_loop.add_callback(server.show, "/")
     try:

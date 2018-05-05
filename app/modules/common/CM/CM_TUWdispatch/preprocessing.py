@@ -10,7 +10,7 @@ class SliceMaker(object):
   def __getitem__(self, item):
     return item
 
-#TODO: Adapt to real data
+#XXX: Catogorize
 def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):  
     
     if inv_flag:
@@ -18,7 +18,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):
         for s in selection: 
             tec.append(data["tec"][s])
     else:
-        selection = np.array(list(data["P_th_cap"].values())).nonzero()[0].tolist()
+        selection = np.nonzero(list(data["P_th_cap"].values()))[0].tolist()
         if not selection:
             print("No Capacities installed !!!")
             return "Error1"
@@ -51,8 +51,8 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):
       
     radiation_t =           data["radiation"]
     IK_j =                  {key:data["IK"][key] for key in tec}
-    OP_fix_j =                  {key:data["OP_fix"][key] for key in tec}
-    OP_var_j =                  {key:data["OP_var"][key] for key in tec}
+    OP_fix_j =              {key:data["OP_fix"][key] for key in tec}
+    OP_var_j =              {key:data["OP_var"][key] for key in tec}
     n_el_j =                {key:data["n_el"][key] for key in tec}
     electricity_price_t =   data["energy_carrier_prices"]["electricity"]
     P_min_el_chp =          0
@@ -121,11 +121,11 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):
     rf_j =                  {key:data["RF"][key] for key in tec}
     rf_tot =                data["toatl_RF"]
 
-    temperature = []
-    for idx,val in data["temp"].items():
-        temperature.append([val]*24)
-
-    temperature = dict(zip(range(1,8760+1),sum(temperature,[])))   
+#    temperature = []
+#    for idx,val in data["temp"].items():
+#        temperature.append([val]*24)
+#    temperature = dict(zip(range(1,8760+1),sum(temperature,[])))
+    temperature = data["temp"]
 
     thresh = data["threshold_heatpump"]
 

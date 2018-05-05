@@ -59,7 +59,7 @@ def run(data,inv_flag,selection=[],demand_f=1):
     m.x_el_cap_j = pe.Param(m.j,initialize=val[24]) 
     m.pot_j = pe.Param(m.j,initialize=val[25]) 
     m.lt_j = pe.Param(m.j,initialize=val[26])
-    m.el_surcharge = pe.Param(m.j,initialize=val[27])  # Taxes for electricity price
+#    m.el_surcharge = pe.Param(m.j,initialize=val[27])  # Taxes for electricity price
     m.ir = pe.Param(initialize=val[28])
     m.alpha_j = pe.Param(m.j,initialize=val[29])
        
@@ -100,7 +100,6 @@ def run(data,inv_flag,selection=[],demand_f=1):
             return m.x_el_jt[j,t] == m.x_th_jt[j,t] / m.n_th_j[j] * m.n_el_j[j]
         else:
             return pe.Constraint.Skip
-            
     m.gen_el_jt = pe.Constraint(m.j,m.t,rule=gen_el_jt_rule)
 
     #%  At any time, the heating generation must cover the heating demand
@@ -108,7 +107,6 @@ def run(data,inv_flag,selection=[],demand_f=1):
 #        rule = sum([m.x_th_jt[j,t] for j in m.j]) >= demand_f * m.demand_th_t[t] 
         rule = sum([m.x_th_jt[j,t] for j in m.j]) + \
                 sum([m.x_unload_hs_t[hs,t] for hs in m.j_hs])>= demand_f * m.demand_th_t[t] 
-
         return rule 
     m.genearation_covers_demand_t = pe.Constraint(m.t,rule=genearation_covers_demand_t_rule)  
     
@@ -120,7 +118,6 @@ def run(data,inv_flag,selection=[],demand_f=1):
         else:
             rule = m.Cap_j[j] == m.x_th_cap_j[j]
         return rule 
-    
     m.capacity_restriction_max_j = pe.Constraint(m.j,rule=capacity_restriction_max_j_rule)
 
     def capacity_restriction_min_j_rule (m,j):
@@ -150,6 +147,7 @@ def run(data,inv_flag,selection=[],demand_f=1):
         if m.temperature_t[t] <= thresh:
             return m.x_th_jt[j,t] == 0
         else: 
+#            return m.x_th_jt[j,t] ==  m.x_el_jt[j,t]*0.41*50/(50-m.temperature_t[t])
             return m.x_th_jt[j,t] <=  max_demad
     m.heat_pump_restriction_jt = pe.Constraint(m.j_hp,m.t,rule=heat_pump_restriction_jt_rule)  
     
