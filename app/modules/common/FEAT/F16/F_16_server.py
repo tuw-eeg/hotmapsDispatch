@@ -70,6 +70,7 @@ temperature_name_map, temperature_name_map_inv, temperature = load_extern_data("
 input_list_mapper = mapper(path_parameter)
 input_price_list_mapper = mapper(path_parameter,"prices and emmision factors")
 parameter_list_mapper = mapper(path_parameter,"financal and other parameteres")
+heat_storage_list_mapper = mapper(path_parameter,"Heat Storage")
 
 input_list= ['name',
  'installed capacity (MW_th)',
@@ -82,19 +83,22 @@ input_list= ['name',
  'renewable factor']
 
 input_price_list = ["energy carrier","prices(EUR/MWh)","emission factor"]
+
 parameter_list = ['CO2 Price',
  'Interes Rate [0-1]',
  'Total Renewable Factor [0-1]',
  'Total Demand[ MWh]']
 
+
 #%%   
 
-def execute(data,inv_flag,selection=[],demand_f=1):
+def execute(data,inv_flag,selection=[[],[]],demand_f=1):
     val = dispatch.main(data,inv_flag,selection,demand_f) 
     return val
 
 def drop_down(dic,map_dic):
     options =  list(set([map_dic[i[0]]+"_"+str(i[1]) for i in list(dic)]))
+    options = sorted(options)
     return Select(title="Country-Year:", value="Wien_2016", options=options)
 
 def cds(dd,dic,map_dic_inv):
@@ -144,7 +148,7 @@ def generate_tables(columns,name="",):
         
     col = [TableColumn(field=name, title=name) for name in columns]
     source = ColumnDataSource(data)
-    table = DataTable(source=source,columns=col,width=1550,height=800,
+    table = DataTable(source=source,columns=col,width=1550,height=550,
                            editable=True,row_headers =True)  
     
     return table  
@@ -163,10 +167,12 @@ def modify_doc(doc):
     
     data_table = generate_tables(input_list)
     data_table_prices = generate_tables(input_price_list,"prices and emmision factors") 
-    data_table_data = generate_tables(parameter_list,"financal and other parameteres") 
+    data_table_data = generate_tables(parameter_list,"financal and other parameteres")
+    data_table_heat_storage = generate_tables(list(heat_storage_list_mapper),"Heat Storage")
     
     scale_load = Slider(start=0, end=10, value=1, step=.1,title="Scale Demand")
     scale_price = Slider(start=0, end=10, value=1, step=.1,title="Scale Price")
+    scale_price_sale = Slider(start=0, end=10, value=1, step=.1,title="Scale Price")
     scale_radiation = Slider(start=0, end=10, value=1, step=.1,title="Scale Radiation") 
     scale_temperature = Slider(start=0, end=10, value=1, step=.1,title="Scale Temperature")  
     
@@ -217,6 +223,34 @@ def modify_doc(doc):
     scale_price.on_change('value', price_callback)
     mean_price.on_change('active', price_callback)
     
+#%%    
+    select_price_sale, source_price_sale, plot_price_sale = genearte_selection(prices,price_name_map)
+    feed_in_tarif_sale = TextInput(value="0", title="Offset- FiT ( Feed in Tarif) :")
+    const_price_sale = TextInput(value="0", title="Constant - Flat Price:")
+    mean_price_sale = CheckboxGroup(labels=["use mean electricity price"])
+    
+    def price_callback_sale(attrname, old, new):
+        if mean_price_sale.active != []:
+            c,year = select_price_sale.value.split("_")
+            source_price_sale.data["y"] = [np.mean(prices[price_name_map_inv[c],int(year)])]*8760       
+        else:
+            if feed_in_tarif_sale.value =="":
+                feed_in_tarif_sale.value = "0"
+            if const_price_sale.value =="":
+                const_price_sale.value = "0"
+            if float(const_price_sale.value) == 0 :
+                c,year = select_price_sale.value.split("_")
+                source_price_sale.data["y"] = (np.array(prices[price_name_map_inv[c],int(year)]) * scale_price_sale.value + float(feed_in_tarif_sale.value)).tolist()          
+            else:
+                source_price_sale.data["y"] = (np.array([float(feed_in_tarif_sale.value)+float(const_price_sale.value)]*8760) * scale_price_sale.value ).tolist() 
+            
+    select_price_sale.on_change('value', price_callback_sale)
+    feed_in_tarif_sale.on_change("value", price_callback_sale)
+    const_price_sale.on_change("value", price_callback_sale)   
+    scale_price_sale.on_change('value', price_callback_sale)
+    mean_price_sale.on_change('active', price_callback_sale) 
+#%% 
+    
     select_radiation,source_radiation,plot_radiation = genearte_selection(radiation,radiation_name_map)
     select_temperature, source_temperature, plot_temperature = genearte_selection(temperature,temperature_name_map)
     
@@ -252,12 +286,21 @@ def modify_doc(doc):
                     column(widgetbox(feed_in_tarif),widgetbox(const_price),
                            widgetbox(scale_price),widgetbox(mean_price))
                     )
+                    
+    row_price_sale = row(column(widgetbox(select_price_sale),plot_price_sale),
+                    column(widgetbox(feed_in_tarif_sale),widgetbox(const_price_sale),
+                           widgetbox(scale_price_sale),widgetbox(mean_price_sale))
+                    )
+    label1 = Div(text="""<h1 style=" font-size: 20px; text-align: center; text-transform: uppercase; "> Heat Generators:</h1> """)
+    label2 = Div(text="""<h1 style=" font-size: 20px; text-align: center; text-transform: uppercase; "> Heat Storages:</h1> """)
+    col_hp_hs = column(label1,data_table,label2,data_table_heat_storage)
     
-    dic = {"Heat Generators":data_table,
+    dic = {"Heat Producers and Heat Storage":col_hp_hs,
            "Parameters":data_table_data,
            "Prices & Emission factors":data_table_prices,
            "Head Demand":row_load,
            "Electricity price":row_price,
+           "Sale Electricity price":row_price_sale,
            "Temperature":row_temp,
            "Radiation":row_rad}
     
@@ -303,7 +346,12 @@ def modify_doc(doc):
         data_data = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore')
         data_data = data_data.fillna(0)
         
-
+        data_heat_storages = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore')
+        data_heat_storages = data_heat_storages.fillna(0)
+        dic_hs = data_heat_storages.set_index("name").to_dict()
+        for key in list(dic_hs):
+            data[heat_storage_list_mapper[key]] = dic_hs[key]
+        
 
         dic1 = data1.set_index("name").to_dict()
         for key in list(dic1):
@@ -322,16 +370,22 @@ def modify_doc(doc):
         
         data["demand_th"] = dict(zip(range(1,len(source_load.data["y"])+1),source_load.data["y"]))
         data["energy_carrier_prices"]["electricity"] = dict(zip(range(1,len(source_price.data["y"])+1),source_price.data["y"]))
+        data["sale_electricity"] = dict(zip(range(1,len(source_price_sale.data["y"])+1),source_price_sale.data["y"]))
+
         data["radiation"] = dict(zip(range(1,len(source_radiation.data["y"])+1),source_radiation.data["y"]))
         data["temp"] = dict(zip(range(1,len(source_temperature.data["y"])+1),source_temperature.data["y"]))
         
+        data["all_heat_geneartors"] = data["tec"] + data["tec_hs"]
+        
         solutions = None
-        selection = []
+        selection = [[],[]]
         inv_flag = False
         if invest.active:
             inv_flag = True
-            selection = data_table.source.selected["1d"]["indices"]
-            if selection == []:
+            selection0 = data_table.source.selected["1d"]["indices"]
+            selection1 = data_table_heat_storage.source.selected["1d"]["indices"]
+            selection = [selection0,selection1]
+            if selection[0] == []:
                 div_spinner.text = """<strong style="color: red;">Error: Please specify the technologies for for the invesment model !!!</strong>"""
                 return
         solutions,_,_ = execute(data,inv_flag,selection)
@@ -417,7 +471,6 @@ def modify_doc(doc):
     upload_button.callback = CustomJS(args=dict(file_source=file_source), code =upload_code)
     
     spinner_text = open(path_spinner_html).read()
-
     div_spinner = Div(text="")
     output = Tabs(tabs=[])
     
@@ -440,7 +493,7 @@ def modify_doc(doc):
     
     def ivest_callback(active):
         if active:
-            div_spinner.text = """<strong style="color: red;">Mark Technologies by pressing "CTRL" +  "left mous" </strong>""" 
+            div_spinner.text = """<strong style="color: red;">Mark Technologies by pressing "CTRL" +  "left mouse", Rows are marked yellow </strong>""" 
         else:
             div_spinner.text = ""
             

@@ -33,11 +33,9 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         
         c_inv_stock = {j:instance.x_th_cap_j[j] * instance.IK_j[j] * instance.alpha_j[j] for j in instance.j}
         c_inv = {j:(instance.Cap_j[j]() - instance.x_th_cap_j[j])  * instance.IK_j[j] * instance.alpha_j[j] for j in instance.j}
+        c_op_fix = {j:instance.Cap_j[j]() * instance.OP_fix_j[j] for j in instance.j}
         if inv_flag:
             c_op_fix = {j:(instance.Cap_j[j]()+instance.x_th_cap_j[j]) * instance.OP_fix_j[j] for j in instance.j}
-        else:
-            c_op_fix = {j:instance.Cap_j[j]() * instance.OP_fix_j[j] for j in instance.j}
-    
         c_op_var = {j:sum(instance.x_th_jt[j,t]()* instance.OP_var_j[j]  for t in instance.t) for j in instance.j}
         c_var= {j:sum(instance.mc_jt[j,t] * instance.x_th_jt[j,t]() for t in instance.t) for j in instance.j if j not in instance.j_chp}  # 
         sv_chp = (instance.ratioPMaxFW - instance.ratioPMax) / (instance.ratioPMax*instance.ratioPMaxFW)
@@ -47,7 +45,7 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         c_ramp = {j:sum(instance.ramp_j_waste_t[j,t]() * instance.c_ramp_waste for t in instance.t) for j in instance.j_waste}
         for j in instance.j_chp:
             c_ramp[j] = sum(instance.ramp_j_chp_t[j,t]() * instance.c_ramp_chp for t in instance.t)
-        rev_tot = {j:sum(instance.x_el_jt[j,t]()*instance.electricity_price_t[t] for t in instance.t) for j in instance.j}
+        rev_tot = {j:sum(instance.x_el_jt[j,t]()*instance.sale_electricity_price_t[t] for t in instance.t) for j in instance.j}
         
         c_tot_inv = instance.cost() + sum ([c_inv_stock[j]  for j in instance.j])
         c_tot = sum(c_var.values())
@@ -85,36 +83,69 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         del sv_chp 
         solution["Anual Total Costs"] = instance.cost()
         solution["Anual Total Costs (with costs of existing power plants)"] = c_tot_inv
+         
+        solution["Anual Investment Cost"] =  {j:0 for j in instance.j} 
+        solution["Anual Investment Cost Heat Storage"] = {hs:0 for hs in instance.j_hs} 
         if inv_flag:
             solution["Anual Investment Cost"] = {j:(instance.Cap_j[j]() - instance.x_th_cap_j[j])  * instance.IK_j[j] * instance.alpha_j[j] for j in instance.j}
-#            for hs in instance.j_hs:
-#                solution["Anual Investment Cost"][hs] = instance.Cap_hs[hs]()*instance.IK_hs[hs]* instance.alpha_hs[hs]
-        else:
-            solution["Anual Investment Cost"] =  {j:0 for j in instance.j}                                                                                      
-        
+            solution["Anual Investment Cost Heat Storage"] = {hs:instance.Cap_hs[hs]()  * instance.IK_hs[hs] * instance.alpha_hs[hs] for hs in instance.j_hs}
+
         solution["Anual Investment Cost (of existing power plants)"] = c_inv_stock
+        solution["Anual Investment Cost (of existing heat storages)"] = {hs:instance.cap_hs[hs] * instance.IK_hs[hs] * instance.alpha_hs[hs] for hs in instance.j_hs}
+        solution["Anual Investment Cost (of existing power plants and heat storages)"]={**solution["Anual Investment Cost (of existing heat storages)"],
+                 **solution["Anual Investment Cost (of existing power plants)"]}
+        solution["Anual Total Costs (with costs of existing power plants and heat storages)"] = \
+            solution["Anual Total Costs (with costs of existing power plants)"] + \
+            sum(solution["Anual Investment Cost (of existing heat storages)"].values())
+        
+        solution["Mean Value Heat Price (with costs of existing power plants and heat storages)"] = solution["Anual Total Costs (with costs of existing power plants and heat storages)"] / sum([instance.demand_th_t[t] for t in instance.t])
+        
         solution["Electrical Peak Load Costs"] = instance.P_el_max()*10000
         solution["Specific Capital Costs of installed Capacities"] = {j:instance.IK_j[j] * instance.alpha_j[j] for j in solution["Installed Capacities"].keys() if solution["Installed Capacities"][j] !=0 }
         solution["Technologies"] = [j for j in instance.j]
         solution["Marginal Costs"] = [np.mean([instance.mc_jt[j,t] for t in instance.t]) for j in instance.j] 
         
         solution["State of Charge"] = {hs:[instance.store_level_hs_t[hs,t]() for t in instance.t] for hs in instance.j_hs}
-        if inv_flag:
-            solution["Installed Heat Storage Capacities"]: {hs:instance.Cap_hs[hs]()+instance.cap_hs[hs] for hs in instance.j_hs }
-        else:
-            solution["Installed Heat Storage Capacities"]: {hs:instance.cap_hs[hs] for hs in instance.j_hs }
         
+        solution["HS-Capacities"] = {hs:instance.Cap_hs[hs]()+instance.cap_hs[hs] if instance.Cap_hs[hs]() != None else instance.cap_hs[hs] for hs in instance.j_hs }
+
         solution["Turbining Time"] =  {hs:[instance.x_unload_hs_t[hs,t]() for t in instance.t] for hs in instance.j_hs}  
         solution["Pumping Time"] =  {hs:[instance.x_load_hs_t[hs,t]() for t in instance.t] for hs in instance.j_hs}  
         solution["Heat Storage Technologies"] = list(instance.j_hs.value)
+        solution["Turbining Time over year"] =  {hs:sum([instance.x_unload_hs_t[hs,t]() for t in instance.t]) for hs in instance.j_hs}  
+        
+        solution["Revenue from Heat Storages"]  = {hs:sum([instance.x_unload_hs_t[hs,t]() * instance.sale_electricity_price_t[t] for t in instance.t]) for hs in instance.j_hs }
+        solution["Operational Cost of Heat Storages"]= {hs:solution["HS-Capacities"][hs] * instance.OP_fix_hs[hs] + sum(instance.x_load_hs_t[hs,t]() * instance.electricity_price_t[t] for t in instance.t) for hs in instance.j_hs }
+        solution["Specific Capital Costs of installed Heat Storages"] = {hs:instance.IK_hs[hs] * instance.alpha_hs[hs] for hs in solution["HS-Capacities"].keys() if solution["HS-Capacities"][hs] !=0 }
+        solution["Fuel Costs Heat Storages"] = {hs:0 for hs in instance.j_hs}  
 #XXX: needed?        
-        solution["TEC"] =  solution["Technologies"] + solution["Heat Storage Technologies"]
+        solution["Technologies:"] =  solution["Technologies"] + solution["Heat Storage Technologies"]
         
-        solution["TPE"] = {**solution["Thermal Power Energymix"], 
+        solution["Thermal Power Energymix:"] = {**solution["Thermal Power Energymix"], 
                                         **solution["Turbining Time"]}
+
+        solution["Installed Capacities:"] ={**solution["Installed Capacities"], 
+                                        **solution["HS-Capacities"]} 
         
-        solution["Marginal Costs"] += [1e100]
+        solution["Thermal Generation Mix:"] = {**solution["Thermal Generation Mix"], 
+                                        **solution["Turbining Time over year"]}  
         
+        solution["Marginal Costs:"] = solution["Marginal Costs"]+[1e100]
+        
+        solution["Anual Investment Cost:"] =  {**solution["Anual Investment Cost"],
+        **solution["Anual Investment Cost Heat Storage"]} 
+        
+        solution["Revenue From Electricity:"] = {**solution["Revenue From Electricity"],
+                **solution["Revenue from Heat Storages"]}
+        
+        solution["Operational Cost:"] = {**solution["Operational Cost"],
+                **solution["Operational Cost of Heat Storages"]}
+        
+        solution["Specific Capital Costs of Installed Capacities:"] = {**solution["Specific Capital Costs of installed Capacities"],
+                **solution["Specific Capital Costs of installed Heat Storages"]}
+        solution["Fuel Costs:"] = {**solution["Fuel Costs"], 
+                **solution["Fuel Costs Heat Storages"]} 
+        solution["all_heat_geneartors"] = list(instance.all_heat_geneartors.value)
         with open(path2solution+r"\solution.json", "w") as f:
             json.dump(solution, f)
             

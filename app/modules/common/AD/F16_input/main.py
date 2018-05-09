@@ -24,6 +24,8 @@ path_parameter2 = path + r"\FEAT\F16\input.xlsx"
 path_parameter = path2data + r"\DH_technology_cost.xlsx"
 # default key for the extern paramters (load,price,radiation,temperature)
 init_data=("Wien",2016)
+# Set investment flag
+inv_flag = 0
 #%% Function definition for loading,writing and mapping the default values
 def return_dict(name_dat,init_data=init_data):
     """
@@ -202,9 +204,8 @@ def load_data():
     data["tec"] = tec
     data["tec_hs"] = tec_hs
     
-    # Set investment flag
-    inv_flag = 0
-    
+    data["all_heat_geneartors"] = data["tec"] + data["tec_hs"]
+
     return data, inv_flag 
 
 

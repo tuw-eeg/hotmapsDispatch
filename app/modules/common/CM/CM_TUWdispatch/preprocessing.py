@@ -11,20 +11,25 @@ class SliceMaker(object):
     return item
 
 #XXX: Catogorize
-def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):  
+def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):  
     
     if inv_flag:
         tec = []
-        for s in selection: 
+        for s in selection[0]: 
             tec.append(data["tec"][s])
+        j_hs =      [ data["tec_hs"][s] for s in selection[1] ]
+        
     else:
-        selection = np.nonzero(list(data["P_th_cap"].values()))[0].tolist()
-        if not selection:
+        selection_nonzero = np.nonzero(list(data["P_th_cap"].values()))[0].tolist()
+        if not selection_nonzero:
             print("No Capacities installed !!!")
             return "Error1"
         tec = []
-        for s in selection: 
+        for s in selection_nonzero: 
             tec.append(data["tec"][s])
+        
+        j_hs = data["tec_hs"]
+        
     j =         tec
     j_hp =      [key for key in tec if "heat pump" in key ]
     j_pth =     [key for key in tec if "Power To Heat" in key]
@@ -34,7 +39,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):
     j_bp =      [key for key in tec if "boiler" in key]
     j_wh =      [key for key in tec if "Waste Heat" in key]
     j_gt =      [key for key in tec if "Geo Thermal" in key]
-    j_hs =      data["tec_hs"]
+    
 #    j_hs =      ["Heat Storage"]
 
     #%% Parameter - #TODO: depends on how the input data looks finally
@@ -55,6 +60,11 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):
     OP_var_j =              {key:data["OP_var"][key] for key in tec}
     n_el_j =                {key:data["n_el"][key] for key in tec}
     electricity_price_t =   data["energy_carrier_prices"]["electricity"]
+    try:
+        sale_electricity_price_t =   data["sale_electricity"]
+    except:
+        sale_electricity_price_t =   data["energy_carrier_prices"]["electricity"]
+        
     P_min_el_chp =          0
     Q_min_th_chp =          0
     ratioPMaxFW =           450/700
@@ -81,6 +91,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):
 
         
     mc_jt =                 {(key,t):mc[key,t] for t in range(1,8760+1) for key in tec}
+
     n_th_j =                {key:data["n_th"][key] for key in tec}
     x_th_cap_j =            {key:data["P_th_cap"][key] for key in tec}
     x_el_cap_j =            {key:data["P_el_cap"][key] for key in tec}
@@ -107,7 +118,8 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):
     loss_hs =               {hs: data["n_turb_hs"][hs] for hs in j_hs}
     IK_hs =                 {hs: data["IK_cap_hs"][hs] for hs in j_hs}
     cap_hs =                {hs: data["cap_hs"][hs] for hs in j_hs}
-
+    OP_fix_hs =             {hs: data["OP_fix_hs"][hs] for hs in j_hs}
+        
     ir =    	              data["interest_rate"]  
     q =                     1+ir
     alpha_hs =              {hs: ( q**data["LT_hs"][hs] * ir) / \
@@ -128,13 +140,14 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[]):
     temperature = data["temp"]
 
     thresh = data["threshold_heatpump"]
-
+    all_heat_geneartors = data["all_heat_geneartors"] 
     args = (tec, j_hp, j_pth, j_st, j_waste, j_chp, j_bp, j_wh, j_gt, j_hs, 
             demand_th_t, max_demad, radiation_t,IK_j, OP_fix_j, n_el_j, 
             electricity_price_t, P_min_el_chp, Q_min_th_chp,
             ratioPMaxFW, ratioPMax, mc_jt, n_th_j, x_th_cap_j, x_el_cap_j, 
             pot_j, lt_j, el_surcharge, ir, alpha_j, load_cap_hs, unload_cap_hs,
             n_hs, loss_hs, IK_hs, cap_hs, c_ramp_chp, c_ramp_waste, alpha_hs,
-            rf_j,rf_tot,OP_var_j,temperature,thresh)
+            rf_j,rf_tot,OP_var_j,temperature,thresh,sale_electricity_price_t,
+            OP_fix_hs,all_heat_geneartors)
     
     return args

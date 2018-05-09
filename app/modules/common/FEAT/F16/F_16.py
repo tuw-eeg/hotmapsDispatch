@@ -18,14 +18,14 @@ from AD.F16_input.main import load_data
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
 import CM.CM_TUWdispatch.run_cm as dispatch
 #%%
-def execute(data,inv_flag,selection=[],demand_f=1):
+def execute(data,inv_flag,selection=[[],[]],demand_f=1):
     val = dispatch.main(data,inv_flag,selection,demand_f) 
     return val 
 #%%
 if __name__ == "__main__":
     print('calculation started')   
     data,inv_flag = load_data()   
-    solutions,instance,results = execute(data,inv_flag,selection=[])
+    solutions,instance,results = execute(data,inv_flag,selection=[[],[]])
     if solutions == "Error1":
         print( 'No Capacities installed !!!')
     elif solutions == "Error2":

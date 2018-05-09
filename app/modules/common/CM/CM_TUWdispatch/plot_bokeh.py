@@ -414,7 +414,10 @@ def bar_chart(dic,path2output,decison_var,cmap):
     text=list(np.round(val,2))
     items = []
     for name,glyph,label in zip(legend,bars,text):
-        items.append((name+": "+str(("%.3e"%float(label)))+"",[glyph]))
+#        items.append((name+": "+str(("%.3e"%float(label)))+"",[glyph]))
+        items.append((name+": "+str(EngNumber(float(label)))+"",[glyph]))
+
+        
     legend = Legend(items=items,location=(10, 10))    
     p.add_layout(legend, 'right')
     p.legend.click_policy = "mute" # "mute"
@@ -447,10 +450,10 @@ def costBarStack_chart(dic,decison_vars,path2output,cmap):
     Returns:
         bar chart:      bokeh.plotting.figure
     """
-    data = {x: [dic["Anual Investment Cost"][x]+dic["Anual Investment Cost (of existing power plants)"][x],
-                dic["Operational Cost"][x],
-                 dic["Fuel Costs"][x], 
-                 -dic["Revenue From Electricity"][x]] for x in dic["Technologies"]}
+    data = {x: [dic["Anual Investment Cost:"][x]+dic["Anual Investment Cost (of existing power plants and heat storages)"][x],
+                dic["Operational Cost:"][x],
+                 dic["Fuel Costs:"][x], 
+                 -dic["Revenue From Electricity:"][x]] for x in dic["Technologies:"]}
     bars = decison_vars.copy()
     bars.pop(1)
     data["bars"] = bars
@@ -464,8 +467,8 @@ def costBarStack_chart(dic,decison_vars,path2output,cmap):
 
     source = ColumnDataSource(data=data)
     
-    p.vbar_stack(dic["Technologies"], x='bars', width=0.9, color=[cmap[x] for x in dic["Technologies"]], 
-                 source=source, legend=[value(x) for x in dic["Technologies"]]) 
+    p.vbar_stack(dic["Technologies:"], x='bars', width=0.9, color=[cmap[x] for x in dic["Technologies:"]], 
+                 source=source, legend=[value(x) for x in dic["Technologies:"]]) 
     
     p.legend.location = "top_right"
     p.legend.orientation = "vertical"
@@ -546,14 +549,15 @@ def plotExtra_table (decision_vars,dic,path2output):
         if type(dic[decision_var]) == dict:
             formatted_val = []
             for item in list(dic[decision_var].values()):
-                formatted_val.append("%.3e"%item)
+#                formatted_val.append("%.3e"%item)
+                formatted_val.append(str(EngNumber(item)))
                 
             line = [[decision_var] + formatted_val]
             data = data + line
-    source = ColumnDataSource(pd.DataFrame(data, columns=["topic"]+list(dic["Technologies"])))
+    source = ColumnDataSource(pd.DataFrame(data, columns=["topic"]+list(dic["Technologies:"])))
     
     column0 = [TableColumn(field="topic", title="Topic")]
-    columns = [TableColumn(field=x, title=x) for x in dic["Technologies"]]
+    columns = [TableColumn(field=x, title=x) for x in dic["Technologies:"]]
     columns = column0+columns
     
     data_table = DataTable(source=source, columns=columns, width=800, height=800)
@@ -712,11 +716,10 @@ def plot_solutions(show_plot=False,path2json=path2json):
         try:
             with open(path2json) as f:
                 dic = json.load(f)
-            
+
             if os.path.isdir(path2output) == False:
                 print("Create Dictionary...")
-                data5 = pd.read_excel(path_parameter)
-                cmap = colormapping(data5.tec.values.tolist())
+                cmap = colormapping(dic["all_heat_geneartors"])
                 os.mkdir(path2output)
                 print("Created: "+ path2output)
                 pickle.dump(cmap, 
@@ -728,7 +731,7 @@ def plot_solutions(show_plot=False,path2json=path2json):
             return True
         
 # XXX: caution       
-        decison_var="Thermal Power Energymix" 
+        decison_var="Thermal Power Energymix:" 
         legend = list(dic[decison_var].keys())
 #        decison_var="TPE" 
         legend = list(dic[decison_var].keys())
@@ -740,31 +743,33 @@ def plot_solutions(show_plot=False,path2json=path2json):
         y3 = matrix(dic,decison_var,legend,t)
 #XXX: caution
         cmap = pickle.load(open(path2output+r"\cmap.spec", "rb"))
-#        cmap = colormapping(dic["TEC"])
+#        cmap = colormapping(dic["Technologies:"])
+        dic["Marginal Costs"] = dic["Marginal Costs:"] 
+        
         p1 = stack_chart(tw,dic,y1,legend,decison_var,path2output,cmap,"w")
         p2 = stack_chart(ts,dic,y2,legend,decison_var,path2output,cmap,"s")
         p3 = stack_chart(t,dic,y3,legend,decison_var,path2output,cmap)    
         p4 = load_duration_curve(t,dic,y3,legend,decison_var,path2output,cmap)    
-        decison_var = "Thermal Generation Mix"
+        decison_var = "Thermal Generation Mix:"
         p5 = pie_chart(dic[decison_var],path2output,decison_var,cmap)
         p10 = bar_chart(dic[decison_var],path2output,decison_var,cmap)
-        decison_var = "Installed Capacities"
+        decison_var = "Installed Capacities:"
         p6 = pie_chart(dic[decison_var],path2output,decison_var,cmap)
         p7 = bar_chart(dic[decison_var],path2output,decison_var,cmap)
-        decison_var = "Specific Capital Costs of installed Capacities"
+        decison_var = "Specific Capital Costs of installed Capacities:"
         
         decision_vars = ["Anual Total Costs",
-                         "Anual Total Costs (with costs of existing power plants)",
+                         "Anual Total Costs (with costs of existing power plants and heat storages)",
                          "Electricity Production by CHP",
                          "Thermal Production by CHP",
                          "Mean Value Heat Price",
-                         "Mean Value Heat Price (with costs of existing power plants)",
+                         "Mean Value Heat Price (with costs of existing power plants and heat storages)",
                          "Median Value Heat Price",
                          "Electrical Consumption of Heatpumps and Power to Heat devices",
                          "Maximum Electrical Load of Heatpumps and Power to Heat devices",
-                         "Revenue From Electricity",
+                         "Revenue From Electricity:",
                          "Ramping Costs",
-                         "Operational Cost",
+                         "Operational Cost:",
                          "Anual Investment Cost",
                          "Anual Investment Cost (of existing power plants)",
                          "Electrical Peak Load Costs",
@@ -775,9 +780,9 @@ def plot_solutions(show_plot=False,path2json=path2json):
         
         l1 = layout([[p5,p10],[p6,p7]])
         
-        decision_vars = ["Anual Investment Cost",
-                         "Anual Investment Cost (of existing power plants)", 
-                         "Operational Cost", "Fuel Costs", "Revenue From Electricity"]
+        decision_vars = ["Anual Investment Cost:",
+                         "Anual Investment Cost (of existing power plants and heat storages)", 
+                         "Operational Cost:", "Fuel Costs:", "Revenue From Electricity:"]
         p8 = costBarStack_chart(dic,decision_vars,path2output,cmap)
         
         p11 = plotExtra_table(decision_vars,dic,path2output)
@@ -804,7 +809,8 @@ def plot_solutions(show_plot=False,path2json=path2json):
             show(tabs)
         return tabs.tabs
     
-    except:
+    except Exception as e:
+        print(str(e))
         return "Error4"
 #%%
 if __name__ == "__main__":
