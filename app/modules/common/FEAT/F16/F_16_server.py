@@ -16,12 +16,14 @@ from bokeh.models.widgets import Panel, Tabs, Button,Div,Toggle,Select,CheckboxG
 import os,sys,io,base64
 import pickle
 from bokeh.plotting import figure
+from bokeh.models import PanTool,WheelZoomTool,BoxZoomTool,ResetTool,SaveTool,HoverTool
 
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
 if path not in sys.path:
     sys.path.append(path)
 
+#TODO: Upgrade to new bokeh version 
 from bokeh import __version__
 if __version__ != '0.12.10':
     print("Your current bokeh version ist not compatible (Your Version:" +__version__+")")
@@ -133,7 +135,9 @@ def genearte_selection(dic,dict_key_map):
     """
     select = drop_down(dic,dict_key_map)
     source = cds(select,dic,invert_dict(dict_key_map))
-    fig = figure(tools="pan,wheel_zoom,box_zoom,reset,save")
+    hover = HoverTool(tooltips=[("(x,y)", "($x, $y)")])
+    TOOLS = [PanTool(),WheelZoomTool(),BoxZoomTool(),ResetTool(),SaveTool(),hover]
+    fig = figure(tools=TOOLS)
     fig.line('x', 'y', source=source, line_alpha=0.6)
     fig.toolbar.logo = None
     
@@ -222,8 +226,7 @@ def modify_doc(doc):
     const_price.on_change("value", price_callback)   
     scale_price.on_change('value', price_callback)
     mean_price.on_change('active', price_callback)
-    
-#%%    
+#%%#TODO: Modify for non redundant code  
     select_price_sale, source_price_sale, plot_price_sale = genearte_selection(prices,price_name_map)
     feed_in_tarif_sale = TextInput(value="0", title="Offset- FiT ( Feed in Tarif) :")
     const_price_sale = TextInput(value="0", title="Constant - Flat Price:")
@@ -249,8 +252,7 @@ def modify_doc(doc):
     const_price_sale.on_change("value", price_callback_sale)   
     scale_price_sale.on_change('value', price_callback_sale)
     mean_price_sale.on_change('active', price_callback_sale) 
-#%% 
-    
+#%%
     select_radiation,source_radiation,plot_radiation = genearte_selection(radiation,radiation_name_map)
     select_temperature, source_temperature, plot_temperature = genearte_selection(temperature,temperature_name_map)
     
@@ -306,11 +308,9 @@ def modify_doc(doc):
     
     tabs_liste = [Panel(child=p, title=name) for name, p in dic.items()]
     
-    
     tabs = Tabs(tabs=tabs_liste)
 
 
-    #%%
     def download_callback():
         div_spinner.text = spinner_text
         print("Download...")
@@ -326,6 +326,11 @@ def modify_doc(doc):
         data_data_df = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore')
 #        data_data_df = data_data_df.fillna(0)
         data_data_df.to_excel(writer,'Data')
+        
+        data_hs_df = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore')
+#        data_hs_df = data_hs_df.fillna(0)
+        data_hs_df.to_excel(writer,'Heat Storages')
+        
         writer.save()
         print("Download done.\nSaved to <"+path_download_output+">")
         div_spinner.text = """<strong style="color: green;">Download done.\nSaved to: """+path_download_output+"""</strong>""" 
@@ -390,10 +395,8 @@ def modify_doc(doc):
                 return
         solutions,_,_ = execute(data,inv_flag,selection)
         if solutions == "Error1":
-#            print( 'No Capacities installed !!!')
             div_spinner.text = """<strong style="color: red;">Error: No Capacities are installed !!!</strong>"""
         elif solutions == "Error2":
-#            print("The installed capacities are not enough to cover the load !!!" )
             div_spinner.text = """<strong style="color: red;">Error: The installed capacities are not enough to cover the load !!!</strong>""" 
         elif solutions == "Error3":
             print("Error in Saving Solution to JSON !!!")
@@ -425,11 +428,11 @@ def modify_doc(doc):
             print(file_type)
             file_io = io.BytesIO(file_contents)
             excel_object = pd.ExcelFile(file_io, engine='xlrd')
-            data2 = excel_object.parse(sheet_name = 'Parameter for Powerplants', index_col = 0,skiprows = range(21,50)).apply(pd.to_numeric, errors='ignore')
+            data2 = excel_object.parse(sheet_name = 'Heat Generators', index_col = 0,skiprows = range(22,50)).apply(pd.to_numeric, errors='ignore')
             data2 = data2.fillna(0)
             data_table.source.data.update(data2)
             
-            data2 = excel_object.parse(sheet_name = 'prices and emmision factors', index_col = 0,skiprows = range(13,50)).apply(pd.to_numeric, errors='ignore')
+            data2 = excel_object.parse(sheet_name = 'prices and emmision factors', index_col = 0,skiprows = range(14,50)).apply(pd.to_numeric, errors='ignore')
             data2 = data2.fillna(0)
             data_table_prices.source.data.update(data2)
             
@@ -440,19 +443,17 @@ def modify_doc(doc):
             data2 = data2.fillna(0)
             data_table_data.source.data.update(data2)
             
-        elif file_type == "csv":
-            print(file_type)
-            file_io = io.StringIO(bytes.decode(file_contents))
-            data2 = pd.read_csv(file_io).apply(pd.to_numeric, errors='ignore')
+            data2 = excel_object.parse(sheet_name = 'Heat Storages', index_col = 0).apply(pd.to_numeric, errors='ignore')
             data2 = data2.fillna(0)
-            data_table.source.data.update(data2)
+            data_table_heat_storage.source.data.update(data2)
+            div_spinner.text = """<strong style="color: green;">Upload done</strong>"""
         else:
             print("Not a valid file to upload")
-            div_spinner.text = "Not a valid file to upload"
+            div_spinner.text = """<strong style="color: red;">Not a valid file to uploade</strong>"""
         print('Upload done')
-        div_spinner.text = """<strong style="color: green;">Upload done</strong>"""
+        
     #%%
-    
+#XXX: How to Download file from Server with JS ?  (currently obsoulete, saves to path of this file)    
 #    download_code=open(path_download_js).read()
 #    download_callback_js = CustomJS(args=dict(source=source), code=download_code)
 #    download_button = Button(label='Download Power Plant Parameters', button_type='success', callback=download_callback_js)

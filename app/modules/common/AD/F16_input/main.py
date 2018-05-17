@@ -98,7 +98,52 @@ def overwrite(old,new,value,mapper):
             old[mapper[key]]=dic[key]
         else:
             old[mapper[key]]=list(dic[key].values())[0]
-#%%           
+#%%      
+def write_fit(string,profil):
+    """
+    This function return a dict that uses the string input to specify the 
+    
+    Parameters:
+        string:     str
+                    String that specifies the feed in Tarif or Offset
+                    Has to be in this form "XXf + XXh""   
+                        XX... value (float)
+                        f... Fix Price
+                        h... Offset
+                    like: "20f + 35.05h"
+    Return:
+        dictionary  dict
+                    Returns the dict with spezified Feed in Tarif and or 
+                    Fix Price for the given profile
+    """
+    feed_in_tarif = 0
+    fix_price = 0
+    string = string.strip()
+    if  string != "0" and string !="":
+        for string in string.split("+"):
+            string = string.strip()
+            if string == "":
+                continue
+            elif string[-1] == 'f':
+                try:
+                    feed_in_tarif = float(string[:-1])
+                except:
+                    print("User Input for FiT is wrong,...assuming 0 ")
+                    feed_in_tarif = 0
+            elif string[-1] == 'h':
+                try:
+                    fix_price = float(string[:-1])
+                except:
+                    print("User Input for constant hourly price is wrong,... using variable prices")
+                    fix_price = 0
+            else:
+                print("User Input for electricity is wrong")
+                sys.exit()
+    if fix_price == 0:    
+        return dict(zip(range(1,8760+1),(np.array(list(profil.values()))+feed_in_tarif).tolist()))
+    else:
+        return dict(zip(range(1,8760+1),[feed_in_tarif+fix_price]*8760))                      
+#%%
 def load_data():
     """
     This function returns the data for the dispatch model 
@@ -155,16 +200,19 @@ def load_data():
     
     data_input_hg = pd.read_excel(path_parameter2,"Heat Generators",skiprows=range(22,26)).fillna(0)
     data_input_prices_ef = pd.read_excel(path_parameter2,"prices and emmision factors").fillna(0)
+    data_input_hs = pd.read_excel(path_parameter2,"Heat Storage").fillna(0)
     
     # Generate Mapping tables to distinguish the input data
     input_list_mapper = return_mapper()
     input_price_list_mapper = return_mapper("prices and emmision factors")
     parameter_list_mapper = return_mapper("financal and other parameteres")
+    hs_mapper = return_mapper("Heat Storage")
     
      # Overwrite default values with user input data 
     overwrite(data,data_input_hg,"name",input_list_mapper)
     overwrite(data,data_input_prices_ef,"energy carrier",input_price_list_mapper)
     overwrite(data,data_input_params,"",parameter_list_mapper)
+    overwrite(data,data_input_hs,"name",hs_mapper)
 
     # Load externel data like demand, radiation,temperature, electricity price     
     demand = pickle.load(open(path2data+r"\load_profiles.dat", "rb"))[init_data]    
@@ -173,33 +221,16 @@ def load_data():
     data["radiation"] = return_dict("radiation_profiles")
     data["temp"] = return_dict("temperature_profiles")
     
-    # %%
-    feed_in_tarif = 0
-    fix_price = 0
-    if data["energy_carrier_prices"]["electricity"] !=0:
-        for string in data["energy_carrier_prices"]["electricity"].split("+"):
-            string = string.strip()
-            if string == "":
-                continue
-            elif string[-1] == 'f':
-                try:
-                    feed_in_tarif = float(string[:-1])
-                except:
-                    print("User Input for FiT is wrong,...assuming 0 ")
-                    feed_in_tarif = 0
-            elif string[-1] == 'h':
-                try:
-                    fix_price = float(string[:-1])
-                except:
-                    print("User Input for constant hourly price is wrong,... using variable prices")
-                    fix_price = 0
-            else:
-                print("User Input for electricity is wrong")
-                sys.exit()
-    if fix_price == 0:    
-        data["energy_carrier_prices"]["electricity"] = dict(zip(range(1,8760+1),(np.array(list(return_dict("price_profiles").values()))+feed_in_tarif).tolist()))
-    else:
-        data["energy_carrier_prices"]["electricity"] = dict(zip(range(1,8760+1),[feed_in_tarif+fix_price]*8760))
+    #%%
+    fit = data_input_hs = pd.read_excel(path_parameter2,"FiT_Offset").fillna(0)
+    
+                            
+    data["energy_carrier_prices"]["electricity"] = write_fit(data["energy_carrier_prices"]["electricity"],return_dict("price_profiles"))
+    data["sale_electricity"] = write_fit(str(fit["Sale Electricity Price"].values[0]),return_dict("price_profiles"))
+    data["temp"] = write_fit(str(fit["Temperature"].values[0]),data["temp"])
+    data["radiation"]  = write_fit(str(fit["Radiation"].values[0]),data["radiation"])
+    data["demand_th"] = write_fit(str(fit["Demand"].values[0]),data["demand_th"])
+    
     #%%
     data["tec"] = tec
     data["tec_hs"] = tec_hs
