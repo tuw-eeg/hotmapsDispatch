@@ -92,8 +92,9 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
 
         solution["Anual Investment Cost (of existing power plants)"] = c_inv_stock
         solution["Anual Investment Cost (of existing heat storages)"] = {hs:instance.cap_hs[hs] * instance.IK_hs[hs] * instance.alpha_hs[hs] for hs in instance.j_hs}
-        solution["Anual Investment Cost (of existing power plants and heat storages)"]={**solution["Anual Investment Cost (of existing heat storages)"],
-                 **solution["Anual Investment Cost (of existing power plants)"]}
+        solution["Anual Investment Cost (of existing power plants and heat storages)"]={**solution["Anual Investment Cost (of existing power plants)"],
+                 **solution["Anual Investment Cost (of existing heat storages)"],
+                 }
         solution["Anual Total Costs (with costs of existing power plants and heat storages)"] = \
             solution["Anual Total Costs (with costs of existing power plants)"] + \
             sum(solution["Anual Investment Cost (of existing heat storages)"].values())

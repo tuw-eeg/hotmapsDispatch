@@ -380,6 +380,9 @@ def modify_doc(doc):
         data["radiation"] = dict(zip(range(1,len(source_radiation.data["y"])+1),source_radiation.data["y"]))
         data["temp"] = dict(zip(range(1,len(source_temperature.data["y"])+1),source_temperature.data["y"]))
         
+        data["tec_hs"] = list(data_heat_storages["name"].values)
+        data["tec"] = list(data1["name"].values)
+        
         data["all_heat_geneartors"] = data["tec"] + data["tec_hs"]
         
         solutions = None

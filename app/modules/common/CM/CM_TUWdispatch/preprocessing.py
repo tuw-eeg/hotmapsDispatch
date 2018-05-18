@@ -27,8 +27,12 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
         tec = []
         for s in selection_nonzero: 
             tec.append(data["tec"][s])
+            
+        selection_nonzero = np.nonzero(list(data["cap_hs"].values()))[0].tolist() 
+        tec_hs = []
+        for s in selection_nonzero: 
+            tec_hs.append(data["tec_hs"][s])
         
-        j_hs = data["tec_hs"]
         
     j =         tec
     j_hp =      [key for key in tec if "heat pump" in key ]
@@ -39,8 +43,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     j_bp =      [key for key in tec if "boiler" in key]
     j_wh =      [key for key in tec if "Waste Heat" in key]
     j_gt =      [key for key in tec if "Geo Thermal" in key]
-    
-#    j_hs =      ["Heat Storage"]
+    j_hs =      tec_hs
 
     #%% Parameter - #TODO: depends on how the input data looks finally
     demand_th_t =           data["demand_th"]
@@ -133,14 +136,12 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     rf_j =                  {key:data["RF"][key] for key in tec}
     rf_tot =                data["toatl_RF"]
 
-#    temperature = []
-#    for idx,val in data["temp"].items():
-#        temperature.append([val]*24)
-#    temperature = dict(zip(range(1,8760+1),sum(temperature,[])))
     temperature = data["temp"]
 
     thresh = data["threshold_heatpump"]
     all_heat_geneartors = data["all_heat_geneartors"] 
+    
+    
     args = (tec, j_hp, j_pth, j_st, j_waste, j_chp, j_bp, j_wh, j_gt, j_hs, 
             demand_th_t, max_demad, radiation_t,IK_j, OP_fix_j, n_el_j, 
             electricity_price_t, P_min_el_chp, Q_min_th_chp,
