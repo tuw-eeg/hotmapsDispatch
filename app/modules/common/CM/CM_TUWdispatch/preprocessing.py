@@ -17,7 +17,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
         tec = []
         for s in selection[0]: 
             tec.append(data["tec"][s])
-        j_hs =      [ data["tec_hs"][s] for s in selection[1] ]
+        tec_hs =      [ data["tec_hs"][s] for s in selection[1] ]
         
     else:
         selection_nonzero = np.nonzero(list(data["P_th_cap"].values()))[0].tolist()
