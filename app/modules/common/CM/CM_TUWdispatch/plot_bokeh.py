@@ -220,13 +220,41 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     x,y = create_patch_coordinates(sorted_values,t)
     
     areas = [p.patch(xy[0],xy[1],color=colors[i], alpha=0.8, line_color=None,muted_alpha=0.2) for i,xy in enumerate(zip(x,y)) ]
-    
+     
+
+                    
     electricity = np.array(dic["Electricity Price"])[t]
     
     heat_p = np.array(dic["Heat Price"])[t]
     items = [("Heat Demand",   [line] )]
     for label,glyph in zip(legend,areas):
         items.append((label,[glyph]))
+    
+
+    try:
+        for hs in dic["Heat Storage Technologies"]:
+            if sum(np.array(dic["Loading Heat Storage"][hs])[t]) != 0:
+                loading = p.patch( [t[0]] + list(t) + [t[-1]],
+                              [0] + (np.array(dic["Loading Heat Storage"][hs])*-1)[t].tolist() + [0]
+                              ,color="#EF7B7B",line_color=None,muted_alpha=0.2)
+                items.append(("Loading-"+hs,[loading]))
+                
+                level = p.line( list(t),np.array(dic["State of Charge"][hs])[t].tolist(),color="green",muted_alpha=0.2)
+                items.append(("Level-"+hs,[level]))
+                
+                load = p.line( list(t),np.array(dic["Loading Heat Storage"][hs])[t].tolist(),color="red",muted_alpha=0.2)
+                items.append(("Load-"+hs,[load]))
+                
+                unload = p.line( list(t),np.array(dic["Unloading Heat Storage"][hs])[t].tolist(),color="blue",muted_alpha=0.2)
+                items.append(("Unload-"+hs,[unload]))
+                
+                level.visible  = False
+                load.visible = False
+                unload.visible = False
+                
+    except:
+        pass
+    
     legend = Legend(items=items,location=(10, 10))
     
     p.add_layout(legend, 'right')   
@@ -317,24 +345,20 @@ def load_duration_curve(t,dic,y,legend,decison_var,path2output,cmap):
 #%%
 def pie_chart(dic,path2output,decison_var,cmap):
     """
-    This function returns a bokeh figure that shows the data from 
-    dic[decison_var] as a pie chart.
-    This figure has also an interactive legend. 
-    i.e: by clicking you can hide or show the areas of the clicked technologies 
+    This function returns a bokeh figure that shows the data from dic as a pie 
+    chart.This figure has also an interactive legend. 
+    i.e: by clicking you can hide or show the bars of the clicked technologies 
         
     Parameters:
         dic:            dict
-                        Dictionary that contains the solution of the model
+                        Dictionary that contains data that should be analyzed 
+                        from the solution of the model  
                         
         path2output:    string
                         path where the figure should be saved (obsolete)     
                         
         decison_var:    string
-                        Decciosn variable that should be analyzed from the 
-                        solution      
-                        
-        cmap:           dict
-                        colormaping table to assign each techology to a color
+                        Title of the Plot      
     Returns:
         pie_chart:      bokeh.plotting.figure
     """
@@ -374,21 +398,20 @@ def pie_chart(dic,path2output,decison_var,cmap):
 #%%
 def bar_chart(dic,path2output,decison_var,cmap):
     """
-    This function returns a bokeh figure that shows the data from 
-    dic[decison_var] as a bar chart.
-    This figure has also an interactive legend. 
+    This function returns a bokeh figure that shows the data from dic as a bar 
+    chart.This figure has also an interactive legend. 
     i.e: by clicking you can hide or show the bars of the clicked technologies 
         
     Parameters:
         dic:            dict
-                        Dictionary that contains the solution of the model
+                        Dictionary that contains data that should be analyzed 
+                        from the solution of the model  
                         
         path2output:    string
                         path where the figure should be saved (obsolete)     
                         
         decison_var:    string
-                        Decciosn variable that should be analyzed from the 
-                        solution      
+                        Title of the Plot      
                         
         cmap:           dict
                         colormaping table to assign each technology to a color
@@ -508,10 +531,13 @@ def plot_table (decision_vars,dic,path2output):
             val.append(sum(dic[decision_var]))
         else:
             val.append(dic[decision_var])
-#    formatted_val = []
-#    for item in val:
-#        formatted_val.append("%.3e"%item)
-    formatted_val = [str(EngNumber(item)) for item in val]
+    try:
+        formatted_val = [str(EngNumber(item)) for item in val]
+    except:
+        formatted_val = []
+        for item in val:
+            formatted_val.append("%.3e"%item)
+
     data = dict(
             topic = decision_vars,
             value = formatted_val,
@@ -730,20 +756,22 @@ def plot_solutions(show_plot=False,path2json=path2json):
                   path2json+"\n*********\n")
             return True
         
-# XXX: caution       
         decison_var="Thermal Power Energymix:" 
         legend = list(dic[decison_var].keys())
-#        decison_var="TPE" 
-        legend = list(dic[decison_var].keys())
-        tw = range(0,350)  
-        ts = range(730*5,730*5+336+1)   
+        tw = range(730*1,730*1+336+1)  
+        ts = range(730*6,730*6+336+1)   
         t = range(0,8760)
         y1 = matrix(dic,decison_var,legend,tw)
         y2 = matrix(dic,decison_var,legend,ts)
         y3 = matrix(dic,decison_var,legend,t)
-#XXX: caution
+
         cmap = pickle.load(open(path2output+r"\cmap.spec", "rb"))
-#        cmap = colormapping(dic["Technologies:"])
+        cmap2 = colormapping(dic["Technologies:"])
+        if cmap != cmap2:
+            cmap = cmap2
+            pickle.dump(cmap, 
+                            open(path2output+r'\cmap.spec', 'wb'))
+            
         dic["Marginal Costs"] = dic["Marginal Costs:"] 
         
         p1 = stack_chart(tw,dic,y1,legend,decison_var,path2output,cmap,"w")

@@ -92,6 +92,8 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.x_unload_hs_t = pe.Var(m.j_hs,m.t,within=pe.NonNegativeReals)
     m.Cap_hs = pe.Var(m.j_hs,within=pe.NonNegativeReals)
     m.store_level_hs_t = pe.Var(m.j_hs,m.t,within=pe.NonNegativeReals)
+    m.binary_load_hs_t = pe.Var(m.j_hs,m.t,within=pe.Binary)
+    m.binary_unload_hs_t = pe.Var(m.j_hs,m.t,within=pe.Binary)
     
     m.ramp_j_chp_t = pe.Var(m.j_chp, m.t,within=pe.NonNegativeReals)
     m.ramp_j_waste_t = pe.Var(m.j_waste, m.t,within=pe.NonNegativeReals)
@@ -181,7 +183,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
         sv_chp = (m.ratioPMaxFW - m.ratioPMax) / (m.ratioPMax*m.ratioPMaxFW)
         rule = m.x_el_jt[j,t] <= m.Cap_j[j]/m.ratioPMax - sv_chp * m.x_th_jt[j,t]
         return rule 
-    m.chp_geneartion_restriction1_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction1_jt_rule)
+#    m.chp_geneartion_restriction1_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction1_jt_rule)   # should be adopted using binary variables
     
     def chp_geneartion_restriction2_jt_rule(m,j,t):
         rule = m.P_min_el_chp <=  m.x_el_jt[j,t]
@@ -191,9 +193,15 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     #% The ratio of the maximum heat decoupling to the maximum electrical power determines the decrease in the maximum heat decoupling 
     #with the produced electrical net power.
     def chp_geneartion_restriction3_jt_rule(m,j,t):
-        rule = m.x_el_jt[j,t] >= m.x_th_jt[j,t] / m.ratioPMaxFW
+#        rule = m.x_el_jt[j,t] >= m.x_th_jt[j,t] / m.ratioPMaxFW    # should be adopted using binary variables
+        rule = m.x_el_jt[j,t] == m.x_th_jt[j,t] / m.ratioPMaxFW
+
         return rule 
     m.chp_geneartion_restriction3_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction3_jt_rule) 
+    
+    def load_or_unload_rule(m,hs,t):
+        return m.binary_load_hs_t[hs,t] + m.binary_unload_hs_t[hs,t] == 1
+    m.load_or_unload = pe.Constraint(m.j_hs,m.t,rule=load_or_unload_rule)
     
     # The heat storage level = old_level + pumping  - turbining
     def storage_state_hs_t_rule(m,hs,t):
@@ -213,25 +221,28 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
             return m.store_level_hs_t[hs,t] <= m.cap_hs[hs]
     m.storage_state_capacity_restriction_hs_t = pe.Constraint(m.j_hs,m.t,rule=storage_state_capacity_restriction_hs_t_rule)
     
-#    def storage_cap_restriction_hs_rule(m,hs):
-#        if not inv_flag:
-#            return m.Cap_hs[hs] == m.cap_hs[hs]
-#    m.storage_cap_restriction_hs = pe.Constraint(m.j_hs,rule=storage_cap_restriction_hs_rule)
+    def storage_cap_restriction_hs_rule(m,hs,t,flag):
+        if flag :
+            if inv_flag:
+                return m.x_load_hs_t[hs,t] <=  m.Cap_hs[hs] + m.cap_hs[hs] - m.store_level_hs_t[hs,t]
+            else:
+                return m.x_load_hs_t[hs,t] <=  m.cap_hs[hs] - m.store_level_hs_t[hs,t]
+        else:
+            return m.x_unload_hs_t[hs,t] <=  m.store_level_hs_t[hs,t] - m.unload_cap_hs[hs]
+        
+#    m.storage_cap_restriction_hs = pe.Constraint(m.j_hs,m.t,[True,False],rule=storage_cap_restriction_hs_rule)
     
     # The discharge and charge amounts are limited 
     def load_hs_t_restriction_rule (m,hs,t):
-        return m.x_load_hs_t[hs,t] <= m.load_cap_hs[hs]
+        return m.x_load_hs_t[hs,t] <=  m.binary_load_hs_t[hs,t]*m.load_cap_hs[hs]
     m.load_hs_t_restriction = pe.Constraint(m.j_hs,m.t,rule=load_hs_t_restriction_rule)
     
     def unload_hs_t_restriction_rule (m,hs,t,flag):
         
         if flag:
-            return m.x_unload_hs_t[hs,t] <= m.unload_cap_hs[hs]
+            return m.x_unload_hs_t[hs,t] <=  m.binary_unload_hs_t[hs,t]*m.unload_cap_hs[hs]
         else:
-            if t == 1:
-                return m.x_unload_hs_t[hs,t] <= m.store_level_hs_t[hs,t]              
-            else:
-                return m.x_unload_hs_t[hs,t] <= m.store_level_hs_t[hs,t-1] 
+            return m.x_unload_hs_t[hs,t] <=  m.binary_unload_hs_t[hs,t]*m.store_level_hs_t[hs,t] 
 
     m.unload_hs_t_restriction = pe.Constraint(m.j_hs,m.t,[True,False],rule=unload_hs_t_restriction_rule)
     #%
@@ -275,13 +286,13 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
         c_var = c_var + sum([m.mc_jt[j,t] *(m.x_el_jt[j,t] + sv_chp * m.x_th_jt[j,t])/ m.n_el_j[j] for j in m.j_chp for t in m.t])
         c_peak_el = m.P_el_max*10000  
         c_ramp = sum ([m.ramp_j_waste_t[j,t] * m.c_ramp_waste for j in m.j_waste for t in m.t]) + sum ([m.ramp_j_chp_t[j,t] * m.c_ramp_chp for j in m.j_chp for t in m.t])
-        c_storage = sum([m.x_load_hs_t[hs,t]*m.electricity_price_t[t]  for hs in m.j_hs for t in m.t])        
-        c_tot = c_inv + c_var + c_op_fix + c_op_var + c_peak_el + c_ramp +c_storage
+        c_storage = sum([m.x_load_hs_t[hs,t]*m.electricity_price_t[t]  for hs in m.j_hs for t in m.t])
+        c_hs_penalty = sum([m.x_unload_hs_t[hs,t]*1e-6  for hs in m.j_hs for t in m.t]) # for modeling reasons       
+        c_tot = c_inv + c_var + c_op_fix + c_op_var + c_peak_el + c_ramp +c_storage + c_hs_penalty
  
         rev_gen_electricity = sum([m.x_el_jt[j,t]*(m.sale_electricity_price_t[t]) for j in m.j for t in m.t])
  
-        rev_storage = sum([m.x_unload_hs_t[hs,t]*m.sale_electricity_price_t[t] for hs in m.j_hs for t in m.t])
-        rev_tot = rev_gen_electricity + rev_storage
+        rev_tot = rev_gen_electricity
         
         rule = c_tot - rev_tot
         return rule
@@ -297,10 +308,26 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     solv_start = datetime.now()
     print("*****************\nStart Solving...\n*****************")
     opt = pe.SolverFactory("gurobi")
+    opt.options['MIPGap'] = 0.5
+    opt.options['Threads'] = 4
     results = opt.solve(instance, load_solutions=False,tee=True,suffixes=['.*'])   # tee= Solver Progress, Suffix um z.B Duale Variablen anzuzeigen -> '.*' für alle   
     instance.solutions.load_from(results)
     instance.solutions.store_to(results)
     print("*****************\ntime for solving: " + str(datetime.now()-solv_start)+"\n*****************")
+    solv_start = datetime.now()
+    try:
+        if len(list(instance.j_hs.value)) != 0:
+            print("*****************\nFixing Binary and resolving...\n*****************")
+            # to get Dual Variables the binary variables had to be fixed and then resolved again 
+            instance.binary_load_hs_t.fix()
+            instance.binary_unload_hs_t.fix()
+            instance.preprocess() 
+            results = opt.solve(instance, load_solutions=False,tee=True,suffixes=['.*'])   # tee= Solver Progress, Suffix um z.B Duale Variablen anzuzeigen -> '.*' für alle   
+            instance.solutions.load_from(results)
+            instance.solutions.store_to(results)
+            print("*****************\ntime for resolving: " + str(datetime.now()-solv_start)+"\n*****************")
+    except:
+        pass
 
     return(instance,results)
 

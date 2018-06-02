@@ -8,6 +8,8 @@ Created on Tue Sep 26 11:52:51 2017
 import os
 import json
 import numpy as np
+import pandas as pd
+import copy
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
 
@@ -110,12 +112,11 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         
         solution["HS-Capacities"] = {hs:instance.Cap_hs[hs]()+instance.cap_hs[hs] if instance.Cap_hs[hs]() != None else instance.cap_hs[hs] for hs in instance.j_hs }
 
-        solution["Turbining Time"] =  {hs:[instance.x_unload_hs_t[hs,t]() for t in instance.t] for hs in instance.j_hs}  
-        solution["Pumping Time"] =  {hs:[instance.x_load_hs_t[hs,t]() for t in instance.t] for hs in instance.j_hs}  
+        solution["Unloading Heat Storage"] =  {hs:[instance.x_unload_hs_t[hs,t]() for t in instance.t] for hs in instance.j_hs}  
+        solution["Loading Heat Storage"] =  {hs:[instance.x_load_hs_t[hs,t]() for t in instance.t] for hs in instance.j_hs}  
         solution["Heat Storage Technologies"] = list(instance.j_hs.value)
-        solution["Turbining Time over year"] =  {hs:sum([instance.x_unload_hs_t[hs,t]() for t in instance.t]) for hs in instance.j_hs}  
-        
-        solution["Revenue from Heat Storages"]  = {hs:sum([instance.x_unload_hs_t[hs,t]() * instance.sale_electricity_price_t[t] for t in instance.t]) for hs in instance.j_hs }
+        solution["Unloading Heat Storage over year"] =  {hs:sum([instance.x_unload_hs_t[hs,t]() for t in instance.t]) for hs in instance.j_hs}  
+        solution["Revenue from Heat Storages"]  = {hs:0 for hs in instance.j_hs} 
         solution["Operational Cost of Heat Storages"]= {hs:solution["HS-Capacities"][hs] * instance.OP_fix_hs[hs] + sum(instance.x_load_hs_t[hs,t]() * instance.electricity_price_t[t] for t in instance.t) for hs in instance.j_hs }
         solution["Specific Capital Costs of installed Heat Storages"] = {hs:instance.IK_hs[hs] * instance.alpha_hs[hs] for hs in solution["HS-Capacities"].keys() if solution["HS-Capacities"][hs] !=0 }
         solution["Fuel Costs Heat Storages"] = {hs:0 for hs in instance.j_hs}  
@@ -123,21 +124,23 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Technologies:"] =  solution["Technologies"] + solution["Heat Storage Technologies"]
         
         solution["Thermal Power Energymix:"] = {**solution["Thermal Power Energymix"], 
-                                        **solution["Turbining Time"]}
+                                        **solution["Unloading Heat Storage"]}
 
         solution["Installed Capacities:"] ={**solution["Installed Capacities"], 
                                         **solution["HS-Capacities"]} 
         
         solution["Thermal Generation Mix:"] = {**solution["Thermal Generation Mix"], 
-                                        **solution["Turbining Time over year"]}  
+                                        **solution["Unloading Heat Storage over year"]}  
         
-        solution["Marginal Costs:"] = solution["Marginal Costs"]+[1e100]
+        solution["Marginal Costs:"] = solution["Marginal Costs"]+[1e100]*len(solution["Heat Storage Technologies"])
         
         solution["Anual Investment Cost:"] =  {**solution["Anual Investment Cost"],
         **solution["Anual Investment Cost Heat Storage"]} 
         
         solution["Revenue From Electricity:"] = {**solution["Revenue From Electricity"],
                 **solution["Revenue from Heat Storages"]}
+ 
+                
         
         solution["Operational Cost:"] = {**solution["Operational Cost"],
                 **solution["Operational Cost of Heat Storages"]}
@@ -147,6 +150,27 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Fuel Costs:"] = {**solution["Fuel Costs"], 
                 **solution["Fuel Costs Heat Storages"]} 
         solution["all_heat_geneartors"] = list(instance.all_heat_geneartors.value)
+        
+        # only sum effective energy -> producton of solar thermal over  heat 
+        # demand is not shown in the Thermal Generation mix
+        
+        matrix = pd.DataFrame(solution["Thermal Power Energymix:"]).values
+        sum_matrix = matrix.sum(1)
+        demand = solution["Heat Demand"]
+        
+        dif = sum_matrix - demand
+        mask = sum_matrix > demand
+        reduce = mask*dif
+        
+        _dic = copy.deepcopy(solution)
+        try:
+            for j in instance.j_st:
+                _dic["Thermal Power Energymix:"][j] = list(np.array(solution["Thermal Power Energymix:"][j]) - reduce)
+                solution["Thermal Generation Mix:"]  = pd.DataFrame(_dic["Thermal Power Energymix:"]).sum().to_dict()
+        except:
+            pass
+
+        
         with open(path2solution+r"\solution.json", "w") as f:
             json.dump(solution, f)
             
