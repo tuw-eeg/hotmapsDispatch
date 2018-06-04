@@ -195,9 +195,14 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     def chp_geneartion_restriction3_jt_rule(m,j,t):
 #        rule = m.x_el_jt[j,t] >= m.x_th_jt[j,t] / m.ratioPMaxFW    # should be adopted using binary variables
         rule = m.x_el_jt[j,t] == m.x_th_jt[j,t] / m.ratioPMaxFW
-
         return rule 
     m.chp_geneartion_restriction3_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction3_jt_rule) 
+    
+#   Seting cap for chp generation
+    def chp_geneartion_restriction4_jt_rule(m,j,t):
+        rule = m.x_th_jt[j,t] <= m.demand_th_t[t] + sum(m.x_load_hs_t[hs,t] for hs in m.j_hs)
+        return rule 
+    m.chp_geneartion_restriction4_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction4_jt_rule)
     
     def load_or_unload_rule(m,hs,t):
         return m.binary_load_hs_t[hs,t] + m.binary_unload_hs_t[hs,t] == 1

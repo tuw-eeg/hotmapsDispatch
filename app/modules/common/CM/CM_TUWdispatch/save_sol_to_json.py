@@ -166,6 +166,9 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         try:
             for j in instance.j_st:
                 _dic["Thermal Power Energymix:"][j] = list(np.array(solution["Thermal Power Energymix:"][j]) - reduce)
+                null = np.array(solution["Thermal Power Energymix:"][j])
+                null *= null > 0 
+                _dic["Thermal Power Energymix:"][j] = list(null)
                 solution["Thermal Generation Mix:"]  = pd.DataFrame(_dic["Thermal Power Energymix:"]).sum().to_dict()
         except:
             pass
