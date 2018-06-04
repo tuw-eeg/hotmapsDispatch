@@ -283,7 +283,8 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
         c_op_var = sum([m.x_th_jt[j,t]* m.OP_var_j[j] for j in m.j for t in m.t])
         c_var= sum([m.mc_jt[j,t] * m.x_th_jt[j,t] for j in m.j for t in m.t  if j not in m.j_chp])  # 
         sv_chp = (m.ratioPMaxFW - m.ratioPMax) / (m.ratioPMax*m.ratioPMaxFW)
-        c_var = c_var + sum([m.mc_jt[j,t] *(m.x_el_jt[j,t] + sv_chp * m.x_th_jt[j,t])/ m.n_el_j[j] for j in m.j_chp for t in m.t])
+#        c_var = c_var + sum([m.mc_jt[j,t] *(m.x_el_jt[j,t] + sv_chp * m.x_th_jt[j,t])/ m.n_el_j[j] for j in m.j_chp for t in m.t])
+        c_var = c_var + sum([m.mc_jt[j,t] * m.x_th_jt[j,t] - m.sale_electricity_price_t[t] * m.x_el_jt[j,t] for j in m.j_chp for t in m.t])
         c_peak_el = m.P_el_max*10000  
         c_ramp = sum ([m.ramp_j_waste_t[j,t] * m.c_ramp_waste for j in m.j_waste for t in m.t]) + sum ([m.ramp_j_chp_t[j,t] * m.c_ramp_chp for j in m.j_chp for t in m.t])
         c_storage = sum([m.x_load_hs_t[hs,t]*m.electricity_price_t[t]  for hs in m.j_hs for t in m.t])
