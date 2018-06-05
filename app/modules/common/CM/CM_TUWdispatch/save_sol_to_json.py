@@ -23,35 +23,16 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         print("Saving Solver Output ....")
         
         
-        c_inv={}
-        c_op_fix={}
-        c_op_var={}
-        c_var={}
-        c_peak_el={}
         c_ramp={}
-        c_tot={}
         rev_tot={}
-        c_final={}
         
         c_inv_stock = {j:instance.x_th_cap_j[j] * instance.IK_j[j] * instance.alpha_j[j] for j in instance.j}
-        c_inv = {j:(instance.Cap_j[j]() - instance.x_th_cap_j[j])  * instance.IK_j[j] * instance.alpha_j[j] for j in instance.j}
-        c_op_fix = {j:instance.Cap_j[j]() * instance.OP_fix_j[j] for j in instance.j}
-        if inv_flag:
-            c_op_fix = {j:(instance.Cap_j[j]()+instance.x_th_cap_j[j]) * instance.OP_fix_j[j] for j in instance.j}
-        c_op_var = {j:sum(instance.x_th_jt[j,t]()* instance.OP_var_j[j]  for t in instance.t) for j in instance.j}
-        c_var= {j:sum(instance.mc_jt[j,t] * instance.x_th_jt[j,t]() for t in instance.t) for j in instance.j if j not in instance.j_chp}  # 
-        sv_chp = (instance.ratioPMaxFW - instance.ratioPMax) / (instance.ratioPMax*instance.ratioPMaxFW)
-        for j in instance.j_chp:
-            c_var[j] = sum(instance.mc_jt[j,t] *(instance.x_el_jt[j,t]() + sv_chp * instance.x_th_jt[j,t]())/ instance.n_el_j[j] for t in instance.t)
-        c_peak_el = instance.P_el_max()*10000  
         c_ramp = {j:sum(instance.ramp_j_waste_t[j,t]() * instance.c_ramp_waste for t in instance.t) for j in instance.j_waste}
         for j in instance.j_chp:
             c_ramp[j] = sum(instance.ramp_j_chp_t[j,t]() * instance.c_ramp_chp for t in instance.t)
         rev_tot = {j:sum(instance.x_el_jt[j,t]()*instance.sale_electricity_price_t[t] for t in instance.t) for j in instance.j}
         
         c_tot_inv = instance.cost() + sum ([c_inv_stock[j]  for j in instance.j])
-        c_tot = sum(c_var.values())
-        c_tot = sum(c_inv.values()) + sum(c_var.values()) + sum(c_op_fix.values()) + sum(c_op_var.values()) + c_peak_el + sum(c_ramp.values())
 
         
         solution={ "Thermal Power Energymix":{j:[instance.x_th_jt[(j,t)]() for t in instance.t] for j in instance.j},
@@ -76,14 +57,10 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Mean Value Heat Price (with costs of existing power plants)"] =  c_tot_inv/sum([instance.demand_th_t[t] for t in instance.t])
         solution["Median Value Heat Price"] = np.median(np.array(solution["Heat Price"]))          
         solution["Operational Cost"]= {j:(instance.Cap_j[j]() * instance.OP_fix_j[j] + sum(instance.x_th_jt[j,t]() * instance.OP_var_j[j]for t in instance.t))for j in instance.j}
-        sv_chp = (instance.ratioPMaxFW - instance.ratioPMax) / (instance.ratioPMax*instance.ratioPMaxFW)
-        solution["Variable Cost CHP's"]= sum([instance.mc_jt[j,t] *(instance.x_el_jt[j,t]() + sv_chp * instance.x_th_jt[j,t]())/ instance.n_el_j[j] for j in instance.j_chp for t in instance.t])
+        solution["Variable Cost CHP's"]= sum([instance.mc_jt[j,t] * instance.x_th_jt[j,t]() - instance.sale_electricity_price_t[t] * instance.x_el_jt[j,t]() for j in instance.j_chp for t in instance.t])
         solution["Fuel Costs"] = {j:sum([instance.mc_jt[j,t] * instance.x_th_jt[j,t]() for t in instance.t]) for j in instance.j}
-        for j in instance.j_chp:
-            solution["Fuel Costs"][j] = sum(instance.mc_jt[j,t] *(instance.x_el_jt[j,t]() + sv_chp * instance.x_th_jt[j,t]())/ instance.n_el_j[j]  for t in instance.t)
-        
-        del sv_chp 
-        solution["Anual Total Costs"] = instance.cost()
+
+        solution["Anual Total Costs"] = instance.cost() #Operational + Fuel + Ramping + el. Peakload-el. Revenues without Investmentcosts of existing Powerplants
         solution["Anual Total Costs (with costs of existing power plants)"] = c_tot_inv
          
         solution["Anual Investment Cost"] =  {j:0 for j in instance.j} 
@@ -107,7 +84,9 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Specific Capital Costs of installed Capacities"] = {j:instance.IK_j[j] * instance.alpha_j[j] for j in solution["Installed Capacities"].keys() if solution["Installed Capacities"][j] !=0 }
         solution["Technologies"] = [j for j in instance.j]
         solution["Marginal Costs"] = [np.mean([instance.mc_jt[j,t] for t in instance.t]) for j in instance.j] 
-        
+        for i,val in enumerate(instance.j):
+            if val in instance.j_chp:
+                solution["Marginal Costs"][i] = solution["Marginal Costs"][i] - instance.n_el_j[val]/instance.n_th_j[val]*np.mean([instance.sale_electricity_price_t[t] for t in instance.t])
         solution["State of Charge"] = {hs:[instance.store_level_hs_t[hs,t]() for t in instance.t] for hs in instance.j_hs}
         
         solution["HS-Capacities"] = {hs:instance.Cap_hs[hs]()+instance.cap_hs[hs] if instance.Cap_hs[hs]() != None else instance.cap_hs[hs] for hs in instance.j_hs }

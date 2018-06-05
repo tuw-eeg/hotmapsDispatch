@@ -102,7 +102,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     
     #% electircal power generation
     def gen_el_jt_rule(m,j,t):
-        if j not in m.j_chp and m.n_th_j[j] != 0:
+        if j not in m.j_chp or m.n_th_j[j] != 0:
             return m.x_el_jt[j,t] == m.x_th_jt[j,t] / m.n_th_j[j] * m.n_el_j[j]
         else:
             return pe.Constraint.Skip
@@ -194,7 +194,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     #with the produced electrical net power.
     def chp_geneartion_restriction3_jt_rule(m,j,t):
 #        rule = m.x_el_jt[j,t] >= m.x_th_jt[j,t] / m.ratioPMaxFW    # should be adopted using binary variables
-        rule = m.x_el_jt[j,t] == m.x_th_jt[j,t] / m.ratioPMaxFW
+        rule = m.x_el_jt[j,t] == m.x_th_jt[j,t] / m.n_th_j[j] * m.n_el_j[j]
         return rule 
     m.chp_geneartion_restriction3_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction3_jt_rule) 
     
@@ -286,10 +286,9 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
                        sum([m.cap_hs[hs] * m.OP_fix_hs[hs] for hs in m.j_hs])
 			
         c_op_var = sum([m.x_th_jt[j,t]* m.OP_var_j[j] for j in m.j for t in m.t])
-        c_var= sum([m.mc_jt[j,t] * m.x_th_jt[j,t] for j in m.j for t in m.t  if j not in m.j_chp])  # 
-        sv_chp = (m.ratioPMaxFW - m.ratioPMax) / (m.ratioPMax*m.ratioPMaxFW)
-#        c_var = c_var + sum([m.mc_jt[j,t] *(m.x_el_jt[j,t] + sv_chp * m.x_th_jt[j,t])/ m.n_el_j[j] for j in m.j_chp for t in m.t])
-        c_var = c_var + sum([m.mc_jt[j,t] * m.x_th_jt[j,t] - m.sale_electricity_price_t[t] * m.x_el_jt[j,t] for j in m.j_chp for t in m.t])
+        c_var= sum([m.mc_jt[j,t] * m.x_th_jt[j,t] for j in m.j for t in m.t])  # 
+#        c_var_chp = sum([m.mc_jt[j,t] * m.x_th_jt[j,t] - m.sale_electricity_price_t[t] * m.x_el_jt[j,t] for j in m.j_chp for t in m.t])
+        c_var = c_var
         c_peak_el = m.P_el_max*10000  
         c_ramp = sum ([m.ramp_j_waste_t[j,t] * m.c_ramp_waste for j in m.j_waste for t in m.t]) + sum ([m.ramp_j_chp_t[j,t] * m.c_ramp_chp for j in m.j_chp for t in m.t])
         c_storage = sum([m.x_load_hs_t[hs,t]*m.electricity_price_t[t]  for hs in m.j_hs for t in m.t])
@@ -297,10 +296,8 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
         c_tot = c_inv + c_var + c_op_fix + c_op_var + c_peak_el + c_ramp +c_storage + c_hs_penalty
  
         rev_gen_electricity = sum([m.x_el_jt[j,t]*(m.sale_electricity_price_t[t]) for j in m.j for t in m.t])
- 
-        rev_tot = rev_gen_electricity
         
-        rule = c_tot - rev_tot
+        rule = c_tot - rev_gen_electricity
         return rule
     m.cost = pe.Objective(rule=cost_rule)
     
