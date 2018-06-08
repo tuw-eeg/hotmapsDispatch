@@ -99,6 +99,8 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Operational Cost of Heat Storages"]= {hs:solution["HS-Capacities"][hs] * instance.OP_fix_hs[hs] + sum(instance.x_load_hs_t[hs,t]() * instance.electricity_price_t[t] for t in instance.t) for hs in instance.j_hs }
         solution["Specific Capital Costs of installed Heat Storages"] = {hs:instance.IK_hs[hs] * instance.alpha_hs[hs] for hs in solution["HS-Capacities"].keys() if solution["HS-Capacities"][hs] !=0 }
         solution["Fuel Costs Heat Storages"] = {hs:0 for hs in instance.j_hs}  
+        solution["Installed Capacities Heat Storages"] = {hs:instance.unload_cap_hs[hs] for hs in instance.j_hs}  
+
 #XXX: needed?        
         solution["Technologies:"] =  solution["Technologies"] + solution["Heat Storage Technologies"]
         
@@ -106,7 +108,7 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
                                         **solution["Unloading Heat Storage"]}
 
         solution["Installed Capacities:"] ={**solution["Installed Capacities"], 
-                                        **solution["HS-Capacities"]} 
+                                        **solution["Installed Capacities Heat Storages"]} 
         
         solution["Thermal Generation Mix:"] = {**solution["Thermal Generation Mix"], 
                                         **solution["Unloading Heat Storage over year"]}  
