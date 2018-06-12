@@ -39,7 +39,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.j_wh = pe.Set(initialize = val[7])
     m.j_gt = pe.Set(initialize = val[8])
     m.j_hs = pe.Set(initialize = val[9])
-    
+    m.all_heat_geneartors = pe.Set(initialize = val[46])
     #%% Parameter - TODO: depends on how the input data looks finally
     m.demand_th_t = pe.Param(m.t,initialize = val[10])
     max_demad = val[11]
@@ -81,7 +81,10 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     
     m.sale_electricity_price_t = pe.Param(m.t,initialize=val[44])
     m.OP_fix_hs = pe.Param(m.j_hs,initialize=val[45]) 
-    m.all_heat_geneartors = pe.Set(initialize = val[46])
+    
+    m.mr_j = pe.Param(m.j, initialize = val[47])
+    
+    
     #%% Variablen
     m.x_th_jt = pe.Var(m.j,m.t,within=pe.NonNegativeReals)
     m.Cap_j = pe.Var(m.j,within=pe.NonNegativeReals)       
@@ -92,8 +95,6 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.x_unload_hs_t = pe.Var(m.j_hs,m.t,within=pe.NonNegativeReals)
     m.Cap_hs = pe.Var(m.j_hs,within=pe.NonNegativeReals)
     m.store_level_hs_t = pe.Var(m.j_hs,m.t,within=pe.NonNegativeReals)
-    m.binary_load_hs_t = pe.Var(m.j_hs,m.t,within=pe.Binary)
-    m.binary_unload_hs_t = pe.Var(m.j_hs,m.t,within=pe.Binary)
     
     m.ramp_j_chp_t = pe.Var(m.j_chp, m.t,within=pe.NonNegativeReals)
     m.ramp_j_waste_t = pe.Var(m.j_waste, m.t,within=pe.NonNegativeReals)
@@ -135,6 +136,12 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
         rule = m.x_th_jt[j,t] <= m.Cap_j[j] 
         return rule 
     m.generation_restriction_jt = pe.Constraint(m.j,m.t,rule=generation_restriction_jt_rule)
+    
+     #% mr specifies the amaount of capacity that has to run all the time. (0-1)
+    def must_run_jt_rule(m,j,t): 
+        rule = m.x_th_jt[j,t] >= m.mr_j[j]*m.Cap_j[j] 
+        return rule 
+    m.must_run_jt = pe.Constraint(m.j,m.t,rule=must_run_jt_rule)   
     
     #% The solar gains depend on the installed capacity and the solar radiation
     def solar_restriction_jt_rule(m,j,t): 
@@ -204,10 +211,6 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
         return rule 
     m.chp_geneartion_restriction4_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction4_jt_rule)
     
-    def load_or_unload_rule(m,hs,t):
-        return m.binary_load_hs_t[hs,t] + m.binary_unload_hs_t[hs,t] == 1
-    m.load_or_unload = pe.Constraint(m.j_hs,m.t,rule=load_or_unload_rule)
-    
     # The heat storage level = old_level + pumping  - turbining
     def storage_state_hs_t_rule(m,hs,t):
         if t == 1:
@@ -239,15 +242,15 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     
     # The discharge and charge amounts are limited 
     def load_hs_t_restriction_rule (m,hs,t):
-        return m.x_load_hs_t[hs,t] <=  m.binary_load_hs_t[hs,t]*m.load_cap_hs[hs]
+        return m.x_load_hs_t[hs,t] <=  m.load_cap_hs[hs]
     m.load_hs_t_restriction = pe.Constraint(m.j_hs,m.t,rule=load_hs_t_restriction_rule)
     
     def unload_hs_t_restriction_rule (m,hs,t,flag):
         
         if flag:
-            return m.x_unload_hs_t[hs,t] <=  m.binary_unload_hs_t[hs,t]*m.unload_cap_hs[hs]
+            return m.x_unload_hs_t[hs,t] <=  m.unload_cap_hs[hs]
         else:
-            return m.x_unload_hs_t[hs,t] <=  m.binary_unload_hs_t[hs,t]*m.store_level_hs_t[hs,t] 
+            return m.x_unload_hs_t[hs,t] <=  m.store_level_hs_t[hs,t] 
 
     m.unload_hs_t_restriction = pe.Constraint(m.j_hs,m.t,[True,False],rule=unload_hs_t_restriction_rule)
     #%
@@ -291,10 +294,10 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
         c_var = c_var
         c_peak_el = m.P_el_max*10000  
         c_ramp = sum ([m.ramp_j_waste_t[j,t] * m.c_ramp_waste for j in m.j_waste for t in m.t]) + sum ([m.ramp_j_chp_t[j,t] * m.c_ramp_chp for j in m.j_chp for t in m.t])
-        c_storage = sum([m.x_load_hs_t[hs,t]*m.electricity_price_t[t]  for hs in m.j_hs for t in m.t])
-        c_hs_penalty = sum([m.x_unload_hs_t[hs,t]*1e-6  for hs in m.j_hs for t in m.t]) # for modeling reasons       
-        c_tot = c_inv + c_var + c_op_fix + c_op_var + c_peak_el + c_ramp +c_storage + c_hs_penalty
- 
+        c_hs_penalty_load = sum([m.x_load_hs_t[hs,t]*1e-6  for hs in m.j_hs for t in m.t])
+        c_hs_penalty_unload = sum([m.x_unload_hs_t[hs,t]*1e-6  for hs in m.j_hs for t in m.t]) # for modeling reasons       
+        c_tot = c_inv + c_var + c_op_fix + c_op_var + c_peak_el + c_ramp +c_hs_penalty_load + c_hs_penalty_unload
+        
         rev_gen_electricity = sum([m.x_el_jt[j,t]*(m.sale_electricity_price_t[t]) for j in m.j for t in m.t])
         
         rule = c_tot - rev_gen_electricity
@@ -317,21 +320,6 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     instance.solutions.load_from(results)
     instance.solutions.store_to(results)
     print("*****************\ntime for solving: " + str(datetime.now()-solv_start)+"\n*****************")
-    solv_start = datetime.now()
-    try:
-        if len(list(instance.j_hs.value)) != 0:
-            print("*****************\nFixing Binary and resolving...\n*****************")
-            # to get Dual Variables the binary variables had to be fixed and then resolved again 
-            instance.binary_load_hs_t.fix()
-            instance.binary_unload_hs_t.fix()
-            instance.preprocess() 
-            results = opt.solve(instance, load_solutions=False,tee=True,suffixes=['.*'])   # tee= Solver Progress, Suffix um z.B Duale Variablen anzuzeigen -> '.*' für alle   
-            instance.solutions.load_from(results)
-            instance.solutions.store_to(results)
-            print("*****************\ntime for resolving: " + str(datetime.now()-solv_start)+"\n*****************")
-    except:
-        pass
-
     return(instance,results)
 
 

@@ -140,8 +140,8 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
 
     thresh = data["threshold_heatpump"]
     all_heat_geneartors = data["all_heat_geneartors"] 
-    
-    
+    mr_j = {key:data["MR"][key] for key in tec}
+
     args = (tec, j_hp, j_pth, j_st, j_waste, j_chp, j_bp, j_wh, j_gt, j_hs, 
             demand_th_t, max_demad, radiation_t,IK_j, OP_fix_j, n_el_j, 
             electricity_price_t, P_min_el_chp, Q_min_th_chp,
@@ -149,6 +149,6 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
             pot_j, lt_j, el_surcharge, ir, alpha_j, load_cap_hs, unload_cap_hs,
             n_hs, loss_hs, IK_hs, cap_hs, c_ramp_chp, c_ramp_waste, alpha_hs,
             rf_j,rf_tot,OP_var_j,temperature,thresh,sale_electricity_price_t,
-            OP_fix_hs,all_heat_geneartors)
+            OP_fix_hs,all_heat_geneartors, mr_j)
     
     return args

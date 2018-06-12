@@ -82,12 +82,13 @@ input_list= ['name',
  'OPEX fix (EUR/MWa)',
  'OPEX var (EUR/MWh)',
  'life time',
- 'renewable factor']
+ 'renewable factor',
+ 'must run [0-1]']
 
 input_price_list = ["energy carrier","prices(EUR/MWh)","emission factor"]
 
 parameter_list = ['CO2 Price',
- 'Interes Rate [0-1]',
+ 'Interest Rate [0-1]',
  'Total Renewable Factor [0-1]',
  'Total Demand[ MWh]']
 
