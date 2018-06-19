@@ -83,7 +83,7 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Electrical Peak Load Costs"] = instance.P_el_max()*10000
         solution["Specific Capital Costs of installed Capacities"] = {j:instance.IK_j[j] * instance.alpha_j[j] for j in solution["Installed Capacities"].keys() if solution["Installed Capacities"][j] !=0 }
         solution["Technologies"] = [j for j in instance.j]
-        solution["Marginal Costs"] = [np.mean([instance.mc_jt[j,t] for t in instance.t]) for j in instance.j] 
+        solution["Marginal Costs"] = [np.mean([instance.mc_jt[j,t] for t in instance.t]) - instance.n_el_j[j]/instance.n_th_j[j] *np.mean([instance.sale_electricity_price_t[t] for t in instance.t]) if j in instance.j_chp else np.mean([instance.mc_jt[j,t] for t in instance.t]) for j in instance.j] 
         for i,val in enumerate(instance.j):
             if val in instance.j_chp:
                 solution["Marginal Costs"][i] = solution["Marginal Costs"][i] - instance.n_el_j[val]/instance.n_th_j[val]*np.mean([instance.sale_electricity_price_t[t] for t in instance.t])

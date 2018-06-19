@@ -230,28 +230,40 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     for label,glyph in zip(legend,areas):
         items.append((label,[glyph]))
     
-
+    
+    flag = False
     try:
         for hs in dic["Heat Storage Technologies"]:
             if sum(np.array(dic["Loading Heat Storage"][hs])[t]) != 0:
+                flag = True
                 loading = p.patch( [t[0]] + list(t) + [t[-1]],
                               [0] + (np.array(dic["Loading Heat Storage"][hs])*-1)[t].tolist() + [0]
                               ,color="#EF7B7B",line_color=None,muted_alpha=0.2)
                 items.append(("Loading-"+hs,[loading]))
                 
-                level = p.line( list(t),np.array(dic["State of Charge"][hs])[t].tolist(),color="green",muted_alpha=0.2)
-                items.append(("Level-"+hs,[level]))
+                p4 = figure(x_range=p.x_range,title="Heat Storages",
+                x_axis_label = "Time in Hours",
+                y_axis_label = "MWh_th")
+                p4.toolbar.logo = None
+                p4.grid.minor_grid_line_color = '#eeeeee'
+                items4 = []
                 
-                load = p.line( list(t),np.array(dic["Loading Heat Storage"][hs])[t].tolist(),color="red",muted_alpha=0.2)
-                items.append(("Load-"+hs,[load]))
+                level = p4.line( list(t),np.array(dic["State of Charge"][hs])[t].tolist(),color=cmap[hs],muted_alpha=0.2)
+                items4.append(("Level-"+hs,[level]))
                 
-                unload = p.line( list(t),np.array(dic["Unloading Heat Storage"][hs])[t].tolist(),color="blue",muted_alpha=0.2)
-                items.append(("Unload-"+hs,[unload]))
+                load = p4.line( list(t),np.array(dic["Loading Heat Storage"][hs])[t].tolist(),color="green",muted_alpha=0.2)
+                items4.append(("Load-"+hs,[load]))
                 
-                level.visible  = False
+                unload = p4.line( list(t),np.array(dic["Unloading Heat Storage"][hs])[t].tolist(),color="blue",muted_alpha=0.2)
+                items4.append(("Unload-"+hs,[unload]))
+                
+                level.visible  = True
                 load.visible = False
                 unload.visible = False
-                
+                legend4 = Legend(items=items4,location=(10, 10))
+    
+                p4.add_layout(legend4, 'right')   
+                p4.legend.click_policy = "hide" # "mute"
     except:
         pass
     
@@ -274,7 +286,11 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     line3 = p3.line(t,list(heat_p),color="#cb181d",line_width=0.5,muted_alpha=0.2)
     p3.toolbar.logo = None
     p3.grid.minor_grid_line_color = '#eeeeee'
-    s = gridplot([[p],[p2],[p3]],plot_width=1000, plot_height=300,
+    if flag:
+        s = gridplot([[p],[p2],[p3],[p4]],plot_width=1000, plot_height=300,
+                 toolbar_options=dict(logo=None))
+    else:
+        s = gridplot([[p],[p2],[p3]],plot_width=1000, plot_height=300,
                  toolbar_options=dict(logo=None))
     return s
 #%%

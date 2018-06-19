@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from bokeh.application.handlers import FunctionHandler
 from bokeh.application import Application
-from bokeh.layouts import widgetbox,layout,row,column
+from bokeh.layouts import widgetbox,layout,row,column,Spacer
 from bokeh.models import ColumnDataSource,TableColumn,DataTable,CustomJS,TextInput, Slider
 from bokeh.server.server import Server
 from bokeh.models.widgets import Panel, Tabs, Button,Div,Toggle,Select,CheckboxGroup
@@ -41,7 +41,10 @@ path2data = path+r"\AD\F16_input"
 path_download_js = "download.js"
 path_download_output= path + r"\FEAT\F16\download_input.xlsx"
 path_upload_js = "upload.js"
-path_spinner_html = "spinner2.html" 
+path_spinner_html = "spinner2.html"
+path_spinner_load_html = "spinner.html"
+load_text = open(path_spinner_load_html).read()
+spinner_text = open(path_spinner_html).read()
 #%%
 io_loop = IOLoop.current()
 global data_table,data_table_prices,data_table_data,f
@@ -294,9 +297,12 @@ def modify_doc(doc):
                     column(widgetbox(feed_in_tarif_sale),widgetbox(const_price_sale),
                            widgetbox(scale_price_sale),widgetbox(mean_price_sale))
                     )
-    label1 = Div(text="""<h1 style=" font-size: 20px; text-align: center; text-transform: uppercase; "> Heat Generators:</h1> """)
-    label2 = Div(text="""<h1 style=" font-size: 20px; text-align: center; text-transform: uppercase; "> Heat Storages:</h1> """)
-    col_hp_hs = column(label1,data_table,label2,data_table_heat_storage)
+    label1 = Div(text="""<h1 style=" font-size: 20px; text-align: center; text-transform: uppercase; ">Heat Generators </h1>  """, width=210, height=10)
+    button1= Button(label='🞧', width=30)
+    label2 = Div(text="""<h1 style=" font-size: 20px; text-align: center; text-transform: uppercase; ">Heat Storages </h1>  """, width=180, height=10)
+    button2= Button(label='🞧', width=30)
+
+    col_hp_hs = column([row(label1,button1),data_table,row(label2,button2),data_table_heat_storage])
     
     dic = {"Heat Producers and Heat Storage":col_hp_hs,
            "Parameters":data_table_data,
@@ -475,19 +481,19 @@ def modify_doc(doc):
     upload_code=open(path_upload_js).read()
     upload_button.callback = CustomJS(args=dict(file_source=file_source), code =upload_code)
     
-    spinner_text = open(path_spinner_html).read()
     div_spinner = Div(text="")
     output = Tabs(tabs=[])
     
     def reset_callback():
-        div_spinner.text = spinner_text
+        div_spinner.text = load_text
         output.tabs = []
         div_spinner.text = ""
+        grid.children = [Div()]
         
     reset_button = Button(label="Reset View", button_type="warning")
     reset_button.on_click(reset_callback)
-    pmax = TextInput(title="Pmax [MW]")
-    to_install = TextInput(title="Missing Capacities [MW]")
+    pmax = TextInput(title="Pmax [MW]",disabled=True)
+    to_install = TextInput(title="Missing Capacities [MW]",disabled=True)
     
     update_pmax(pmax,source_load,data_table,to_install)    
     
@@ -502,15 +508,262 @@ def modify_doc(doc):
         else:
             div_spinner.text = ""
             
-            
     invest.on_click(ivest_callback)
     
-    l = layout([
-            [widgetbox(download_button,upload_button,run_button,reset_button,invest),
-             widgetbox(div_spinner),widgetbox(Div(width=100, height=100)),widgetbox(pmax,Div(),to_install)],
-            [widgetbox(output)],
-            [widgetbox(tabs)],
-            ], sizing_mode='scale_width')
+#%% 
+
+    
+    heat_pumps = {}
+    flow_temp_dic = {}
+    return_temp_dic = {}
+    tec_mapper = {}
+    for sheet in pd.ExcelFile(path_parameter).sheet_names:
+        if sheet in ['Heat Generators','prices and emmision factors','financal and other parameteres',"Heat Storage", "Techologies"]:
+            continue
+        tec_mapper[sheet] = pd.read_excel(path_parameter,sheet).columns[0]
+        heat_pumps[sheet] = pd.read_excel(path_parameter,sheet,skiprows=[0]).fillna(0).set_index("COP")
+        flow_temp_dic[sheet] = heat_pumps[sheet].columns.values.tolist()
+        return_temp_dic[sheet] = heat_pumps[sheet].index.values.tolist()
+
+    grid = column(children=[Div()])
+    ok_button = Button(label='✓ ADD', width=60)
+    cancel_button = Button(label='	🞮 CANCEL', width=60)
+    select_tec = Select(title="Add Heat Generator:", options = pd.read_excel(path_parameter,"Techologies")["Techologies"].values.tolist())
+    select_hp = Select(title= "Select a Heat Pump:", options=list(tec_mapper.values()))
+    tec_mapper_inv = invert_dict(tec_mapper)
+    
+    tabs_geneator = Tabs(tabs=[] ,width = 800)
+    tec_buttons = widgetbox(children = [select_tec])
+    children = [tec_buttons,widgetbox(tabs_geneator),row(children = [ok_button,cancel_button])]
+    
+    def add_heat_generator():
+        div_spinner.text = load_text
+        grid.children = children
+        select_tec.value = select_tec.options[0]
+        div_spinner.text = ""
+        installed_cap.end=int(float(pmax.value))+1 
+    button1.on_click(add_heat_generator)
+    
+    def cancel():
+        div_spinner.text = load_text
+        grid.children = [Div()]
+        div_spinner.text = ""
+    cancel_button.on_click(cancel)
+
+    def add_to_cds():
+        installed_cap.end=int(float(pmax.value))+1 
+        print("ADD Heat Generator to Table ,\nNot implemented now !!!")
+    ok_button.on_click(add_to_cds)
+        
+    cop_label = TextInput(placeholder="COP", title="COP",disabled= True)
+    flow_temp = Select(title="Flow Temperature")
+    return_temp = Select(title="Return Temperature")
+    cop_layout= column([row([return_temp,flow_temp]),cop_label])    
+    cop_panel = Panel(child=cop_layout, title="Coefficient of Performance, COP")
+    
+    energy_carrier_options = pd.read_excel(path_parameter,"prices and emmision factors",skiprows=[0])["energy carrier"].values.tolist()
+    energy_carrier_select = Select(options = energy_carrier_options, title="Energy Carrier")
+    energy_carrier_select.value = energy_carrier_options[0]
+    
+    data_tec = pd.read_excel(path_parameter,skiprows=[0])
+    
+    select_chp = Select(title= "Select a CHP", options=data_tec[data_tec["output"] == "CHP"]["name"].values.tolist()) 
+    select_boiler = Select(title= "Select a Boiler", options=data_tec[data_tec["type"] == "boiler"]["name"].values.tolist()) 
+    
+    
+    n_th_label = TextInput(placeholder="-", title="Thermal Efficiency")
+    n_el_label = TextInput(placeholder="-", title="Electrical Efficiency")
+
+    opex_fix_label = TextInput(placeholder="-", title="OPEX fix (EUR/MWa)'")
+    opex_var_label = TextInput(placeholder="-", title="OPEX var (EUR/MWh)")
+
+    lt_label = TextInput(placeholder="-", title="life time (a)")
+    ik_label = TextInput(placeholder="-", title="investment costs (EUR/MW_th")
+    
+    must_run_box = Toggle(label="Must Run", button_type="danger")
+    renewable_factor = Slider(start=0, end=1, value=0, step=.1, title="Renewable Factor")
+    installed_cap = Slider(start=0, end=int(float(pmax.value))+1, value=0, step=.1, title="Installed Capacity")
+
+
+    
+    tec_param_layout = row(children = [widgetbox(energy_carrier_select),
+                                       widgetbox(n_th_label),
+                                       widgetbox(n_el_label)])
+    
+    finance_param_layout = column(children=[row(children=[ik_label,lt_label]),
+                                            row(children=[opex_fix_label,
+                                                          opex_var_label])])
+    model_param_layout = widgetbox(must_run_box,renewable_factor,installed_cap)
+    tec_param_panel = Panel(child=tec_param_layout, title="Technical Parameters")
+    finance_param_panel = Panel(child=finance_param_layout, title="Finance Parameters")
+    model_param_panel = Panel(child=model_param_layout, title="Model Parameters")
+    
+    def add_heat_pump(name,old,new):
+        installed_cap.end=int(float(pmax.value))+1 
+        flow_temp.options = flow_temp_dic[tec_mapper_inv[select_hp.value]]
+        flow_temp.value = flow_temp_dic[tec_mapper_inv[select_hp.value]][0] # Caution: this calls the cop_callback, thus need of try block 
+        return_temp.options = return_temp_dic[tec_mapper_inv[select_hp.value]]
+        return_temp.value = return_temp_dic[tec_mapper_inv[select_hp.value]][0] # Caution: this calls the cop_callback,
+        cop_label.value = str(heat_pumps[tec_mapper_inv[select_hp.value]].loc[return_temp.value,flow_temp.value])        
+        n_th_label.value = cop_label.value
+        n_th_label.disabled = True
+        tabs_geneator.tabs = [ cop_panel , tec_param_panel, finance_param_panel , model_param_panel]
+        
+    select_hp.on_change('value', add_heat_pump)
+
+    def add_tec(name,old,new):
+        installed_cap.end=int(float(pmax.value))+1 
+        div_spinner.text = load_text
+        
+        n_th_label.disabled = False
+        
+        ###
+        energy_carier_search = data_tec["input"][data_tec["type"].str.contains(select_tec.value)]
+        if energy_carier_search.empty:
+            energy_carrier_value = energy_carrier_select.options[0]
+        else:
+            energy_carrier_value = str(energy_carier_search.iloc[0])
+        energy_carrier_select.value = energy_carrier_value
+        ###
+        n_el_search = data_tec['efficiency el'][data_tec["type"].str.contains(select_tec.value)]
+        if n_el_search.empty:
+            n_el_value = ""
+        else:
+            n_el_value = str(n_el_search.iloc[0])
+        n_el_label.value = n_el_value
+        ###
+        n_th_search = data_tec['efficiency th'][data_tec["type"].str.contains(select_tec.value)]
+        if n_th_search.empty:
+            n_th_value = ""
+        else:
+            n_th_value = str(n_th_search.iloc[0])
+        n_th_label.value = n_th_value
+        ####
+        
+        
+        ###
+        ik_search = data_tec["investment costs (EUR/MW_th)"][data_tec["type"].str.contains(select_tec.value)]
+        if ik_search.empty:
+            ik_value = ""
+        else:
+            ik_value = str(ik_search.iloc[0])
+        ik_label.value = ik_value
+        ###
+        opex_fix_search = data_tec['OPEX fix (EUR/MWa)'][data_tec["type"].str.contains(select_tec.value)]
+        if opex_fix_search.empty:
+            opex_fix_value = ""
+        else:
+            opex_fix_value = str(opex_fix_search.iloc[0])
+        opex_fix_label.value = opex_fix_value
+        ###
+        opex_var_search = data_tec['OPEX var (EUR/MWh)'][data_tec["type"].str.contains(select_tec.value)]
+        if opex_var_search.empty:
+            opex_var_value = ""
+        else:
+            opex_var_value = str(opex_var_search.iloc[0])
+        opex_var_label.value = opex_var_value
+        ####        
+
+        lt_search = data_tec['life time'][data_tec["type"].str.contains(select_tec.value)]
+        if lt_search.empty:
+            lt_value = ""
+        else:
+            lt_value = str(lt_search.iloc[0])
+        lt_label.value = lt_value
+        ####        
+        
+        if select_tec.value == "heat pump":
+            tec_buttons.children = [select_tec,select_hp]
+            select_hp.value = select_hp.options[0]
+        elif select_tec.value == "CHP":
+            tec_buttons.children = [select_tec,select_chp]
+            select_chp.value = select_chp.options[0]
+        elif select_tec.value == "boiler":
+            tec_buttons.children = [select_tec,select_boiler]
+            select_boiler.value = select_boiler.options[0]
+        else:
+            tec_buttons.children = [select_tec]
+            tabs_geneator.tabs = [tec_param_panel, finance_param_panel , model_param_panel]
+        
+        div_spinner.text = ""
+        
+    select_tec.on_change('value', add_tec)
+    ###
+    def auto_load_boiler(name,old,new):
+        installed_cap.end=int(float(pmax.value))+1 
+        
+        energy_carrier_select.value = str(data_tec[data_tec["name"] == select_boiler.value]["input"].values[0])
+        n_el_label.value =   str(data_tec[data_tec["name"] == select_boiler.value]["efficiency el"].values[0])
+        n_th_label.value =   str(data_tec[data_tec["name"] == select_boiler.value]["efficiency th"].values[0])
+        
+        opex_fix_label.value = str(data_tec[data_tec["name"] == select_boiler.value]["OPEX fix (EUR/MWa)"].values[0])
+        opex_var_label.value = str(data_tec[data_tec["name"] == select_boiler.value]["OPEX var (EUR/MWh)"].values[0])
+
+        lt_label.value = str(data_tec[data_tec["name"] == select_boiler.value]["life time"].values[0])
+        ik_label.value = str(data_tec[data_tec["name"] == select_boiler.value]["investment costs (EUR/MW_th)"].values[0])
+    
+        tabs_geneator.tabs = [tec_param_panel, finance_param_panel , model_param_panel]
+    select_boiler.on_change('value', auto_load_boiler)  
+    
+    ###
+       
+    def auto_load_chp(name,old,new):
+        installed_cap.end=int(float(pmax.value))+1 
+        
+        energy_carrier_select.value =  str(data_tec[data_tec["name"] == select_chp.value]["input"].values[0])
+        n_el_label.value =   str(data_tec[data_tec["name"] == select_chp.value]["efficiency el"].values[0])
+        n_th_label.value =   str(data_tec[data_tec["name"] == select_chp.value]["efficiency th"].values[0])
+
+        
+        opex_fix_label.value = str(data_tec[data_tec["name"] == select_chp.value]["OPEX fix (EUR/MWa)"].values[0])
+        opex_var_label.value = str(data_tec[data_tec["name"] == select_chp.value]["OPEX var (EUR/MWh)"].values[0])
+
+        lt_label.value = str(data_tec[data_tec["name"] == select_chp.value]["life time"].values[0])
+        ik_label.value = str(data_tec[data_tec["name"] == select_chp.value]["investment costs (EUR/MW_th)"].values[0])
+        tabs_geneator.tabs = [tec_param_panel, finance_param_panel , model_param_panel]
+                
+    select_chp.on_change('value', auto_load_chp)  
+    ###
+    def update_slider(name,old,new):
+        try:
+            installed_cap.end=int(float(pmax.value))+1        
+        except:
+            pass
+    pmax.on_change("value",update_slider)
+    
+    
+    
+    def cop_callback(name,old,new):
+        try: # because of empty fields at the start no COP can be found 
+            cop_label.value = str(heat_pumps[tec_mapper_inv[select_hp.value]].loc[return_temp.value,flow_temp.value])
+            n_th_label.value = cop_label.value
+            n_th_label.disabled = True
+        except:
+            pass 
+    flow_temp.on_change('value', cop_callback)
+    return_temp.on_change('value', cop_callback)
+#%%    
+    
+    l = column([
+                row([
+                        widgetbox(download_button,upload_button,run_button,
+                                  reset_button,invest),
+                          widgetbox(div_spinner),
+                          widgetbox(Div()),
+                          widgetbox(pmax,Div(),to_install)]),
+                 widgetbox(Div(height=25)),
+                 grid,
+                 widgetbox(Div(height=25)),
+                 widgetbox(output),
+                 widgetbox(tabs)], 
+            sizing_mode='scale_width')
+#    l = layout([
+#            [row([widgetbox(download_button,upload_button,run_button,reset_button,invest),
+#             widgetbox(div_spinner),widgetbox(pmax,Div(),to_install)])],
+#            [grid],
+#            [widgetbox(output)],
+#            [widgetbox(tabs)],
+#            ], sizing_mode='scale_both')
 
     doc.add_root(l)
     
