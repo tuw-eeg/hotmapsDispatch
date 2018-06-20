@@ -34,7 +34,14 @@ from AD.F16_input.main import load_data
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
 import CM.CM_TUWdispatch.run_cm as dispatch
 
-
+#%%
+def uniqueid():
+    seed = 0
+    while True:
+       yield seed
+       seed += 1
+       
+unique_id = uniqueid()
 #%% Setting Global default paramters and default paths
 path_parameter = path+r"\AD\F16_input\DH_technology_cost.xlsx"
 path2data = path+r"\AD\F16_input"
@@ -150,13 +157,16 @@ def genearte_selection(dic,dict_key_map):
 
 def generate_tables(columns,name="",):
     if name == "":
-        data = pd.read_excel(path_parameter,skiprows=[0])
+        data = pd.read_excel(path_parameter,skiprows=[0])[columns]
+        data = pd.DataFrame({x:[] for x in columns})
     else:
-        data = pd.read_excel(path_parameter,name,skiprows=[0])
-        
+        data = pd.read_excel(path_parameter,name,skiprows=[0])[columns]
+    
+    
     col = [TableColumn(field=name, title=name) for name in columns]
     source = ColumnDataSource(data)
-    table = DataTable(source=source,columns=col,width=1550,height=550,
+    #,width=1550,height=700
+    table = DataTable(source=source,columns=col,width=1550,
                            editable=True,row_headers =True)  
     
     return table  
@@ -416,13 +426,13 @@ def modify_doc(doc):
             print("Error: Something get Wrong")
             div_spinner.text = """<strong style="color: red;">Error: Something get Wrong</strong>""" 
         else:
-            tabs = plot_solutions()
+            output_tabs = plot_solutions()
             print('calculation done')
-            if tabs == "Error4":
+            if output_tabs == "Error4":
                 print("Error @ Ploting  !!!")
                 div_spinner.text = """<strong style="color: red;">Error: @ Ploting !!!</strong>""" 
             else:
-                output.tabs = tabs
+                output.tabs = output_tabs
                 div_spinner.text = """<strong style="color: green;">Calculation done</strong>""" 
         
 
@@ -512,7 +522,7 @@ def modify_doc(doc):
     
 #%% 
 
-    
+    data_tec = pd.read_excel(path_parameter,skiprows=[0])
     heat_pumps = {}
     flow_temp_dic = {}
     return_temp_dic = {}
@@ -524,19 +534,27 @@ def modify_doc(doc):
         heat_pumps[sheet] = pd.read_excel(path_parameter,sheet,skiprows=[0]).fillna(0).set_index("COP")
         flow_temp_dic[sheet] = heat_pumps[sheet].columns.values.tolist()
         return_temp_dic[sheet] = heat_pumps[sheet].index.values.tolist()
+    
 
-    grid = column(children=[Div()])
-    ok_button = Button(label='✓ ADD', width=60)
-    cancel_button = Button(label='	🞮 CANCEL', width=60)
-    select_tec = Select(title="Add Heat Generator:", options = pd.read_excel(path_parameter,"Techologies")["Techologies"].values.tolist())
-    select_hp = Select(title= "Select a Heat Pump:", options=list(tec_mapper.values()))
+
+    
     tec_mapper_inv = invert_dict(tec_mapper)
+    select_tec2_options= {"heat pump": list(tec_mapper.values()),
+                          "CHP": data_tec[data_tec["output"] == "CHP"]["name"].values.tolist(),
+                          "boiler":data_tec[data_tec["type"] == "boiler"]["name"].values.tolist()}
+    
+    grid = column(children=[Div()])
+    ok_button = Button(label='✓ ADD', button_type='success',width=60)
+    cancel_button = Button(label='	🞮 CANCEL', button_type='danger',width=60)
+    select_tec = Select(title="Add Heat Generator:", options = pd.read_excel(path_parameter,"Techologies")["Techologies"].values.tolist())
+    select_tec2 = Select()
     
     tabs_geneator = Tabs(tabs=[] ,width = 800)
     tec_buttons = widgetbox(children = [select_tec])
     children = [tec_buttons,widgetbox(tabs_geneator),row(children = [ok_button,cancel_button])]
     
     def add_heat_generator():
+        output.tabs = []
         div_spinner.text = load_text
         grid.children = children
         select_tec.value = select_tec.options[0]
@@ -550,9 +568,32 @@ def modify_doc(doc):
         div_spinner.text = ""
     cancel_button.on_click(cancel)
 
-    def add_to_cds():
-        installed_cap.end=int(float(pmax.value))+1 
-        print("ADD Heat Generator to Table ,\nNot implemented now !!!")
+    def add_to_cds():  
+        div_spinner.text = load_text
+        df2 = pd.DataFrame(data_table.source.data)
+        df2.set_index(df2["index"])
+        del df2["index"]
+        new_data={}
+        for x in input_list:
+            if x == "name":
+                new_data[x] = str(name_label.value)
+            elif  x == 'must run [0-1]':
+                new_data[x] = str(int(widgets_dict[x].active))
+            else:
+                new_data[x] = str(widgets_dict[x].value)
+                
+        df2 = df2.append(new_data,ignore_index=True)
+        df2 = df2.apply(pd.to_numeric, errors='ignore')
+        df2["index"] = df2.index
+        data_table.source.data.update(df2)
+        del df2
+        grid.children = [Div()]
+        div_spinner.text = """<strong style="color: green;">Heat Generator ADDED</strong>"""
+        
+        
+        
+
+         
     ok_button.on_click(add_to_cds)
         
     cop_label = TextInput(placeholder="COP", title="COP",disabled= True)
@@ -565,12 +606,6 @@ def modify_doc(doc):
     energy_carrier_select = Select(options = energy_carrier_options, title="Energy Carrier")
     energy_carrier_select.value = energy_carrier_options[0]
     
-    data_tec = pd.read_excel(path_parameter,skiprows=[0])
-    
-    select_chp = Select(title= "Select a CHP", options=data_tec[data_tec["output"] == "CHP"]["name"].values.tolist()) 
-    select_boiler = Select(title= "Select a Boiler", options=data_tec[data_tec["type"] == "boiler"]["name"].values.tolist()) 
-    
-    
     n_th_label = TextInput(placeholder="-", title="Thermal Efficiency")
     n_el_label = TextInput(placeholder="-", title="Electrical Efficiency")
 
@@ -580,43 +615,48 @@ def modify_doc(doc):
     lt_label = TextInput(placeholder="-", title="life time (a)")
     ik_label = TextInput(placeholder="-", title="investment costs (EUR/MW_th")
     
-    must_run_box = Toggle(label="Must Run", button_type="danger")
+    must_run_box = Toggle(label="Must Run",  button_type="warning")
     renewable_factor = Slider(start=0, end=1, value=0, step=.1, title="Renewable Factor")
     installed_cap = Slider(start=0, end=int(float(pmax.value))+1, value=0, step=.1, title="Installed Capacity")
-
-
     
-    tec_param_layout = row(children = [widgetbox(energy_carrier_select),
-                                       widgetbox(n_th_label),
-                                       widgetbox(n_el_label)])
+    name_label = TextInput(placeholder="-", title="Name",disabled=True)
+    
+    widgets_list= [
+            [select_tec,select_tec2], installed_cap, n_th_label, n_el_label, 
+            ik_label, opex_fix_label, opex_var_label,lt_label, 
+            renewable_factor, must_run_box
+            ]
+    
+    widgets_dict = dict(zip(input_list,widgets_list))
+
+
+    tec_param_layout = column(children=[row(children=[energy_carrier_select,name_label]),
+                                            row(children=[n_th_label,
+                                                          n_el_label])])
     
     finance_param_layout = column(children=[row(children=[ik_label,lt_label]),
                                             row(children=[opex_fix_label,
                                                           opex_var_label])])
     model_param_layout = widgetbox(must_run_box,renewable_factor,installed_cap)
+    
     tec_param_panel = Panel(child=tec_param_layout, title="Technical Parameters")
     finance_param_panel = Panel(child=finance_param_layout, title="Finance Parameters")
     model_param_panel = Panel(child=model_param_layout, title="Model Parameters")
     
-    def add_heat_pump(name,old,new):
-        installed_cap.end=int(float(pmax.value))+1 
-        flow_temp.options = flow_temp_dic[tec_mapper_inv[select_hp.value]]
-        flow_temp.value = flow_temp_dic[tec_mapper_inv[select_hp.value]][0] # Caution: this calls the cop_callback, thus need of try block 
-        return_temp.options = return_temp_dic[tec_mapper_inv[select_hp.value]]
-        return_temp.value = return_temp_dic[tec_mapper_inv[select_hp.value]][0] # Caution: this calls the cop_callback,
-        cop_label.value = str(heat_pumps[tec_mapper_inv[select_hp.value]].loc[return_temp.value,flow_temp.value])        
+    def add_heat_pump():
+
+        flow_temp.options = flow_temp_dic[tec_mapper_inv[select_tec2.value]]
+        flow_temp.value = flow_temp_dic[tec_mapper_inv[select_tec2.value]][0] # Caution: this calls the cop_callback, thus need of try block 
+        return_temp.options = return_temp_dic[tec_mapper_inv[select_tec2.value]]
+        return_temp.value = return_temp_dic[tec_mapper_inv[select_tec2.value]][0] # Caution: this calls the cop_callback,
+        cop_label.value = str(heat_pumps[tec_mapper_inv[select_tec2.value]].loc[return_temp.value,flow_temp.value])        
         n_th_label.value = cop_label.value
         n_th_label.disabled = True
         tabs_geneator.tabs = [ cop_panel , tec_param_panel, finance_param_panel , model_param_panel]
-        
-    select_hp.on_change('value', add_heat_pump)
 
     def add_tec(name,old,new):
-        installed_cap.end=int(float(pmax.value))+1 
         div_spinner.text = load_text
-        
         n_th_label.disabled = False
-        
         ###
         energy_carier_search = data_tec["input"][data_tec["type"].str.contains(select_tec.value)]
         if energy_carier_search.empty:
@@ -625,62 +665,34 @@ def modify_doc(doc):
             energy_carrier_value = str(energy_carier_search.iloc[0])
         energy_carrier_select.value = energy_carrier_value
         ###
-        n_el_search = data_tec['efficiency el'][data_tec["type"].str.contains(select_tec.value)]
-        if n_el_search.empty:
-            n_el_value = ""
-        else:
-            n_el_value = str(n_el_search.iloc[0])
-        n_el_label.value = n_el_value
-        ###
-        n_th_search = data_tec['efficiency th'][data_tec["type"].str.contains(select_tec.value)]
-        if n_th_search.empty:
-            n_th_value = ""
-        else:
-            n_th_value = str(n_th_search.iloc[0])
-        n_th_label.value = n_th_value
-        ####
-        
-        
-        ###
-        ik_search = data_tec["investment costs (EUR/MW_th)"][data_tec["type"].str.contains(select_tec.value)]
-        if ik_search.empty:
-            ik_value = ""
-        else:
-            ik_value = str(ik_search.iloc[0])
-        ik_label.value = ik_value
-        ###
-        opex_fix_search = data_tec['OPEX fix (EUR/MWa)'][data_tec["type"].str.contains(select_tec.value)]
-        if opex_fix_search.empty:
-            opex_fix_value = ""
-        else:
-            opex_fix_value = str(opex_fix_search.iloc[0])
-        opex_fix_label.value = opex_fix_value
-        ###
-        opex_var_search = data_tec['OPEX var (EUR/MWh)'][data_tec["type"].str.contains(select_tec.value)]
-        if opex_var_search.empty:
-            opex_var_value = ""
-        else:
-            opex_var_value = str(opex_var_search.iloc[0])
-        opex_var_label.value = opex_var_value
-        ####        
-
-        lt_search = data_tec['life time'][data_tec["type"].str.contains(select_tec.value)]
-        if lt_search.empty:
-            lt_value = ""
-        else:
-            lt_value = str(lt_search.iloc[0])
-        lt_label.value = lt_value
-        ####        
-        
-        if select_tec.value == "heat pump":
-            tec_buttons.children = [select_tec,select_hp]
-            select_hp.value = select_hp.options[0]
-        elif select_tec.value == "CHP":
-            tec_buttons.children = [select_tec,select_chp]
-            select_chp.value = select_chp.options[0]
-        elif select_tec.value == "boiler":
-            tec_buttons.children = [select_tec,select_boiler]
-            select_boiler.value = select_boiler.options[0]
+        for x in input_list:
+            if x == "name":
+                if widgets_dict[x][0].value not in widgets_dict[x][1].value:
+                    name_label.value =  widgets_dict[x][0].value 
+                else:
+                    name_label.value =  widgets_dict[x][1].value
+                continue
+            search = data_tec[x][data_tec["type"].str.contains(select_tec.value)]
+            if search.empty:
+                value = ""
+            else:
+                value = str(search.iloc[0])
+            try:
+                widgets_dict[x].value = value
+            except:
+                if x == 'must run [0-1]':
+                    try:
+                        widgets_dict[x].active = bool(int(x))
+                    except:
+                        widgets_dict[x].active = False
+                    continue
+                widgets_dict[x].value = 0
+               
+        if select_tec.value in ["heat pump","CHP","boiler"]:
+            select_tec2.title= "Select a "+str(select_tec.value)+":"
+            select_tec2.options = select_tec2_options[select_tec.value]
+            tec_buttons.children = [select_tec,select_tec2]
+            select_tec2.value = select_tec2.options[0]
         else:
             tec_buttons.children = [select_tec]
             tabs_geneator.tabs = [tec_param_panel, finance_param_panel , model_param_panel]
@@ -689,41 +701,27 @@ def modify_doc(doc):
         
     select_tec.on_change('value', add_tec)
     ###
-    def auto_load_boiler(name,old,new):
-        installed_cap.end=int(float(pmax.value))+1 
-        
-        energy_carrier_select.value = str(data_tec[data_tec["name"] == select_boiler.value]["input"].values[0])
-        n_el_label.value =   str(data_tec[data_tec["name"] == select_boiler.value]["efficiency el"].values[0])
-        n_th_label.value =   str(data_tec[data_tec["name"] == select_boiler.value]["efficiency th"].values[0])
-        
-        opex_fix_label.value = str(data_tec[data_tec["name"] == select_boiler.value]["OPEX fix (EUR/MWa)"].values[0])
-        opex_var_label.value = str(data_tec[data_tec["name"] == select_boiler.value]["OPEX var (EUR/MWh)"].values[0])
-
-        lt_label.value = str(data_tec[data_tec["name"] == select_boiler.value]["life time"].values[0])
-        ik_label.value = str(data_tec[data_tec["name"] == select_boiler.value]["investment costs (EUR/MW_th)"].values[0])
+    def auto_load(name,old,new):
+        if widgets_dict["name"][0].value not in widgets_dict["name"][1].value:
+            name_label.value =  widgets_dict["name"][0].value
+        else:
+            name_label.value =  widgets_dict["name"][1].value
+                    
+        if select_tec.value == "heat pump":
+            add_heat_pump()
+        else:
+            energy_carrier_select.value = str(data_tec[data_tec["name"] == select_tec2.value]["input"].values[0])
+            n_el_label.value =   str(data_tec[data_tec["name"] == select_tec2.value]["efficiency el"].values[0])
+            n_th_label.value =   str(data_tec[data_tec["name"] == select_tec2.value]["efficiency th"].values[0])
+            
+            opex_fix_label.value = str(data_tec[data_tec["name"] == select_tec2.value]["OPEX fix (EUR/MWa)"].values[0])
+            opex_var_label.value = str(data_tec[data_tec["name"] == select_tec2.value]["OPEX var (EUR/MWh)"].values[0])
     
-        tabs_geneator.tabs = [tec_param_panel, finance_param_panel , model_param_panel]
-    select_boiler.on_change('value', auto_load_boiler)  
-    
-    ###
-       
-    def auto_load_chp(name,old,new):
-        installed_cap.end=int(float(pmax.value))+1 
-        
-        energy_carrier_select.value =  str(data_tec[data_tec["name"] == select_chp.value]["input"].values[0])
-        n_el_label.value =   str(data_tec[data_tec["name"] == select_chp.value]["efficiency el"].values[0])
-        n_th_label.value =   str(data_tec[data_tec["name"] == select_chp.value]["efficiency th"].values[0])
+            lt_label.value = str(data_tec[data_tec["name"] == select_tec2.value]["life time"].values[0])
+            ik_label.value = str(data_tec[data_tec["name"] == select_tec2.value]["investment costs (EUR/MW_th)"].values[0])
+            tabs_geneator.tabs = [tec_param_panel, finance_param_panel , model_param_panel]
+    select_tec2.on_change('value', auto_load)  
 
-        
-        opex_fix_label.value = str(data_tec[data_tec["name"] == select_chp.value]["OPEX fix (EUR/MWa)"].values[0])
-        opex_var_label.value = str(data_tec[data_tec["name"] == select_chp.value]["OPEX var (EUR/MWh)"].values[0])
-
-        lt_label.value = str(data_tec[data_tec["name"] == select_chp.value]["life time"].values[0])
-        ik_label.value = str(data_tec[data_tec["name"] == select_chp.value]["investment costs (EUR/MW_th)"].values[0])
-        tabs_geneator.tabs = [tec_param_panel, finance_param_panel , model_param_panel]
-                
-    select_chp.on_change('value', auto_load_chp)  
-    ###
     def update_slider(name,old,new):
         try:
             installed_cap.end=int(float(pmax.value))+1        
@@ -735,7 +733,7 @@ def modify_doc(doc):
     
     def cop_callback(name,old,new):
         try: # because of empty fields at the start no COP can be found 
-            cop_label.value = str(heat_pumps[tec_mapper_inv[select_hp.value]].loc[return_temp.value,flow_temp.value])
+            cop_label.value = str(heat_pumps[tec_mapper_inv[select_tec2.value]].loc[return_temp.value,flow_temp.value])
             n_th_label.value = cop_label.value
             n_th_label.disabled = True
         except:
@@ -754,7 +752,7 @@ def modify_doc(doc):
                  widgetbox(Div(height=25)),
                  grid,
                  widgetbox(Div(height=25)),
-                 widgetbox(output),
+                 column([widgetbox(output)]),
                  widgetbox(tabs)], 
             sizing_mode='scale_width')
 #    l = layout([
