@@ -92,10 +92,10 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
                                  data["em"][data["energy_carrier"][j]]*data["P_co2"] / \
                                   data["n_th"][j]   
    
-    print("Here") 
+
        
     mc_jt =                 {(key,t):mc[key,t] for t in range(1,8760+1) for key in tec}
-    print("Here2") 
+
     n_th_j =                {key:data["n_th"][key] for key in tec}
     x_th_cap_j =            {key:data["P_th_cap"][key] for key in tec}
 #    x_el_cap_j =            {key:data["P_el_cap"][key] for key in tec}
@@ -104,7 +104,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     pot_j = None
     lt_j =                  {key:data["LT"][key] for key in tec}
     el_surcharge =          50  # Taxes for electricity price
-    print("Here3") 
+
        
     ir = data["interest_rate"]  # interest Rate
     q = 1+ir
@@ -114,7 +114,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
             alpha[ix] = 1
         else:
             alpha[ix] =  ( q**val * ir) / ( q**val - 1)
-    print("Here4")              
+             
     alpha_j =               {key:alpha[key] for key in tec}
     
     # Heat Storage
@@ -135,7 +135,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     # Ramping Costs
     c_ramp_chp =            100
     c_ramp_waste =          100
-    print("Here5") 
+ 
     rf_j =                  {key:data["RF"][key] for key in tec}
     rf_tot =                data["toatl_RF"]
 
