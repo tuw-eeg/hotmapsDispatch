@@ -54,7 +54,8 @@ load_text = open(path_spinner_load_html).read()
 spinner_text = open(path_spinner_html).read()
 #%%
 io_loop = IOLoop.current()
-global data_table,data_table_prices,data_table_data,f
+global data_table,data_table_prices,data_table_data,f,carrier_dict
+carrier_dict ={}
 #%%
 def invert_dict(d):
     return dict([ (v, k) for k, v in d.items() ])
@@ -329,9 +330,16 @@ def modify_doc(doc):
 
 
     def download_callback():
+        global carrier_dict
         div_spinner.text = spinner_text
         print("Download...")
+
         df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
+        if df.shape[0] == 0:
+            del df
+            carrier_dict ={}
+            div_spinner.text = """<strong style="color: red;">Nothing to download </strong>""" 
+            return
 #        df = df.fillna(0)
         writer = pd.ExcelWriter(path_download_output)  
         df.to_excel(writer,'Heat Generators')
@@ -346,14 +354,30 @@ def modify_doc(doc):
         
         data_hs_df = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore')
 #        data_hs_df = data_hs_df.fillna(0)
-        data_hs_df.to_excel(writer,'Heat Storages')
+        data_hs_df.to_excel(writer,'Heat Storage')
         
+
+        df_carrier = pd.DataFrame.from_dict(carrier_dict,orient="index")
+        df_carrier["name"]=df_carrier.index
+        df_carrier["carrier"] = df_carrier[0] 
+        del df_carrier[0]
+        df_carrier.index = range(df_carrier.shape[0])
+        df_carrier.to_excel(writer,'Energy Carrier')
+
         writer.save()
+        
         print("Download done.\nSaved to <"+path_download_output+">")
         div_spinner.text = """<strong style="color: green;">Download done.\nSaved to: """+path_download_output+"""</strong>""" 
     #%%
     def run_callback():
+        global carrier_dict
         output.tabs = []
+        df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
+        if df.shape[0] == 0:
+            del df
+            carrier_dict ={}
+            div_spinner.text = """<strong style="color: red;">No Heat Generators aviable </strong>""" 
+            return
         div_spinner.text = spinner_text
         print('calculation started...')
         data,_ = load_data()
@@ -402,6 +426,8 @@ def modify_doc(doc):
         
         data["all_heat_geneartors"] = data["tec"] + data["tec_hs"]
         
+        data["energy_carrier"] = {**data["energy_carrier"],**carrier_dict}
+        
         solutions = None
         selection = [[],[]]
         inv_flag = False
@@ -438,6 +464,7 @@ def modify_doc(doc):
 
 #%%
     def upload_callback(attr, old, new):
+        global carrier_dict
         div_spinner.text = spinner_text
         print('Upload started')
         file_type = file_source.data['file_name'][0].split(".")[1]
@@ -450,6 +477,7 @@ def modify_doc(doc):
             excel_object = pd.ExcelFile(file_io, engine='xlrd')
             data2 = excel_object.parse(sheet_name = 'Heat Generators', index_col = 0,skiprows = range(22,50)).apply(pd.to_numeric, errors='ignore')
             data2 = data2.fillna(0)
+            data2["index"] = data2.index
             data_table.source.data.update(data2)
             
             data2 = excel_object.parse(sheet_name = 'prices and emmision factors', index_col = 0,skiprows = range(14,50)).apply(pd.to_numeric, errors='ignore')
@@ -463,9 +491,15 @@ def modify_doc(doc):
             data2 = data2.fillna(0)
             data_table_data.source.data.update(data2)
             
-            data2 = excel_object.parse(sheet_name = 'Heat Storages', index_col = 0).apply(pd.to_numeric, errors='ignore')
+            data2 = excel_object.parse(sheet_name = 'Heat Storage', index_col = 0).apply(pd.to_numeric, errors='ignore')
             data2 = data2.fillna(0)
             data_table_heat_storage.source.data.update(data2)
+            
+            data2 = excel_object.parse(sheet_name = 'Energy Carrier', index_col = 0)
+            global carrier_dict
+            data2 = data2.set_index(data2["name"])
+            del data2["name"]
+            carrier_dict = data2.to_dict()["carrier"]
             div_spinner.text = """<strong style="color: green;">Upload done</strong>"""
         else:
             print("Not a valid file to upload")
@@ -568,7 +602,8 @@ def modify_doc(doc):
         div_spinner.text = ""
     cancel_button.on_click(cancel)
 
-    def add_to_cds():  
+    def add_to_cds(): 
+        global carrier_dict
         div_spinner.text = load_text
         df2 = pd.DataFrame(data_table.source.data)
         df2.set_index(df2["index"])
@@ -585,11 +620,14 @@ def modify_doc(doc):
         df2 = df2.append(new_data,ignore_index=True)
         df2 = df2.apply(pd.to_numeric, errors='ignore')
         df2["index"] = df2.index
+        _df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
+        if _df.shape[0] == 0:
+            carrier_dict={}
         data_table.source.data.update(df2)
         del df2
         grid.children = [Div()]
         div_spinner.text = """<strong style="color: green;">Heat Generator ADDED</strong>"""
-        
+        carrier_dict[name_label.value] = energy_carrier_select.value
         
         
 
@@ -617,7 +655,7 @@ def modify_doc(doc):
     
     must_run_box = Toggle(label="Must Run",  button_type="warning")
     renewable_factor = Slider(start=0, end=1, value=0, step=.1, title="Renewable Factor")
-    installed_cap = Slider(start=0, end=int(float(pmax.value))+1, value=0, step=.1, title="Installed Capacity")
+    installed_cap = Slider(start=0, end=int(float(pmax.value))+1, value=0, step=1, title="Installed Capacity")
     
     name_label = TextInput(placeholder="-", title="Name",disabled=True)
     

@@ -56,8 +56,8 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.mc_jt = pe.Param(m.j,m.t,initialize= val[21])
     m.n_th_j = pe.Param(m.j,initialize=val[22]) 
     m.x_th_cap_j = pe.Param(m.j,initialize=val[23]) 
-    m.x_el_cap_j = pe.Param(m.j,initialize=val[24]) 
-    m.pot_j = pe.Param(m.j,initialize=val[25]) 
+#    m.x_el_cap_j = pe.Param(m.j,initialize=val[24]) 
+#    m.pot_j = pe.Param(m.j,initialize=val[25]) 
     m.lt_j = pe.Param(m.j,initialize=val[26])
 #    m.el_surcharge = pe.Param(m.j,initialize=val[27])  # Taxes for electricity price
     m.ir = pe.Param(initialize=val[28])

@@ -12,7 +12,7 @@ class SliceMaker(object):
 
 #XXX: Catogorize
 def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):  
-    
+
     if inv_flag:
         tec = []
         for s in selection[0]: 
@@ -56,7 +56,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     if (max_installed_caps <= max_demad*demand_f) and not inv_flag:
         print("The installed capacities are not enough to cover the load")
         return "Error2"
-      
+
     radiation_t =           data["radiation"]
     IK_j =                  {key:data["IK"][key] for key in tec}
     OP_fix_j =              {key:data["OP_fix"][key] for key in tec}
@@ -91,18 +91,21 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
                                 data["n_th"][j] + \
                                  data["em"][data["energy_carrier"][j]]*data["P_co2"] / \
                                   data["n_th"][j]   
-
-        
+   
+    print("Here") 
+       
     mc_jt =                 {(key,t):mc[key,t] for t in range(1,8760+1) for key in tec}
-
+    print("Here2") 
     n_th_j =                {key:data["n_th"][key] for key in tec}
     x_th_cap_j =            {key:data["P_th_cap"][key] for key in tec}
-    x_el_cap_j =            {key:data["P_el_cap"][key] for key in tec}
-    pot_j =                 {key:data["POT"][key] for key in tec}
+#    x_el_cap_j =            {key:data["P_el_cap"][key] for key in tec}
+    x_el_cap_j = None
+#    pot_j =                 {key:data["POT"][key] for key in tec}
+    pot_j = None
     lt_j =                  {key:data["LT"][key] for key in tec}
     el_surcharge =          50  # Taxes for electricity price
-
-   
+    print("Here3") 
+       
     ir = data["interest_rate"]  # interest Rate
     q = 1+ir
     alpha = {}
@@ -111,7 +114,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
             alpha[ix] = 1
         else:
             alpha[ix] =  ( q**val * ir) / ( q**val - 1)
-                  
+    print("Here4")              
     alpha_j =               {key:alpha[key] for key in tec}
     
     # Heat Storage
@@ -132,7 +135,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     # Ramping Costs
     c_ramp_chp =            100
     c_ramp_waste =          100
-    
+    print("Here5") 
     rf_j =                  {key:data["RF"][key] for key in tec}
     rf_tot =                data["toatl_RF"]
 
@@ -140,6 +143,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
 
     thresh = data["threshold_heatpump"]
     all_heat_geneartors = data["all_heat_geneartors"] 
+ 
     mr_j = {key:data["MR"][key] for key in tec}
 
     args = (tec, j_hp, j_pth, j_st, j_waste, j_chp, j_bp, j_wh, j_gt, j_hs, 
