@@ -331,7 +331,7 @@ def modify_doc(doc):
 
     def download_callback():
         global carrier_dict
-        div_spinner.text = spinner_text
+        div_spinner.text = load_text
         print("Download...")
 
         df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
@@ -465,7 +465,7 @@ def modify_doc(doc):
 #%%
     def upload_callback(attr, old, new):
         global carrier_dict
-        div_spinner.text = spinner_text
+        div_spinner.text = load_text
         print('Upload started')
         file_type = file_source.data['file_name'][0].split(".")[1]
         raw_contents = file_source.data['file_contents'][0]
@@ -625,7 +625,7 @@ def modify_doc(doc):
             carrier_dict={}
         data_table.source.data.update(df2)
         del df2
-        grid.children = [Div()]
+#        grid.children = [Div()]
         div_spinner.text = """<strong style="color: green;">Heat Generator ADDED</strong>"""
         carrier_dict[name_label.value] = energy_carrier_select.value
         
