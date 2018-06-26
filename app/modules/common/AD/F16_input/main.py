@@ -19,9 +19,9 @@ if path not in sys.path:
 #%% Setting Global default paramters and default paths
 path2data = os.path.split(os.path.abspath(__file__))[0]
 # path to user input data
-path_parameter2 = path + r"\FEAT\F16\input.xlsx"
+path_parameter2 = os.path.join(path,*( r"\FEAT\F16\input.xlsx".split("\\")))
 # path to default values
-path_parameter = path2data + r"\DH_technology_cost.xlsx"
+path_parameter = os.path.join(path2data,*( r"\DH_technology_cost.xlsx".split("\\")))
 # default key for the extern paramters (load,price,radiation,temperature)
 init_data=("Wien",2016)
 # Set investment flag
@@ -46,7 +46,8 @@ def return_dict(name_dat,init_data=init_data):
                                 one-based indexed dictionary 
     
     """
-    val = pickle.load(open(path2data+r"\\"+name_dat+".dat", "rb"))[init_data]
+    with open(os.path.join(path2data,name_dat+".dat"),"rb") as file: 
+        val = pickle.load(file)[init_data]
     return dict(zip(range(1,len(val)+1),val.tolist()))
 
 def return_mapper(sheet_name="",path2file=path_parameter):
@@ -214,8 +215,9 @@ def load_data():
     overwrite(data,data_input_params,"",parameter_list_mapper)
     overwrite(data,data_input_hs,"name",hs_mapper)
 
-    # Load externel data like demand, radiation,temperature, electricity price     
-    demand = pickle.load(open(path2data+r"\load_profiles.dat", "rb"))[init_data]    
+    # Load externel data like demand, radiation,temperature, electricity price
+    with open(os.path.join(path2data,"load_profiles.dat"),"rb") as file:     
+        demand = pickle.load(file)[init_data]    
     demand_neu = demand / sum(demand) * float(data_input_params["Total Demand[ MWh]"].values[0])
     data["demand_th"] = dict(zip(range(1,len(demand_neu)+1),demand_neu.tolist()))
     data["radiation"] = return_dict("radiation_profiles")

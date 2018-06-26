@@ -271,7 +271,7 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     
     p.add_layout(legend, 'right')   
     p.legend.click_policy = "hide" # "mute"
-    output_file(path2output+r"\\"+decison_var+name)
+#    output_file(path2output+r"\\"+decison_var+name)
     p.toolbar.logo = None
     
     p2 = figure(x_range=p.x_range,title="Electricity Price",
@@ -409,7 +409,7 @@ def pie_chart(dic,path2output,decison_var,cmap):
     legend = Legend(items=items,location=(10, 10))    
     p.add_layout(legend, 'right')
     p.legend.click_policy = "hide" # "mute"
-    output_file(path2output+r"\\"+decison_var+"_pie_chart.html")
+#    output_file(path2output+r"\\"+decison_var+"_pie_chart.html")
     return p
 #%%
 def bar_chart(dic,path2output,decison_var,cmap):
@@ -628,9 +628,9 @@ def tab_panes(path2output,**kwargs):
     return tabs     
 
 #%% Setting Global default paramters and default paths
-path2json = path+r"\AD\F16_input\Solution\solution.json"
-path2output = path+r"\AD\F16_input\Output_Graphics"
-path_parameter = path +  r"\AD\F16_input\DH_technology_cost.xlsx"
+path2json = os.path.join(path,*(r"\AD\F16_input\Solution\solution.json".split("\\")))
+path2output = os.path.join(path,*(r"\AD\F16_input\Output_Graphics".split("\\")))
+path_parameter = os.path.join(path,*(r"\AD\F16_input\DH_technology_cost.xlsx".split("\\")))
 #%%
 def plot_solutions(show_plot=False,path2json=path2json):
     """
@@ -764,8 +764,8 @@ def plot_solutions(show_plot=False,path2json=path2json):
                 cmap = colormapping(dic["all_heat_geneartors"])
                 os.mkdir(path2output)
                 print("Created: "+ path2output)
-                pickle.dump(cmap, 
-                            open(path2output+r'\cmap.spec', 'wb'))
+                with open(os.path.join(path2output,"cmap.spec"),"wb") as file: 
+                    pickle.dump(cmap,file)
      
         except FileNotFoundError:
             print("\n*********\nThere is no JSON File in this path: "+
@@ -780,13 +780,14 @@ def plot_solutions(show_plot=False,path2json=path2json):
         y1 = matrix(dic,decison_var,legend,tw)
         y2 = matrix(dic,decison_var,legend,ts)
         y3 = matrix(dic,decison_var,legend,t)
-
-        cmap = pickle.load(open(path2output+r"\cmap.spec", "rb"))
+        
+        with open(os.path.join(path2output,"cmap.spec"),"rb") as file: 
+            cmap = pickle.load(file)
         cmap2 = colormapping(dic["Technologies:"])
         if cmap != cmap2:
             cmap = cmap2
-            pickle.dump(cmap, 
-                            open(path2output+r'\cmap.spec', 'wb'))
+            with open(os.path.join(path2output,"cmap.spec"),"wb") as file:
+                pickle.dump(cmap,file)
             
         dic["Marginal Costs"] = dic["Marginal Costs:"] 
         
@@ -842,10 +843,10 @@ def plot_solutions(show_plot=False,path2json=path2json):
         tabs = tab_panes(path2output,**kwargs)
         
         i=0
-        while os.path.exists(path2output+"\output%s.html" % i):
+        while os.path.exists(os.path.join(path2output,"output%s.html" % i)):
             i += 1
         
-        output_file(path2output+"\output%s.html" % i,title="Dispatch output")
+        output_file(os.path.join(path2output,"output%s.html" % i),title="Dispatch output")
         save(tabs)
         
         

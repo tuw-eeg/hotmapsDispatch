@@ -4,12 +4,14 @@ Created on Fri Mar  9 15:30:16 2018
 
 @author: root
 """
+#import matplotlib
+#matplotlib.use('agg')
 from tornado.ioloop import IOLoop
 import pandas as pd
 import numpy as np
 from bokeh.application.handlers import FunctionHandler
 from bokeh.application import Application
-from bokeh.layouts import widgetbox,layout,row,column,Spacer
+from bokeh.layouts import widgetbox,layout,row,column
 from bokeh.models import ColumnDataSource,TableColumn,DataTable,CustomJS,TextInput, Slider
 from bokeh.server.server import Server
 from bokeh.models.widgets import Panel, Tabs, Button,Div,Toggle,Select,CheckboxGroup
@@ -43,15 +45,18 @@ def uniqueid():
        
 unique_id = uniqueid()
 #%% Setting Global default paramters and default paths
-path_parameter = path+r"\AD\F16_input\DH_technology_cost.xlsx"
-path2data = path+r"\AD\F16_input"
+path_parameter = os.path.join(path,*(r"\AD\F16_input\DH_technology_cost.xlsx".split("\\")))
+path2data = os.path.join(path,*(r"\AD\F16_input".split("\\")))
 path_download_js = "download.js"
-path_download_output= path + r"\FEAT\F16\download_input.xlsx"
+path_download_output= os.path.join(path,*(r"\FEAT\F16\download_input.xlsx".split("\\")))
 path_upload_js = "upload.js"
 path_spinner_html = "spinner2.html"
 path_spinner_load_html = "spinner.html"
-load_text = open(path_spinner_load_html).read()
-spinner_text = open(path_spinner_html).read()
+with open(path_spinner_load_html) as file:
+    load_text = file.read()
+    
+with open(path_spinner_html) as file:
+    spinner_text = file.read()
 #%%
 io_loop = IOLoop.current()
 global data_table,data_table_prices,data_table_data,f,carrier_dict
@@ -61,9 +66,11 @@ def invert_dict(d):
     return dict([ (v, k) for k, v in d.items() ])
 
 def load_extern_data(name):
-    dict_map = pickle.load(open(path2data+"\\"+name+"_name_map.dat","rb"))
+    with open(os.path.join(path2data,name+"_name_map.dat"),"rb") as file:
+        dict_map = pickle.load(file)
     dict_map_inv = invert_dict(dict_map)
-    dic = pickle.load(open(path2data+"\\"+name+"_profiles.dat","rb"))
+    with open(os.path.join(path2data,name+"_profiles.dat"),"rb") as file:
+        dic = pickle.load(file)
     return dict_map,dict_map_inv,dic
     
 def mapper(path2excel,worksheet_name=""):
@@ -371,7 +378,13 @@ def modify_doc(doc):
     #%%
     def run_callback():
         global carrier_dict
+        
+        div_spinner.text = load_text
         output.tabs = []
+        if type(grid.children[0]) != type(Div()):
+            grid.children = [Div()]
+        div_spinner.text = ""
+
         df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
         if df.shape[0] == 0:
             del df
@@ -522,7 +535,8 @@ def modify_doc(doc):
     run_button.on_click(run_callback)
     
     upload_button = Button(label="Upload Power Plant Parameters", button_type="danger")
-    upload_code=open(path_upload_js).read()
+    with open(path_upload_js) as file:
+        upload_code=file.read()
     upload_button.callback = CustomJS(args=dict(file_source=file_source), code =upload_code)
     
     div_spinner = Div(text="")
