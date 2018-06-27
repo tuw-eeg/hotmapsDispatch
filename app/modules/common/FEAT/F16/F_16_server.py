@@ -4,8 +4,8 @@ Created on Fri Mar  9 15:30:16 2018
 
 @author: root
 """
-#import matplotlib
-#matplotlib.use('agg')
+import matplotlib
+matplotlib.use('agg',warn=False)
 from tornado.ioloop import IOLoop
 import pandas as pd
 import numpy as np
@@ -26,11 +26,19 @@ if path not in sys.path:
     sys.path.append(path)
 
 #TODO: Upgrade to new bokeh version 
-from bokeh import __version__
-if __version__ != '0.12.10':
-    print("Your current bokeh version ist not compatible (Your Version:" +__version__+")")
+import bokeh 
+if bokeh.__version__ != '0.12.10':
+    print("Your current bokeh version ist not compatible (Your Version:" +bokeh.__version__+")")
     print("Please install bokeh==0.12.10")
     sys.exit()    
+
+import tornado
+if tornado.version != '4.5.3':
+    print("Your current tornado version ist not compatible (Your Version:" +tornado.version +")")
+    print("Please install tornado==4.5.3")
+    sys.exit()
+
+
     
 from AD.F16_input.main import load_data 
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
