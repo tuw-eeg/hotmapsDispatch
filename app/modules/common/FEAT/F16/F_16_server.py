@@ -55,10 +55,10 @@ def uniqueid():
 
 unique_id = uniqueid()
 #%% Setting Global default paramters and default paths
-path_parameter = os.path.join(path,*(r"\AD\F16_input\DH_technology_cost.xlsx".split("\\")))
-path2data = os.path.join(path,*(r"\AD\F16_input".split("\\")))
-path_download_js = "download.js"
-path_download_output= os.path.join(path,*(r"\FEAT\F16\download_input.xlsx".split("\\")))
+path_parameter = os.path.join(path, "AD", "F16_input", "DH_technology_cost.xlsx")
+path2data = os.path.join(path, "AD", "F16_input")
+path_download_js = "download.js" # unused
+path_download_output= os.path.join(path, "FEAT", "F16", "download_input.xlsx")
 path_upload_js = os.path.join(root_dir, "upload.js")
 path_spinner_html = os.path.join(root_dir, "spinner2.html")
 path_spinner_load_html = os.path.join(root_dir, "spinner.html")
