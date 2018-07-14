@@ -36,7 +36,7 @@ if __name__ == "__main__":
         print("Error: Something get Wrong")
     else:
         print('calculation done')
-        tabs = plot_solutions(show_plot=True)   
+        tabs = plot_solutions(show_plot=True,solution=solutions)   
         if tabs == "Error4":
             print("Error @ Ploting  !!!")
         
