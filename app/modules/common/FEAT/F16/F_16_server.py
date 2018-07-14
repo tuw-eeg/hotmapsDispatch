@@ -339,212 +339,230 @@ def modify_doc(doc):
 
 
     def download_callback():
-        global carrier_dict
-        div_spinner.text = load_text
-        print("Download...")
-
-        df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
-        if df.shape[0] == 0:
-            del df
-            carrier_dict ={}
-            div_spinner.text = """<strong style="color: red;">Nothing to download </strong>"""
-            return
-#        df = df.fillna(0)
-        time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
-        filename = "download_input.xlsx"
-        path_download = os.path.join(create_folder(time_id),filename)
-
-        writer = pd.ExcelWriter(path_download)
-        df.to_excel(writer,'Heat Generators')
-
-        data_prices_df = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore')
-#        data_prices_df = data_prices_df.fillna(0)
-        data_prices_df.to_excel(writer,'prices and emmision factors')
-
-        data_data_df = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore')
-#        data_data_df = data_data_df.fillna(0)
-        data_data_df.to_excel(writer,'Data')
-
-        data_hs_df = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore')
-#        data_hs_df = data_hs_df.fillna(0)
-        data_hs_df.to_excel(writer,'Heat Storage')
-
-
-        df_carrier = pd.DataFrame.from_dict(carrier_dict,orient="index")
-        df_carrier["name"]=df_carrier.index
-        df_carrier["carrier"] = df_carrier[0]
-        del df_carrier[0]
-        df_carrier.index = range(df_carrier.shape[0])
-        df_carrier.to_excel(writer,'Energy Carrier')
-
-        writer.save()
-        trigger_download(time_id,filename)
-        print("Download done.\nSaved to <"+path_download+">")
-#%TODO: wait untill download has finished and delete folder
-#       or extra script that delete te content of the static folder after 2 hours or something else  
-#        shutil.rmtree(path_download_dir, ignore_errors=True)
-        div_spinner.text = """<strong style="color: green;">Download done.</strong>"""
+        try:
+            global carrier_dict
+            div_spinner.text = load_text
+            print("Download...")
+    
+            df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
+            if df.shape[0] == 0:
+                del df
+                carrier_dict ={}
+                div_spinner.text = """<strong style="color: red;">Nothing to download </strong>"""
+                return
+    #        df = df.fillna(0)
+            time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+            filename = "download_input.xlsx"
+            path_download = os.path.join(create_folder(time_id),filename)
+    
+            writer = pd.ExcelWriter(path_download)
+            df.to_excel(writer,'Heat Generators')
+    
+            data_prices_df = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore')
+    #        data_prices_df = data_prices_df.fillna(0)
+            data_prices_df.to_excel(writer,'prices and emmision factors')
+    
+            data_data_df = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore')
+    #        data_data_df = data_data_df.fillna(0)
+            data_data_df.to_excel(writer,'Data')
+    
+            data_hs_df = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore')
+    #        data_hs_df = data_hs_df.fillna(0)
+            data_hs_df.to_excel(writer,'Heat Storage')
+    
+    
+            df_carrier = pd.DataFrame.from_dict(carrier_dict,orient="index")
+            df_carrier["name"]=df_carrier.index
+            df_carrier["carrier"] = df_carrier[0]
+            del df_carrier[0]
+            df_carrier.index = range(df_carrier.shape[0])
+            df_carrier.to_excel(writer,'Energy Carrier')
+    
+            writer.save()
+            trigger_download(time_id,filename)
+            print("Download done.\nSaved to <"+path_download+">")
+    #%TODO: wait untill download has finished and delete folder
+    #       or extra script that delete te content of the static folder after 2 hours or something else  
+    #        shutil.rmtree(path_download_dir, ignore_errors=True)
+            div_spinner.text = """<strong style="color: green;">Download done.</strong>"""
+        except Exception as e:
+            print(str(e))
+            div_spinner.text = """<strong style="color: red;">Fatal Error @ Download </strong>"""
     #%%
     def run_callback():
-        if float(to_install.value) > 0:
-            div_spinner.text = """<strong style="color: red;">The installed capacities are not enough to cover the load</strong>"""
-            return
-            
-        global carrier_dict
-
-        div_spinner.text = load_text
-        output.tabs = []
-        if type(grid.children[0]) != type(Div()):
-            grid.children = [Div()]
-        div_spinner.text = ""
-
-        df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
-        if df.shape[0] == 0:
-            del df
-            carrier_dict ={}
-            div_spinner.text = """<strong style="color: red;">No Heat Generators aviable </strong>"""
-            return
-        div_spinner.text = spinner_text
-        print('calculation started...')
-        data,_ = load_data()
-
-
-        data1= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
-        data1 = data1.fillna(0)
-
-        data_prices = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore')
-        data_prices = data_prices.fillna(0)
-
-        data_data = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore')
-        data_data = data_data.fillna(0)
-
-        data_heat_storages = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore')
-        data_heat_storages = data_heat_storages.fillna(0)
-        dic_hs = data_heat_storages.set_index("name").to_dict()
-        for key in list(dic_hs):
-            data[heat_storage_list_mapper[key]] = dic_hs[key]
-
-
-        dic1 = data1.set_index("name").to_dict()
-        for key in list(dic1):
-            data[input_list_mapper[key]] = dic1[key]
-
-        dic2 = data_prices.set_index(input_price_list[0]).to_dict()
-
-        for key in list(dic2):
-            data[key] = dic2[key]
-
-
-        data["P_co2"] = float(data_data[parameter_list[0]].values[0])
-        data["interest_rate"] = float(data_data[parameter_list[1]].values[0])
-        data["toatl_RF"] = float(data_data[parameter_list[2]].values[0])
-        data["total_demand"] = float(data_data[parameter_list[3]].values[0])
-
-        data["demand_th"] = dict(zip(range(1,len(source_load.data["y"])+1),source_load.data["y"]))
-        data["energy_carrier_prices"]["electricity"] = dict(zip(range(1,len(source_price.data["y"])+1),source_price.data["y"]))
-        data["sale_electricity"] = dict(zip(range(1,len(source_price_sale.data["y"])+1),source_price_sale.data["y"]))
-
-        data["radiation"] = dict(zip(range(1,len(source_radiation.data["y"])+1),source_radiation.data["y"]))
-        data["temp"] = dict(zip(range(1,len(source_temperature.data["y"])+1),source_temperature.data["y"]))
-
-        data["tec_hs"] = list(data_heat_storages["name"].values)
-        data["tec"] = list(data1["name"].values)
-
-        data["all_heat_geneartors"] = data["tec"] + data["tec_hs"]
-
-        data["energy_carrier"] = {**data["energy_carrier"],**carrier_dict}
-
-        solutions = None
-        selection = [[],[]]
-        inv_flag = False
-        if invest.active:
-            inv_flag = True
-            selection0 = data_table.source.selected["1d"]["indices"]
-            selection1 = data_table_heat_storage.source.selected["1d"]["indices"]
-            selection = [selection0,selection1]
-            if selection[0] == []:
-                div_spinner.text = """<strong style="color: red;">Error: Please specify the technologies for for the invesment model !!!</strong>"""
+        try:
+            if float(to_install.value) > 0:
+                div_spinner.text = """<strong style="color: red;">The installed capacities are not enough to cover the load</strong>"""
                 return
-        solutions,_,_ = execute(data,inv_flag,selection)
-        if solutions == "Error1":
-            div_spinner.text = """<strong style="color: red;">Error: No Capacities are installed !!!</strong>"""
-        elif solutions == "Error2":
-            div_spinner.text = """<strong style="color: red;">Error: The installed capacities are not enough to cover the load !!!</strong>"""
-        elif solutions == "Error3":
-            print("Error in Saving Solution to JSON !!!")
-            print("Cause: Infeasible or unbounded model !!!")
-            div_spinner.text = """<strong style="color: red;">Error: Infeasible or unbounded model !!!</strong>"""
-        elif solutions == None:
-            print("Error: Something get Wrong")
-            div_spinner.text = """<strong style="color: red;">Error: Something get Wrong</strong>"""
-        else:
-            output_tabs = plot_solutions(solution=solutions)
+                
+            global carrier_dict
+    
+            div_spinner.text = load_text
+            output.tabs = []
+            if type(grid.children[0]) != type(Div()):
+                grid.children = [Div()]
+            div_spinner.text = ""
+    
+            df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
+            if df.shape[0] == 0:
+                del df
+                carrier_dict ={}
+                div_spinner.text = """<strong style="color: red;">No Heat Generators aviable </strong>"""
+                return
+            div_spinner.text = spinner_text
+            print('calculation started...')
+            data,_ = load_data()
+    
+    
+            data1= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
+            data1 = data1.fillna(0)
+    
+            data_prices = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore')
+            data_prices = data_prices.fillna(0)
+    
+            data_data = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore')
+            data_data = data_data.fillna(0)
+    
+            data_heat_storages = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore')
+            data_heat_storages = data_heat_storages.fillna(0)
+            dic_hs = data_heat_storages.set_index("name").to_dict()
+            for key in list(dic_hs):
+                data[heat_storage_list_mapper[key]] = dic_hs[key]
+    
+    
+            dic1 = data1.set_index("name").to_dict()
+            for key in list(dic1):
+                data[input_list_mapper[key]] = dic1[key]
+    
+            dic2 = data_prices.set_index(input_price_list[0]).to_dict()
+    
+            for key in list(dic2):
+                data[key] = dic2[key]
+    
+    
+            data["P_co2"] = float(data_data[parameter_list[0]].values[0])
+            data["interest_rate"] = float(data_data[parameter_list[1]].values[0])
+            data["toatl_RF"] = float(data_data[parameter_list[2]].values[0])
+            data["total_demand"] = float(data_data[parameter_list[3]].values[0])
+    
+            data["demand_th"] = dict(zip(range(1,len(source_load.data["y"])+1),source_load.data["y"]))
+            data["energy_carrier_prices"]["electricity"] = dict(zip(range(1,len(source_price.data["y"])+1),source_price.data["y"]))
+            data["sale_electricity"] = dict(zip(range(1,len(source_price_sale.data["y"])+1),source_price_sale.data["y"]))
+    
+            data["radiation"] = dict(zip(range(1,len(source_radiation.data["y"])+1),source_radiation.data["y"]))
+            data["temp"] = dict(zip(range(1,len(source_temperature.data["y"])+1),source_temperature.data["y"]))
+    
+            data["tec_hs"] = list(data_heat_storages["name"].values)
+            data["tec"] = list(data1["name"].values)
+    
+            data["all_heat_geneartors"] = data["tec"] + data["tec_hs"]
+    
+            data["energy_carrier"] = {**data["energy_carrier"],**carrier_dict}
+    
+            solutions = None
+            selection = [[],[]]
+            inv_flag = False
+            if invest.active:
+                inv_flag = True
+                selection0 = data_table.source.selected["1d"]["indices"]
+                selection1 = data_table_heat_storage.source.selected["1d"]["indices"]
+                selection = [selection0,selection1]
+                if selection[0] == []:
+                    div_spinner.text = """<strong style="color: red;">Error: Please specify the technologies for for the invesment model !!!</strong>"""
+                    return
+            solutions,_,_ = execute(data,inv_flag,selection)
             print('calculation done')
-            if output_tabs == "Error4":
-                print("Error @ Ploting  !!!")
-                div_spinner.text = """<strong style="color: red;">Error: @ Ploting !!!</strong>"""
+            print ("Ploting started..")
+            if solutions == "Error1":
+                div_spinner.text = """<strong style="color: red;">Error: No Capacities are installed !!!</strong>"""
+            elif solutions == "Error2":
+                div_spinner.text = """<strong style="color: red;">Error: The installed capacities are not enough to cover the load !!!</strong>"""
+            elif solutions == "Error3":
+                print("Error in Saving Solution to JSON !!!")
+                print("Cause: Infeasible or unbounded model !!!")
+                div_spinner.text = """<strong style="color: red;">Error: Infeasible or unbounded model !!!</strong>"""
+            elif solutions == None:
+                print("Error: Something get Wrong")
+                div_spinner.text = """<strong style="color: red;">Error: Something get Wrong</strong>"""
             else:
-                output.tabs = output_tabs
-                time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
-                filename = "output_graphs.html" 
-                path_download = os.path.join(create_folder(time_id),filename)
-                output_file(path_download,title="Dispatch output")
-                save(output)
-                trigger_download(time_id,filename)
-                # -- Download JSON 
-                time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
-                filename = "output_data.json" 
-                path_download = os.path.join(create_folder(time_id),filename)
-                with open(path_download, "w") as f:
-                    json.dump(solutions, f)
-                trigger_download(time_id,filename)
-                # --
-                div_spinner.text = """<strong style="color: green;">Calculation done</strong>"""
+                output_tabs = plot_solutions(solution=solutions)
 
-
+                if output_tabs == "Error4":
+                    print("Error @ Ploting  !!!")
+                    div_spinner.text = """<strong style="color: red;">Error: @ Ploting !!!</strong>"""
+                else:
+                    output.tabs = output_tabs
+                    print("Ploting done")
+                    print("Download output_graphics started...")
+                    time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+                    filename = "output_graphs.html" 
+                    path_download = os.path.join(create_folder(time_id),filename)
+                    output_file(path_download,title="Dispatch output")
+                    save(output)
+                    trigger_download(time_id,filename)
+                    print("Graphics Downloa done")
+                    print("Download output data started...")
+                    # -- Download JSON 
+                    time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+                    filename = "output_data.json" 
+                    path_download = os.path.join(create_folder(time_id),filename)
+                    with open(path_download, "w") as f:
+                        json.dump(solutions, f)
+                    trigger_download(time_id,filename)
+                    print("Download output data done")
+                    # --
+                    div_spinner.text = """<strong style="color: green;">Calculation done</strong>"""
+        except Exception as e:
+            print(str(e))
+            div_spinner.text = """<strong style="color: red;">Fatal Error @ Running </strong>"""
 #%%
     def upload_callback(attr, old, new):
-        global carrier_dict
-        div_spinner.text = load_text
-        print('Upload started')
-        file_type = file_source.data['file_name'][0].split(".")[1]
-        raw_contents = file_source.data['file_contents'][0]
-        prefix, b64_contents = raw_contents.split(",", 1)
-        file_contents = base64.b64decode(b64_contents)
-        if  file_type in ["xlsx","xls"]:
-            print(file_type)
-            file_io = io.BytesIO(file_contents)
-            excel_object = pd.ExcelFile(file_io, engine='xlrd')
-            data2 = excel_object.parse(sheet_name = 'Heat Generators', index_col = 0,skiprows = range(22,50)).apply(pd.to_numeric, errors='ignore')
-            data2 = data2.fillna(0)
-            data2["index"] = data2.index
-            data_table.source.data.update(data2)
-
-            data2 = excel_object.parse(sheet_name = 'prices and emmision factors', index_col = 0,skiprows = range(14,50)).apply(pd.to_numeric, errors='ignore')
-            data2 = data2.fillna(0)
-            data_table_prices.source.data.update(data2)
-
-            data2 = excel_object.parse(sheet_name = 'Data', index_col = 0).apply(pd.to_numeric, errors='ignore')
-            data2 = data2.fillna(0)
-            r = data2.shape[0]
-            data2 = excel_object.parse(sheet_name = 'Data', index_col = 0,skiprows = range(2,r+1)).apply(pd.to_numeric, errors='ignore')
-            data2 = data2.fillna(0)
-            data_table_data.source.data.update(data2)
-
-            data2 = excel_object.parse(sheet_name = 'Heat Storage', index_col = 0).apply(pd.to_numeric, errors='ignore')
-            data2 = data2.fillna(0)
-            data_table_heat_storage.source.data.update(data2)
-
-            data2 = excel_object.parse(sheet_name = 'Energy Carrier', index_col = 0)
+        try:
             global carrier_dict
-            data2 = data2.set_index(data2["name"])
-            del data2["name"]
-            carrier_dict = data2.to_dict()["carrier"]
-            div_spinner.text = """<strong style="color: green;">Upload done</strong>"""
-        else:
-            print("Not a valid file to upload")
-            div_spinner.text = """<strong style="color: red;">Not a valid file to uploade</strong>"""
-        print('Upload done')
+            div_spinner.text = load_text
+            print('Upload started')
+            file_type = file_source.data['file_name'][0].split(".")[1]
+            raw_contents = file_source.data['file_contents'][0]
+            prefix, b64_contents = raw_contents.split(",", 1)
+            file_contents = base64.b64decode(b64_contents)
+            if  file_type in ["xlsx","xls"]:
+                print(file_type)
+                file_io = io.BytesIO(file_contents)
+                excel_object = pd.ExcelFile(file_io, engine='xlrd')
+                data2 = excel_object.parse(sheet_name = 'Heat Generators', index_col = 0,skiprows = range(22,50)).apply(pd.to_numeric, errors='ignore')
+                data2 = data2.fillna(0)
+                data2["index"] = data2.index
+                data_table.source.data.update(data2)
+    
+                data2 = excel_object.parse(sheet_name = 'prices and emmision factors', index_col = 0,skiprows = range(14,50)).apply(pd.to_numeric, errors='ignore')
+                data2 = data2.fillna(0)
+                data_table_prices.source.data.update(data2)
+    
+                data2 = excel_object.parse(sheet_name = 'Data', index_col = 0).apply(pd.to_numeric, errors='ignore')
+                data2 = data2.fillna(0)
+                r = data2.shape[0]
+                data2 = excel_object.parse(sheet_name = 'Data', index_col = 0,skiprows = range(2,r+1)).apply(pd.to_numeric, errors='ignore')
+                data2 = data2.fillna(0)
+                data_table_data.source.data.update(data2)
+    
+                data2 = excel_object.parse(sheet_name = 'Heat Storage', index_col = 0).apply(pd.to_numeric, errors='ignore')
+                data2 = data2.fillna(0)
+                data_table_heat_storage.source.data.update(data2)
+    
+                data2 = excel_object.parse(sheet_name = 'Energy Carrier', index_col = 0)
+                global carrier_dict
+                data2 = data2.set_index(data2["name"])
+                del data2["name"]
+                carrier_dict = data2.to_dict()["carrier"]
+                div_spinner.text = """<strong style="color: green;">Upload done</strong>"""
+            else:
+                print("Not a valid file to upload")
+                div_spinner.text = """<strong style="color: red;">Not a valid file to uploade</strong>"""
+            print('Upload done')
+            
+        except Exception as e:
+            print(str(e))
+            div_spinner.text = """<strong style="color: red;">Fatal Error @ Update </strong>"""
 
     #%%
     def create_folder(time_id):
