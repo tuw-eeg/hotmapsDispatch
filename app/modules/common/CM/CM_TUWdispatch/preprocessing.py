@@ -12,7 +12,6 @@ class SliceMaker(object):
 
 #XXX: Catogorize
 def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):  
-
     if inv_flag:
         tec = []
         for s in selection[0]: 
@@ -33,7 +32,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
         for s in selection_nonzero: 
             tec_hs.append(data["tec_hs"][s])
         
-        
+   
     j =         tec
     j_hp =      [key for key in tec if "heat pump" in key ]
     j_pth =     [key for key in tec if "Power To Heat" in key]
@@ -44,10 +43,10 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     j_wh =      [key for key in tec if "Waste Heat" in key]
     j_gt =      [key for key in tec if "Geo Thermal" in key]
     j_hs =      tec_hs
-
-    #%% Parameter - #TODO: depends on how the input data looks finally
-    demand_th_t =           data["demand_th"]
     
+  
+    #%% Parameter - #TODO: depends on how the input data looks finally
+    demand_th_t =           data["demand_th"]    
     max_demad =             max(data["demand_th"].values())
     max_installed_caps =    sum([data["P_th_cap"][key] for key in tec])
     delta =                 max_demad*demand_f - max_installed_caps
@@ -67,12 +66,13 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
         sale_electricity_price_t =   data["sale_electricity"]
     except:
         sale_electricity_price_t =   data["energy_carrier_prices"]["electricity"]
-        
+    
+    
     P_min_el_chp =          0
     Q_min_th_chp =          0
     ratioPMaxFW =           450/700
     ratioPMax =             450/820
-           
+    
     mc = {}
     for j in data["tec"]:
         if data["n_th"][j]  == 0:
@@ -93,9 +93,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
                                   data["n_th"][j]   
    
 
-       
     mc_jt =                 {(key,t):mc[key,t] for t in range(1,8760+1) for key in tec}
-
     n_th_j =                {key:data["n_th"][key] for key in tec}
     x_th_cap_j =            {key:data["P_th_cap"][key] for key in tec}
 #    x_el_cap_j =            {key:data["P_el_cap"][key] for key in tec}
@@ -154,5 +152,5 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
             n_hs, loss_hs, IK_hs, cap_hs, c_ramp_chp, c_ramp_waste, alpha_hs,
             rf_j,rf_tot,OP_var_j,temperature,thresh,sale_electricity_price_t,
             OP_fix_hs,all_heat_geneartors, mr_j)
-    
+
     return args

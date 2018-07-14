@@ -9,24 +9,22 @@ matplotlib.use('agg',warn=False)
 from tornado.ioloop import IOLoop
 import pandas as pd
 import numpy as np
-from bokeh.application.handlers import FunctionHandler
+from bokeh.application.handlers import FunctionHandler,DirectoryHandler
 from bokeh.application import Application
 from bokeh.layouts import widgetbox,layout,row,column
 from bokeh.models import ColumnDataSource,TableColumn,DataTable,CustomJS,TextInput, Slider
 from bokeh.server.server import Server
 from bokeh.models.widgets import Panel, Tabs, Button,Div,Toggle,Select,CheckboxGroup
-import os,sys,io,base64
-import pickle
-from bokeh.plotting import figure
+import os,sys,io,base64,pickle,datetime,json,shutil
+from bokeh.plotting import figure,output_file,save
 from bokeh.models import PanTool,WheelZoomTool,BoxZoomTool,ResetTool,SaveTool,HoverTool
-
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
 root_dir = os.path.dirname(os.path.abspath(__file__))
 
 if path not in sys.path:
     sys.path.append(path)
-
+#%%
 #TODO: Upgrade to new bokeh version
 import bokeh
 if bokeh.__version__ != '0.12.10':
@@ -39,26 +37,20 @@ if tornado.version != '4.5.3':
     print("Your current tornado version ist not compatible (Your Version:" +tornado.version +")")
     print("Please install tornado==4.5.3")
     sys.exit()
-
+#%%
 
 
 from AD.F16_input.main import load_data
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
 import CM.CM_TUWdispatch.run_cm as dispatch
 
-#%%
-def uniqueid():
-    seed = 0
-    while True:
-       yield seed
-       seed += 1
-
-unique_id = uniqueid()
 #%% Setting Global default paramters and default paths
 path_parameter = os.path.join(path, "AD", "F16_input", "DH_technology_cost.xlsx")
 path2data = os.path.join(path, "AD", "F16_input")
-path_download_js = "download.js" # unused
-path_download_output= os.path.join(path, "FEAT", "F16", "download_input.xlsx")
+path_download_js = os.path.join(root_dir, "download.js")
+path_static = os.path.join(root_dir,"static")
+if not os.path.exists(path_static):
+    os.makedirs(path_static)  
 path_upload_js = os.path.join(root_dir, "upload.js")
 path_spinner_html = os.path.join(root_dir, "spinner2.html")
 path_spinner_load_html = os.path.join(root_dir, "spinner.html")
@@ -358,7 +350,11 @@ def modify_doc(doc):
             div_spinner.text = """<strong style="color: red;">Nothing to download </strong>"""
             return
 #        df = df.fillna(0)
-        writer = pd.ExcelWriter(path_download_output)
+        time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+        filename = "download_input.xlsx"
+        path_download = os.path.join(create_folder(time_id),filename)
+
+        writer = pd.ExcelWriter(path_download)
         df.to_excel(writer,'Heat Generators')
 
         data_prices_df = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore')
@@ -382,11 +378,18 @@ def modify_doc(doc):
         df_carrier.to_excel(writer,'Energy Carrier')
 
         writer.save()
-
-        print("Download done.\nSaved to <"+path_download_output+">")
-        div_spinner.text = """<strong style="color: green;">Download done.\nSaved to: """+path_download_output+"""</strong>"""
+        trigger_download(time_id,filename)
+        print("Download done.\nSaved to <"+path_download+">")
+#%TODO: wait untill download has finished and delete folder
+#       or extra script that delete te content of the static folder after 2 hours or something else  
+#        shutil.rmtree(path_download_dir, ignore_errors=True)
+        div_spinner.text = """<strong style="color: green;">Download done.</strong>"""
     #%%
     def run_callback():
+        if float(to_install.value) > 0:
+            div_spinner.text = """<strong style="color: red;">The installed capacities are not enough to cover the load</strong>"""
+            return
+            
         global carrier_dict
 
         div_spinner.text = load_text
@@ -475,13 +478,27 @@ def modify_doc(doc):
             print("Error: Something get Wrong")
             div_spinner.text = """<strong style="color: red;">Error: Something get Wrong</strong>"""
         else:
-            output_tabs = plot_solutions()
+            output_tabs = plot_solutions(solution=solutions)
             print('calculation done')
             if output_tabs == "Error4":
                 print("Error @ Ploting  !!!")
                 div_spinner.text = """<strong style="color: red;">Error: @ Ploting !!!</strong>"""
             else:
                 output.tabs = output_tabs
+                time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+                filename = "output_graphs.html" 
+                path_download = os.path.join(create_folder(time_id),filename)
+                output_file(path_download,title="Dispatch output")
+                save(output)
+                trigger_download(time_id,filename)
+                # -- Download JSON 
+                time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+                filename = "output_data.json" 
+                path_download = os.path.join(create_folder(time_id),filename)
+                with open(path_download, "w") as f:
+                    json.dump(solutions, f)
+                trigger_download(time_id,filename)
+                # --
                 div_spinner.text = """<strong style="color: green;">Calculation done</strong>"""
 
 
@@ -530,16 +547,32 @@ def modify_doc(doc):
         print('Upload done')
 
     #%%
-#XXX: How to Download file from Server with JS ?  (currently obsoulete, saves to path of this file)
-#    download_code=open(path_download_js).read()
-#    download_callback_js = CustomJS(args=dict(source=source), code=download_code)
-#    download_button = Button(label='Download Power Plant Parameters', button_type='success', callback=download_callback_js)
+    def create_folder(time_id):
+        """ This function creates a folder in the static directory and returns its path""" 
+        path_download_dir = os.path.join(path_static,time_id)
+        if not os.path.exists(path_download_dir):
+            os.makedirs(path_download_dir)
+        return path_download_dir
+    
+    def trigger_download(time_id,filename):
+        """ This function triggers the download of the file specified in the static folder """
+        id_source.data = dict(id=[time_id],filename=[filename])
+        if int(dummy.text[32] ) == 0:
+            dummy.text= dummy.text.replace("0","1")
+        else:
+            dummy.text= dummy.text.replace("1","0")    
+    #%%
+    with open(path_download_js) as file:
+        download_code=file.read()
+    id_source = ColumnDataSource(data=dict())
+    download_callback_js = CustomJS(args=dict(source=id_source), code=download_code)
+    dummy = Div(text="""<strong style="color: #FFFFFF;">1</strong>""")
+    dummy.js_on_change('text', download_callback_js)    
     download_button = Button(label='Download Power Plant Parameters', button_type='success')
     download_button.on_click(download_callback)
 
     file_source = ColumnDataSource({'file_contents':[], 'file_name':[]})
     file_source.on_change('data', upload_callback)
-
 
     run_button = Button(label='Run Dispatch Model', button_type='primary')
     run_button.on_click(run_callback)
@@ -625,9 +658,22 @@ def modify_doc(doc):
         grid.children = [Div()]
         div_spinner.text = ""
     cancel_button.on_click(cancel)
-
+#%%
+    def new_name(name,liste):
+        if name in liste:
+            try:
+                return  new_name(name[:-1]+str(int(name[-1])+1),liste)
+            except:
+                return new_name(name+" 1",liste)
+        else:
+            return name
+#%%
     def add_to_cds():
         global carrier_dict
+        # if user refreshes site, create new dict
+        _df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
+        if _df.shape[0] == 0:
+            carrier_dict={}        
         div_spinner.text = load_text
         df2 = pd.DataFrame(data_table.source.data)
         df2.set_index(df2["index"])
@@ -635,7 +681,12 @@ def modify_doc(doc):
         new_data={}
         for x in input_list:
             if x == "name":
-                new_data[x] = str(name_label.value)
+                try:
+                    new_data[x] = new_name(str(name_label.value),data_table.source.data["name"].tolist())
+                    carrier_dict[new_name(str(name_label.value),data_table.source.data["name"].tolist())] = energy_carrier_select.value
+                except:
+                    new_data[x] = new_name(str(name_label.value),data_table.source.data["name"])
+                    carrier_dict[new_name(str(name_label.value),data_table.source.data["name"])] = energy_carrier_select.value 
             elif  x == 'must run [0-1]':
                 new_data[x] = str(int(widgets_dict[x].active))
             else:
@@ -644,14 +695,10 @@ def modify_doc(doc):
         df2 = df2.append(new_data,ignore_index=True)
         df2 = df2.apply(pd.to_numeric, errors='ignore')
         df2["index"] = df2.index
-        _df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
-        if _df.shape[0] == 0:
-            carrier_dict={}
         data_table.source.data.update(df2)
         del df2
 #        grid.children = [Div()]
-        div_spinner.text = """<strong style="color: green;">Heat Generator ADDED</strong>"""
-        carrier_dict[name_label.value] = energy_carrier_select.value
+        div_spinner.text = """<strong style="color: green;">Heat Generator ADDED</strong>"""  
 
 
 
@@ -667,7 +714,7 @@ def modify_doc(doc):
     energy_carrier_options = pd.read_excel(path_parameter,"prices and emmision factors",skiprows=[0])["energy carrier"].values.tolist()
     energy_carrier_select = Select(options = energy_carrier_options, title="Energy Carrier")
     energy_carrier_select.value = energy_carrier_options[0]
-
+    
     n_th_label = TextInput(placeholder="-", title="Thermal Efficiency")
     n_el_label = TextInput(placeholder="-", title="Electrical Efficiency")
 
@@ -802,6 +849,13 @@ def modify_doc(doc):
             pass
     flow_temp.on_change('value', cop_callback)
     return_temp.on_change('value', cop_callback)
+    
+    
+    
+    def change_name_if_carrier_changes(name,old,new):
+        name_label.value = name_label.value.replace(old,new)
+        
+    energy_carrier_select.on_change('value', change_name_if_carrier_changes)   
 #%%
 
     l = column([
@@ -813,9 +867,10 @@ def modify_doc(doc):
                           widgetbox(pmax,Div(),to_install)]),
                  widgetbox(Div(height=25)),
                  grid,
-                 widgetbox(Div(height=25)),
+                 widgetbox(dummy),
                  column([widgetbox(output)]),
-                 widgetbox(tabs)],
+                 widgetbox(tabs),
+                 ],
             sizing_mode='scale_width')
 #    l = layout([
 #            [row([widgetbox(download_button,upload_button,run_button,reset_button,invest),
@@ -835,6 +890,7 @@ if __name__ == '__main__':
             allow_websocket_origin = [line.strip() for line in fd.readlines()]
 
     bokeh_app = Application(FunctionHandler(modify_doc))
+    bokeh_app.add(DirectoryHandler(filename = root_dir))
     server = Server({'/': bokeh_app}, io_loop=io_loop, allow_websocket_origin=allow_websocket_origin)
     server.start()
     print('Opening Dispath Application on http://localhost:5006/')

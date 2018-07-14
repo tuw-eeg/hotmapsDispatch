@@ -17,9 +17,9 @@ path2solution = os.path.join(path, "AD", "F16_input", "Solution")
 
 def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
     try:
-        if os.path.isdir(path2solution) ==False:
-            print("Create Solution Dictionary")
-            os.mkdir(path2solution)
+#        if os.path.isdir(path2solution) ==False:
+#            print("Create Solution Dictionary")
+#            os.mkdir(path2solution)
         print("Saving Solver Output ....")
 
 
@@ -155,11 +155,12 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
             pass
 
 
-        solfile = os.path.join(path2solution, "solution.json")
-        with open(solfile, "w") as f:
-            json.dump(solution, f)
-
-        print("Done ! ,\nsaved to: <"+solfile+r"> ...")
+#        solfile = os.path.join(path2solution, "solution.json")
+#        with open(solfile, "w") as f:
+#            json.dump(solution, f)
+#        print("Done ! ,\nsaved to: <"+solfile+r"> ...")
+            
+        print("Done !")
         return solution
     except:
         return "Error3"

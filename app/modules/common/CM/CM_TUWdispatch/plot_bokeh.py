@@ -632,7 +632,7 @@ path2json = os.path.join(path, "AD", "F16_input", "Solution", "solution.json")
 path2output = os.path.join(path, "AD", "F16_input", "Output_Graphics")
 path_parameter = os.path.join(path, "AD", "F16_input", "DH_technology_cost.xlsx")
 #%%
-def plot_solutions(show_plot=False,path2json=path2json):
+def plot_solutions(show_plot=False,path2json=path2json,solution=-1):
     """
     This function geneartes a HTML file representeing the results of the model
     and saves it in "\AD\F16_input\Output_Graphics" as "output.html".
@@ -755,22 +755,25 @@ def plot_solutions(show_plot=False,path2json=path2json):
                        < Error4 > if an error occure >
     """
     try:
-        try:
-            with open(path2json) as f:
-                dic = json.load(f)
-
-            if os.path.isdir(path2output) == False:
-                print("Create Dictionary...")
-                cmap = colormapping(dic["all_heat_geneartors"])
-                os.mkdir(path2output)
-                print("Created: "+ path2output)
-                with open(os.path.join(path2output,"cmap.spec"),"wb") as file:
-                    pickle.dump(cmap,file)
-
-        except FileNotFoundError:
-            print("\n*********\nThere is no JSON File in this path: "+
-                  path2json+"\n*********\n")
-            return True
+        if solution == -1:
+            try:
+                with open(path2json) as f:
+                    dic = json.load(f)
+    
+#                if os.path.isdir(path2output) == False:
+#                    print("Create Dictionary...")
+#                    cmap = colormapping(dic["all_heat_geneartors"])
+#                    os.mkdir(path2output)
+#                    print("Created: "+ path2output)
+#                    with open(os.path.join(path2output,"cmap.spec"),"wb") as file:
+#                        pickle.dump(cmap,file)
+    
+            except FileNotFoundError:
+                print("\n*********\nThere is no JSON File in this path: "+
+                      path2json+"\n*********\n")
+                return True
+        else:
+            dic = solution
 
         decison_var="Thermal Power Energymix:"
         legend = list(dic[decison_var].keys())
@@ -780,15 +783,26 @@ def plot_solutions(show_plot=False,path2json=path2json):
         y1 = matrix(dic,decison_var,legend,tw)
         y2 = matrix(dic,decison_var,legend,ts)
         y3 = matrix(dic,decison_var,legend,t)
-
-        with open(os.path.join(path2output,"cmap.spec"),"rb") as file:
-            cmap = pickle.load(file)
-        cmap2 = colormapping(dic["Technologies:"])
-        if cmap != cmap2:
-            cmap = cmap2
-            with open(os.path.join(path2output,"cmap.spec"),"wb") as file:
-                pickle.dump(cmap,file)
-
+        
+#        try:
+#            with open(os.path.join(path2output,"cmap.spec"),"rb") as file:
+#                cmap = pickle.load(file)
+#        except:
+#            print("Create Dictionary...")
+#            cmap = colormapping(dic["all_heat_geneartors"])
+#            os.mkdir(path2output)
+#            print("Created: "+ path2output)
+#            with open(os.path.join(path2output,"cmap.spec"),"wb") as file:
+#                pickle.dump(cmap,file)
+#                
+#    
+#        cmap2 = colormapping(dic["Technologies:"])
+#        if cmap != cmap2:
+#            cmap = cmap2
+#            with open(os.path.join(path2output,"cmap.spec"),"wb") as file:
+#                pickle.dump(cmap,file)
+        
+        cmap = colormapping(dic["Technologies:"])
         dic["Marginal Costs"] = dic["Marginal Costs:"]
 
         p1 = stack_chart(tw,dic,y1,legend,decison_var,path2output,cmap,"w")
@@ -841,15 +855,11 @@ def plot_solutions(show_plot=False,path2json=path2json):
                   "Specific Capital Costs of IC":l2,
                   "Results":p9}
         tabs = tab_panes(path2output,**kwargs)
-
-        i=0
-        while os.path.exists(os.path.join(path2output,"output%s.html" % i)):
-            i += 1
-
-        output_file(os.path.join(path2output,"output%s.html" % i),title="Dispatch output")
-        save(tabs)
-
-
+        
+        if solution == -1:
+            output_file(os.path.join(path2output,"output.html"),title="Dispatch output")
+            save(tabs)
+            
         if show_plot:
             show(tabs)
         return tabs.tabs

@@ -1,44 +1,24 @@
-//window.location="C:/Users/Nesa/Desktop/loader.html";
-/*
-var data = source.data;                  
-var filetext = ['name',
- 'installed capacity (MW_th)',
- 'efficiency th',
- 'efficiency el',
- 'investment costs (EUR/MW_th)',
- 'OPEX fix (EUR/MWa)',
- 'OPEX var (EUR/MWh)',
- 'life time',
- 'potential restriction (MW_th)',
- 'renewable factor']
-filetext = filetext.join();
-for (i=0; i < data['name'].length; i++) {
-    var currRow = [ data['name'][i].toString(),
-				   data['installed capacity (MW_th)'][i].toString(),
-				   data['efficiency th'][i].toString(),
-				   data['efficiency el'][i].toString(),
-				   data['investment costs (EUR/MW_th)'][i].toString(),
-				   data['OPEX fix (EUR/MWa)'][i].toString(),
-				   data['OPEX var (EUR/MWh)'][i].toString(),
-				   data['life time'][i].toString(),
-				   data['potential restriction (MW_th)'][i].toString(),
-				   data['renewable factor'][i].toString()];
-    var joined = currRow.join();
-    filetext = filetext.concat('\n')
-    filetext = filetext.concat(joined);
-}	
-var filename = 'input.csv';
-var blob = new Blob([filetext], { type: 'text/;charset=utf-8;' });
-if (navigator.msSaveBlob) {
-	navigator.msSaveBlob(blob, filename);
-}
-else {
-	var link = document.createElement("a");
-	link = document.createElement('a')
-	link.href = URL.createObjectURL(blob);
-	link.download = filename
-	link.target = "_blank";
-	link.style.visibility = 'hidden';
-	link.dispatchEvent(new MouseEvent('click'))
-}
-*/
+var data = source.data;
+var filename = data['filename'][0]
+var path = '/static/'.concat(data['id'][0]).concat('/').concat(filename)
+fetch(path, {cache: 'no-store'}).then(response => response.blob())
+                    .then(blob => {
+                        //addresses IE
+                        if (navigator.msSaveBlob) {
+                            navigator.msSaveBlob(blob, filename);
+                        }
+
+                        else {
+                            var link = document.createElement("a");
+                            link = document.createElement('a')
+                            link.href = URL.createObjectURL(blob);
+                            window.open(link.href, '_blank');
+
+                            link.download = filename
+                            link.target = "_blank";
+                            link.style.visibility = 'hidden';
+                            link.dispatchEvent(new MouseEvent('click'))
+                            URL.revokeObjectURL(url);
+                        }
+                        return response.text();
+                    });
