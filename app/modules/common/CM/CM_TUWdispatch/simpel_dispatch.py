@@ -48,7 +48,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.IK_j = pe.Param(m.j,initialize=val[13]) 
     m.OP_fix_j = pe.Param(m.j,initialize=val[14]) 
     m.n_el_j = pe.Param(m.j ,initialize=val[15])
-    m.electricity_price_t = pe.Param(m.t,initialize=val[16])
+    m.electricity_price_jt = pe.Param(m.j,m.t,initialize=val[16])
     m.P_min_el_chp = pe.Param(initialize=val[17])
     m.Q_min_th_chp = pe.Param(initialize=val[18])
     m.ratioPMaxFW = pe.Param(initialize=val[19])
@@ -79,7 +79,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.temperature_t = pe.Param(m.t,initialize=val[42])
     thresh =  val[43]
     
-    m.sale_electricity_price_t = pe.Param(m.t,initialize=val[44])
+    m.sale_electricity_price_jt = pe.Param(m.j,m.t,initialize=val[44])
     m.OP_fix_hs = pe.Param(m.j_hs,initialize=val[45]) 
     
     m.mr_j = pe.Param(m.j, initialize = val[47])
@@ -290,15 +290,15 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
 			
         c_op_var = sum([m.x_th_jt[j,t]* m.OP_var_j[j] for j in m.j for t in m.t])
         c_var= sum([m.mc_jt[j,t] * m.x_th_jt[j,t] for j in m.j for t in m.t])  # 
-#        c_var_chp = sum([m.mc_jt[j,t] * m.x_th_jt[j,t] - m.sale_electricity_price_t[t] * m.x_el_jt[j,t] for j in m.j_chp for t in m.t])
+#        c_var_chp = sum([m.mc_jt[j,t] * m.x_th_jt[j,t] - m.sale_electricity_price_jt[j,t] * m.x_el_jt[j,t] for j in m.j_chp for t in m.t])
         c_var = c_var
         c_peak_el = m.P_el_max*10000  
         c_ramp = sum ([m.ramp_j_waste_t[j,t] * m.c_ramp_waste for j in m.j_waste for t in m.t]) + sum ([m.ramp_j_chp_t[j,t] * m.c_ramp_chp for j in m.j_chp for t in m.t])
-        c_hs_penalty_load = sum([m.x_load_hs_t[hs,t]*1e-6  for hs in m.j_hs for t in m.t])
-        c_hs_penalty_unload = sum([m.x_unload_hs_t[hs,t]*1e-6  for hs in m.j_hs for t in m.t]) # for modeling reasons       
+        c_hs_penalty_load = sum([m.x_load_hs_t[hs,t]*1e-6  for hs in m.j_hs for t in m.t])      # for modeling reasons  
+        c_hs_penalty_unload = sum([m.x_unload_hs_t[hs,t]*1e-6  for hs in m.j_hs for t in m.t])  # for modeling reasons       
         c_tot = c_inv + c_var + c_op_fix + c_op_var + c_peak_el + c_ramp +c_hs_penalty_load + c_hs_penalty_unload
         
-        rev_gen_electricity = sum([m.x_el_jt[j,t]*(m.sale_electricity_price_t[t]) for j in m.j for t in m.t])
+        rev_gen_electricity = sum([m.x_el_jt[j,t]*(m.sale_electricity_price_jt[j,t]) for j in m.j for t in m.t])
         
         rule = c_tot - rev_gen_electricity
         return rule
@@ -314,8 +314,8 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     solv_start = datetime.now()
     print("*****************\nStart Solving...\n*****************")
     opt = pe.SolverFactory("gurobi")
-    opt.options['MIPGap'] = 0.5
-    opt.options['Threads'] = 4
+#    opt.options['MIPGap'] = 0.5
+#    opt.options['Threads'] = 4
     results = opt.solve(instance, load_solutions=False,tee=True,suffixes=['.*'])   # tee= Solver Progress, Suffix um z.B Duale Variablen anzuzeigen -> '.*' für alle   
     instance.solutions.load_from(results)
     instance.solutions.store_to(results)

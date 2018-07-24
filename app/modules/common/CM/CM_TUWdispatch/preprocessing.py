@@ -79,9 +79,9 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
             for t in range(1,8760+1):
                 mc[j,t]= 1e100   
         else:
-            if type(data["energy_carrier_prices"][data["energy_carrier"][j]]) == dict:  # Boiler Peak Load
+            if type(data["energy_carrier_prices"][data["energy_carrier"][j]]) == dict:  
                 for t in range(1,8760+1):
-                    mc[j,t]= data["energy_carrier_prices"][data["energy_carrier"][j]][t] /  \
+                    mc[j,t]= data["energy_carrier_prices"][data["energy_carrier"][j]][j,t] /  \
                                   data["n_th"][j] + \
                                  data["em"][data["energy_carrier"][j]]*data["P_co2"] / \
                                   data["n_th"][j] 
