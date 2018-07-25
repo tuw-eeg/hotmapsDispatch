@@ -63,7 +63,6 @@ carrier_dict ={}
 def execute(data,inv_flag,selection=[[],[]],demand_f=1):
     val = dispatch.main(data,inv_flag,selection,demand_f)
     return val
-
 #%%
 # =============================================================================
 # Global Functions     
@@ -127,8 +126,8 @@ def genearte_selection(dic,dict_key_map):
 # ===========================================================================
 def generate_tables(columns,name="",):
     if name == "":
-        data = pd.read_excel(path_parameter,skiprows=[0])[columns]
-        data = pd.DataFrame({x:[] for x in columns})
+#        data = pd.read_excel(path_parameter,skiprows=[0])[columns]
+        data = pd.DataFrame({x:[] for x in columns+["type"]})
     else:
         data = pd.read_excel(path_parameter,name,skiprows=[0])[columns]
 
@@ -356,7 +355,7 @@ def modify_doc(doc):
             div_spinner.text = load_text
             print("Download...")
     
-            df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
+            df= pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore')
             if df.shape[0] == 0:
                 del df
                 carrier_dict ={}
@@ -443,6 +442,7 @@ def modify_doc(doc):
     
             data_heat_storages = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore')
             data_heat_storages = data_heat_storages.fillna(0)
+            
             dic_hs = data_heat_storages.set_index("name").to_dict()
             for key in list(dic_hs):
                 data[heat_storage_list_mapper[key]] = dic_hs[key]
@@ -469,40 +469,34 @@ def modify_doc(doc):
                 else:
                     data[mk]= dict(zip(range(1,len(widgets[wk]["source"].data["y"])+1),widgets[wk]["source"].data["y"])) 
             
-          
-            
-
             data["tec_hs"] = list(data_heat_storages["name"].values)
             data["tec"] = list(data1["name"].values)
     
             data["all_heat_geneartors"] = data["tec"] + data["tec_hs"]
     
             data["energy_carrier"] = {**data["energy_carrier"],**carrier_dict}
-            
-            print("Here1")
+            ##
             for i in _elec:
                 mk = widget_to_model_keys_dict[i]
                 ext=[]
                 for j in data["tec"] :
                     jt = list(zip([j]*8760,range(1,8760+1)))
-                    print(list(external_data[i]))
                     if j in list(external_data[i]):
                         ext.append(dict(zip(jt,external_data[i][j])))
                     else:
                         ext.append(dict(zip(jt,external_data[i]["Default"])))
-                print("Here12")
                 ext = {k: v for d in ext for k, v in d.items()}
-                print("Here13")
-                
                 if  mk == "electricity":
-                    print("Here14")
                     data["energy_carrier_prices"][mk] = ext
                 else:
-                    print("Here15")
                     data[mk] = ext 
-             
-            print("Here2")
-         
+            ## 
+            data["categorize"] = {}
+            _dataframe= pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore')
+            for j in select_tec_options:
+                data["categorize"][j] = _dataframe["name"][_dataframe["type"] == j].values.tolist()
+            
+            print("Hallo")
             solutions = None
             selection = [[],[]]
             inv_flag = False
@@ -558,6 +552,8 @@ def modify_doc(doc):
                     div_spinner.text = """<strong style="color: green;">Calculation done</strong>"""
         except Exception as e:
             print(str(e))
+            print(e)
+            print(type(e))
             div_spinner.text = """<strong style="color: red;">Fatal Error @ Running </strong>"""
 # =============================================================================
     def upload_callback(attr, old, new):
@@ -609,10 +605,25 @@ def modify_doc(doc):
             div_spinner.text = """<strong style="color: red;">Fatal Error @ Update </strong>"""
 # =============================================================================
     def args_callback(attrname, old, new):
+        
 
         _heat_generators= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
         _heat_generators = _heat_generators.fillna(0)
-        _options = ["Default"]+list(_heat_generators["name"].values)
+        _opt = list(_heat_generators["name"].values)
+        
+        # update energy carrier mapping if name of heat producer was changed 
+        new_key = [j for j in _opt if j not in list(carrier_dict)]
+        if len(new_key):
+            new_key = new_key[0]
+        old_key = [j for j in [j for j in list(carrier_dict) if j not in _opt] if j !="Default"]
+        if len(old_key):
+            old_key = old_key[0]
+        if new_key and old_key:
+            carrier_dict[new_key] = carrier_dict.pop(old_key)
+        #
+        
+        _options = ["Default"] + _opt
+        
         for i in data_kwargs:
             widgets[i]["tec"].options = _options
             c,year = widgets[i]["select"].value.split("_")
@@ -689,12 +700,7 @@ def modify_doc(doc):
                 else:
                     div_spinner.text = """<strong style="color: green;"> """+i+""" Data For """+widgets[i]["tec"].value+""" is added </strong>""" 
                 widgets[i]["ok"].clicks = 0 # this calls again this function 
-# =============================================================================
-#   Initilizing of Main GUI
-# =============================================================================    
-    update_pmax(None,None,None)
-    # Total Demand initilize with input
-    args_callback(None,None,None)
+
 # =============================================================================
 #   Signal Emitting / Coupling of Main GUI
 # ============================================================================= 
@@ -730,6 +736,13 @@ def modify_doc(doc):
     run_button.on_click(run_callback)
 
     reset_button.on_click(reset_callback)
+# =============================================================================
+#   Initilizing GUI with Default Values 
+# =============================================================================    
+    # Pmax Initilizing
+    update_pmax(None,None,None)
+    # Total Demand initilize with input
+    args_callback(None,None,None)
 #%%
 # =============================================================================
 #  GUI Elements for adding Technologies
@@ -764,7 +777,7 @@ def modify_doc(doc):
     renewable_factor = Slider(start=0, end=1, value=0, step=.1, title="Renewable Factor")
     installed_cap = Slider(start=0, end=int(float(pmax.value))+1, value=0, step=1, title="Installed Capacity")
 
-    name_label = TextInput(placeholder="-", title="Name",disabled=True)
+    name_label = TextInput(placeholder="-", title="Name",disabled=False)
 
     widgets_list= [
             [select_tec,select_tec2], installed_cap, n_th_label, n_el_label,
@@ -831,7 +844,7 @@ def modify_doc(doc):
                 new_data[x] = str(int(widgets_dict[x].active))
             else:
                 new_data[x] = str(widgets_dict[x].value)
-
+        new_data["type"] = select_tec.value
         df2 = df2.append(new_data,ignore_index=True)
         df2 = df2.apply(pd.to_numeric, errors='ignore')
         df2["index"] = df2.index

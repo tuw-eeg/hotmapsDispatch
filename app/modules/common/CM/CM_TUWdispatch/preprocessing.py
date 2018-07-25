@@ -34,14 +34,14 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
         
    
     j =         tec
-    j_hp =      [key for key in tec if "heat pump" in key ]
-    j_pth =     [key for key in tec if "Power To Heat" in key]
-    j_st =      [key for key in tec if "Solar Thermal" in key]
-    j_waste =   [key for key in tec if "waste" in key]
-    j_chp =     [key for key in tec if "CHP" in key]
-    j_bp =      [key for key in tec if "boiler" in key]
-    j_wh =      [key for key in tec if "Waste Heat" in key]
-    j_gt =      [key for key in tec if "Geo Thermal" in key]
+    j_hp =      [key for key in tec if key in data["categorize"]["heat pump"] ]
+    j_pth =     [key for key in tec if key in data["categorize"]["Power To Heat"] ]
+    j_st =      [key for key in tec if key in data["categorize"]["Solar Thermal"] ]
+    j_waste =   [key for key in tec if key in data["categorize"]["waste treatment"] ]
+    j_chp =     [key for key in tec if key in data["categorize"]["CHP"] ]
+    j_bp =      [key for key in tec if key in data["categorize"]["boiler"] ]
+    j_wh =      [key for key in tec if key in data["categorize"]["Waste Heat"] ]
+    j_gt =      [key for key in tec if key in data["categorize"]["Geo Thermal"] ]
     j_hs =      tec_hs
     
   
