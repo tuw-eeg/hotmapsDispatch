@@ -496,7 +496,6 @@ def modify_doc(doc):
             for j in select_tec_options:
                 data["categorize"][j] = _dataframe["name"][_dataframe["type"] == j].values.tolist()
             
-            print("Hallo")
             solutions = None
             selection = [[],[]]
             inv_flag = False

@@ -14,7 +14,6 @@ if path not in sys.path:
     sys.path.append(path)
 
 from AD.F16_input.main import load_data 
-#from CM.CM_TUWdispatch.simpel_plot import plot_solutions
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
 import CM.CM_TUWdispatch.run_cm as dispatch
 #%%

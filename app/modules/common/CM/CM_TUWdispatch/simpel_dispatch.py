@@ -309,14 +309,15 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     #print("*****************\ntime to load data: " + str(datetime.now()-solv_start)+"\n*****************")
     print("*****************\nCreating Model...\n*****************")
     solv_start = datetime.now()
-    instance = m.create_instance(report_timing= True)
+    instance = m.create_instance(report_timing= False)  #TODO
     print("*****************\ntime to create model: " + str(datetime.now()-solv_start)+"\n*****************")
     solv_start = datetime.now()
     print("*****************\nStart Solving...\n*****************")
     opt = pe.SolverFactory("gurobi")
 #    opt.options['MIPGap'] = 0.5
 #    opt.options['Threads'] = 4
-    results = opt.solve(instance, load_solutions=False,tee=True,suffixes=['.*'])   # tee= Solver Progress, Suffix um z.B Duale Variablen anzuzeigen -> '.*' für alle   
+    #TODO
+    results = opt.solve(instance, load_solutions=False,tee=False,suffixes=['.*'])   # tee= Solver Progress, Suffix um z.B Duale Variablen anzuzeigen -> '.*' für alle   
     instance.solutions.load_from(results)
     instance.solutions.store_to(results)
     print("*****************\ntime for solving: " + str(datetime.now()-solv_start)+"\n*****************")

@@ -109,8 +109,8 @@ def write_fit(string,profil):
                     String that specifies the feed in Tarif or Offset
                     Has to be in this form "XXf + XXh""
                         XX... value (float)
-                        f... Fix Price
-                        h... Offset
+                        h... Fix Price
+                        f... Offset
                     like: "20f + 35.05h"
     Return:
         dictionary  dict
@@ -118,9 +118,10 @@ def write_fit(string,profil):
                     Fix Price for the given profile
     """
     feed_in_tarif = 0
-    fix_price = 0
+    fix_price = "nan"
     string = string.strip()
-    if  string != "0" and string !="":
+
+    if  string != "0" and string !="" and string != "0.0":
         for string in string.split("+"):
             string = string.strip()
             if string == "":
@@ -136,16 +137,90 @@ def write_fit(string,profil):
                     fix_price = float(string[:-1])
                 except:
                     print("User Input for constant hourly price is wrong,... using variable prices")
-                    fix_price = 0
+                    fix_price = "nan"
             else:
                 print("User Input for electricity is wrong")
                 sys.exit()
-    if fix_price == 0:
+    if fix_price == "nan":
         return dict(zip(range(1,8760+1),(np.array(list(profil.values()))+feed_in_tarif).tolist()))
     else:
         return dict(zip(range(1,8760+1),[feed_in_tarif+fix_price]*8760))
 #%%
-def load_data():
+def extract(string):
+    """
+    string has to be in the form : "ID-xx , XXf +XXh"
+    where ID is a string that corrospond with the data in the excel or dat file, 
+    xx is an int, XX float
+    """
+    if type(string) != str:
+        return "no external data specified"
+    
+    strings = string.split(",")
+    
+    if len(strings) == 2:
+        data = strings[0]
+        fit = strings[1].strip()
+        
+        datas = data.split("-")
+        if len(datas) !=2:
+            return "invalid format for external data"
+        iD = datas[0].strip()
+        xx = datas[1].strip()
+        try: 
+            xx=int(xx)
+        except:
+            return "invalid format for external data, please use an integer"
+        return (iD,xx),fit
+    
+    
+    elif len(strings) ==1:
+        
+        fit_or_data = string.split("-")
+        
+        if len(fit_or_data) == 2:
+            iD = fit_or_data[0].strip()
+            xx = fit_or_data[1].strip()
+            try: 
+                xx=int(xx)
+            except:
+                return "invalid format for external data, please use an integer"
+            return (iD,xx),"0"
+    
+        return (0,0),string.strip()
+    else:
+        return "to many arguments for external data specified" 
+#%%
+def load_external_default_values(path,scenario=0):
+    default = pd.read_excel(path,"Default - External Data").fillna(0)
+    
+    if scenario > default.shape[0]-1 or scenario < 0:
+        print("This scenarion is not aviable")
+        print("Exiting Calculation")
+        sys.exit()
+        
+    default_vals = {}
+    for column in default.columns.tolist():
+        x = extract(default[column][scenario])
+        if type(x) == str:
+            print(x + "@ " + column)
+            print("Exiting Calculation")
+            sys.exit()
+        default_vals[column] = dict(zip(["id","fit"],x))
+    return default_vals
+#%%
+def profile_jt(**kwargs):
+    output = {}
+    iD,fit = extract(kwargs["fit_string"])
+    if iD == (0,0):
+        iD = kwargs["default_id"]
+    if fit == "0.0" or fit == "0":
+        fit = kwargs["default_fit"]
+    dic_profil = write_fit(fit,return_dict(kwargs["profile_string"],iD))
+    for t,val in dic_profil.items():
+        output[kwargs["j"],t] = val
+    return output
+#%%   
+def load_data(path_parameter2 = path_parameter2, default_scenario=0):
     """
     This function returns the data for the dispatch model
     - Default Values are specified in DH_technology_cost.xlsx
@@ -199,7 +274,7 @@ def load_data():
     except:
         data_input_params = pd.read_excel(path_parameter2,"Data").fillna(0)
 
-    data_input_hg = pd.read_excel(path_parameter2,"Heat Generators",skiprows=range(22,26)).fillna(0)
+    data_input_hg = pd.read_excel(path_parameter2,"Heat Generators").fillna(0)
     data_input_prices_ef = pd.read_excel(path_parameter2,"prices and emmision factors").fillna(0)
     data_input_hs = pd.read_excel(path_parameter2,"Heat Storage").fillna(0)
 
@@ -210,38 +285,67 @@ def load_data():
     hs_mapper = return_mapper("Heat Storage")
 
      # Overwrite default values with user input data
-    overwrite(data,data_input_hg,"name",input_list_mapper)
+    # skip columns that are not in the inital excel
+    x=[x for x in data_input_hg.columns.tolist() if x in list(input_list_mapper)] 
+    overwrite(data,data_input_hg[x],"name",input_list_mapper)
     overwrite(data,data_input_prices_ef,"energy carrier",input_price_list_mapper)
     overwrite(data,data_input_params,"",parameter_list_mapper)
     overwrite(data,data_input_hs,"name",hs_mapper)
+    
+    # Categorize Technologies
+    select_tec_options = pd.read_excel(path_parameter,"Techologies")["Techologies"].values.tolist()
+    data["categorize"] = {}
+    for j in select_tec_options:
+        data["categorize"][j] = data_input_hg["name"][data_input_hg["type"] == j].values.tolist()
+        
+    # Load externel data like demand, radiation,temperature, sale-/electricity price    
+    default_vals = load_external_default_values(path_parameter2,default_scenario)
+    
+    data["energy_carrier_prices"]["electricity"] = {}
+    data["sale_electricity"] = {}
+    tec = data_input_hg.name.tolist()
+    for j in tec:
+        string = str(data_input_hg["Electricity Price"][data_input_hg.name ==j].values[0])
+        kwargs_elec = dict(fit_string =     string, 
+                           default_id =     default_vals["Electricity Price"]["id"], 
+                           default_fit =    default_vals["Electricity Price"]["fit"] , 
+                           profile_string = "price_profiles", 
+                           j = j)
+       
+        data["energy_carrier_prices"]["electricity"] =  {** data["energy_carrier_prices"]["electricity"],**profile_jt(**kwargs_elec)} 
+        
+        string = str(data_input_hg["Sale Electricity Price"][data_input_hg.name ==j].values[0])
+        kwargs_elec = dict(fit_string =     string, 
+                           default_id =     default_vals["Sale Electricity Price"]["id"], 
+                           default_fit =    default_vals["Sale Electricity Price"]["fit"] , 
+                           profile_string = "price_profiles", 
+                           j = j)
+        data["sale_electricity"]  = {**data["sale_electricity"],**profile_jt(**kwargs_elec)}
+        
 
-    # Load externel data like demand, radiation,temperature, electricity price
-    with open(os.path.join(path2data,"load_profiles.dat"),"rb") as file:
-        demand = pickle.load(file)[init_data]
-    demand_neu = demand / sum(demand) * float(data_input_params["Total Demand[ MWh]"].values[0])
-    data["demand_th"] = dict(zip(range(1,len(demand_neu)+1),demand_neu.tolist()))
-    data["radiation"] = return_dict("radiation_profiles")
-    data["temp"] = return_dict("temperature_profiles")
-
-    #%%
-    fit = data_input_hs = pd.read_excel(path_parameter2,"FiT_Offset").fillna(0)
-
-
-    data["energy_carrier_prices"]["electricity"] = write_fit(data["energy_carrier_prices"]["electricity"],return_dict("price_profiles"))
-    data["sale_electricity"] = write_fit(str(fit["Sale Electricity Price"].values[0]),return_dict("price_profiles"))
-    data["temp"] = write_fit(str(fit["Temperature"].values[0]),data["temp"])
-    data["radiation"]  = write_fit(str(fit["Radiation"].values[0]),data["radiation"])
-    data["demand_th"] = write_fit(str(fit["Demand"].values[0]),data["demand_th"])
-
-    #%%
+    data["temp"] = write_fit(default_vals["Temperature"]["fit"],return_dict("temperature_profiles",default_vals["Temperature"]["id"]))
+    data["radiation"]  = write_fit(default_vals["Radiation"]["fit"],return_dict("radiation_profiles",default_vals["Radiation"]["id"]))
+    data["demand_th"] = write_fit(default_vals["Demand"]["fit"],return_dict("load_profiles",default_vals["Demand"]["id"]))
+    
+    x=np.array(list(data["demand_th"].values()))
+    x = x / sum(x) * data["total_demand"]
+    data["demand_th"] = dict(zip(range(1,8760+1),x.tolist()))
+    del x
+    
+    ec = pd.read_excel(path_parameter2,"Energy Carrier").fillna(0)
+    ec = ec.set_index(ec.name)
+    data["energy_carrier"] = ec.to_dict()["carrier"]
+    
     data["tec"] = tec
+    
+    tec_hs = data_input_hs.name.tolist()
     data["tec_hs"] = tec_hs
 
     data["all_heat_geneartors"] = data["tec"] + data["tec_hs"]
 
     return data, inv_flag
-
-
+     
+    
 if __name__ == "__main__":
     print('Loading Data...')
     val,flag = load_data()
