@@ -46,9 +46,11 @@ import CM.CM_TUWdispatch.run_cm as dispatch
 path_parameter = os.path.join(path, "AD", "F16_input", "DH_technology_cost.xlsx")
 path2data = os.path.join(path, "AD", "F16_input")
 path_download_js = os.path.join(root_dir, "download.js")
-path_static = os.path.join(root_dir,"static")
+path_static = os.path.join(path2data,"static")
 if not os.path.exists(path_static):
-    os.makedirs(path_static)  
+    os.makedirs(path_static)
+#    f = open(os.path.join(path2data,"main.py"), "w")
+#    f.close()
 path_upload_js = os.path.join(root_dir, "upload.js")
 path_spinner_html = os.path.join(root_dir, "spinner2.html")
 path_spinner_load_html = os.path.join(root_dir, "spinner.html")
@@ -65,7 +67,7 @@ def execute(data,inv_flag,selection=[[],[]],demand_f=1):
     return val
 #%%
 # =============================================================================
-# Global Functions     
+# Global Functions
 # =============================================================================
 def invert_dict(d):
     return dict([ (v, k) for k, v in d.items() ])
@@ -139,17 +141,17 @@ def generate_tables(columns,name="",):
                            editable=True,row_headers =True)
     return table
 # ===========================================================================
-def modification_tools(**kwargs): 
-    """ 
+def modification_tools(**kwargs):
+    """
     This function returns 5 Tools for modifaction of the shown input data:
     Parameters:
         kwargs                  dict
                                 specify the labels of the tools
     Return:
         list with 5 etnries
-        1. offset               bokeh.models.TextInput 
+        1. offset               bokeh.models.TextInput
         2. constant             bokeh.models.TextInput
-        3. scale                bokeh.models.Slider 
+        3. scale                bokeh.models.Slider
         4. mean                 bokeh.models.CheckboxGroup
         5. total                bokeh.models.TextInput
         6. tec                  bokeh.models.Select
@@ -163,11 +165,11 @@ def modification_tools(**kwargs):
             Select(title=kwargs.setdefault("tec","add to heat producer"), value="Default", options=[]),
             Button(label='✓', button_type='success',width=60)
             ]
-    return args        
+    return args
 # ===========================================================================
 def generate_widgets(data):
     select,source,figure = genearte_selection(data["data"],data["dic"])
-    offset,constant,scale,mean,total,tec,ok = modification_tools(**data["labels"])        
+    offset,constant,scale,mean,total,tec,ok = modification_tools(**data["labels"])
     return dict(select=select,source=source,figure=figure,offset=offset,
                 constant=constant,scale=scale,mean= mean,total=total,tec=tec,
                 ok=ok)
@@ -194,10 +196,10 @@ def profil(value_list):
         y = np.zeros(8760)
     return y,s
 # =============================================================================
-#  Global Data 
+#  Global Data
 # =======================================================================
-        
-# Load JS Code (for Download and Upload) and HTML Code (for) Spinners) 
+
+# Load JS Code (for Download and Upload) and HTML Code (for) Spinners)
 with open(path_spinner_load_html) as file:
     load_text = file.read()
 with open(path_spinner_html) as file:
@@ -206,12 +208,12 @@ with open(path_download_js) as file:
     download_code=file.read()
 with open(path_upload_js) as file:
     upload_code=file.read()
-# Load External Data from .dat files 
+# Load External Data from .dat files
 price_name_map,price_name_map_inv,prices = load_extern_data("price")
 load_name_map,load_name_map_inv,load_profiles = load_extern_data("load")
 radiation_name_map, radiation_name_map_inv,radiation = load_extern_data("radiation")
 temperature_name_map, temperature_name_map_inv, temperature = load_extern_data("temperature")
-# Specify Sheet Names of the Excel Database (If Changed)  
+# Specify Sheet Names of the Excel Database (If Changed)
 sheets = ['Heat Generators','prices and emmision factors',
           'financal and other parameteres',"Heat Storage", "Techologies"]
 # Mapping model names with names to display in browser, specified in Database-Excel
@@ -238,7 +240,7 @@ parameter_list = ['CO2 Price',
  'Total Renewable Factor [0-1]',
  'Total Demand[ MWh]']
 # select default labels for the modification tools
-lab = dict(offset="Offset",constant="Set To Constant", 
+lab = dict(offset="Offset",constant="Set To Constant",
            mean="Use mean value",total="Sum",scale="Scale")
 # Set Names of the tabs for the external data
 widgets_keys = ["Radiation","Temperature","Electricity price",
@@ -247,8 +249,8 @@ widgets_keys = ["Radiation","Temperature","Electricity price",
 model_keys = ["radiation","temp","electricity","sale_electricity",
                       "demand_th"]
 # string for "Heat Demand"
-_hd = widgets_keys[-1] 
-# string for "electricity prices" 
+_hd = widgets_keys[-1]
+# string for "electricity prices"
 _elec = widgets_keys[2:4]
 # Database for the external data manipulation,
 widgets_data = [ dict(data=radiation,
@@ -280,7 +282,7 @@ external_data = dict(zip(widgets_keys,[{} for _ in range(len(widgets_keys))]))
 
 # =============================================================================
 #  Data for adding Technologies
-# =============================================================================    
+# =============================================================================
 data_tec = pd.read_excel(path_parameter,skiprows=[0])
 heat_pumps = {}
 flow_temp_dic = {}
@@ -300,7 +302,7 @@ select_tec2_options= {"heat pump": list(tec_mapper.values()),
                       "CHP": data_tec[data_tec["output"] == "CHP"]["name"].values.tolist(),
                       "boiler":data_tec[data_tec["type"] == "boiler"]["name"].values.tolist()}
 energy_carrier_options = pd.read_excel(path_parameter,sheets[1],skiprows=[0])[input_price_list[0]].values.tolist()
-#%% 
+#%%
 #%%
 # =============================================================================
 # Function Handler
@@ -313,9 +315,9 @@ def modify_doc(doc):
     data_table_prices = generate_tables(input_price_list,sheets[1])
     data_table_data = generate_tables(parameter_list,sheets[2])
     data_table_heat_storage = generate_tables(list(heat_storage_list_mapper),sheets[3])
-    widgets= { i : generate_widgets(data_kwargs[i]) for i in data_kwargs}        
+    widgets= { i : generate_widgets(data_kwargs[i]) for i in data_kwargs}
     dummy = Div(text="""<strong style="color: #FFFFFF;">1</strong>""")
-    download_button = Button(label='Download Power Plant Parameters', button_type='success') 
+    download_button = Button(label='Download Power Plant Parameters', button_type='success')
     run_button = Button(label='Run Dispatch Model', button_type='primary')
     upload_button = Button(label="Upload Power Plant Parameters", button_type="danger")
     reset_button = Button(label="Reset View", button_type="warning")
@@ -342,7 +344,7 @@ def modify_doc(doc):
     lay[_hd].children[1].children = [widgetbox(widgets[_hd]["total"])]
     # Change layout of Electricity Tabs -> Select technologies to add external data
     for i in _elec:
-        lay[i].children.append(column(widgetbox(widgets[i]["tec"]), widgetbox(widgets[i]["ok"])))                 
+        lay[i].children.append(column(widgetbox(widgets[i]["tec"]), widgetbox(widgets[i]["ok"])))
     dic =  {**dic, **lay}
     tabs_liste = [Panel(child=p, title=name) for name, p in dic.items()]
     tabs = Tabs(tabs=tabs_liste)
@@ -354,7 +356,7 @@ def modify_doc(doc):
             global carrier_dict
             div_spinner.text = load_text
             print("Download...")
-    
+
             df= pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore')
             if df.shape[0] == 0:
                 del df
@@ -365,35 +367,35 @@ def modify_doc(doc):
             time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
             filename = "download_input.xlsx"
             path_download = os.path.join(create_folder(time_id),filename)
-    
+
             writer = pd.ExcelWriter(path_download)
             df.to_excel(writer,sheets[0])
-    
+
             data_prices_df = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore')
     #        data_prices_df = data_prices_df.fillna(0)
             data_prices_df.to_excel(writer,sheets[1])
-    
+
             data_data_df = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore')
     #        data_data_df = data_data_df.fillna(0)
             data_data_df.to_excel(writer,"Data")
-    
+
             data_hs_df = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore')
     #        data_hs_df = data_hs_df.fillna(0)
             data_hs_df.to_excel(writer,sheets[3])
-    
-    
+
+
             df_carrier = pd.DataFrame.from_dict(carrier_dict,orient="index")
             df_carrier["name"]=df_carrier.index
             df_carrier["carrier"] = df_carrier[0]
             del df_carrier[0]
             df_carrier.index = range(df_carrier.shape[0])
             df_carrier.to_excel(writer,'Energy Carrier')
-    
+
             writer.save()
             trigger_download(time_id,filename)
             print("Download done.\nSaved to <"+path_download+">")
-    #%TODO: wait untill download has finished and delete folder
-    #       or extra script that delete te content of the static folder after 2 hours or something else  
+    #TODO wait untill download has finished and delete folder
+    #       or extra script that delete te content of the static folder after 2 hours or something else
     #        shutil.rmtree(path_download_dir, ignore_errors=True)
             div_spinner.text = """<strong style="color: green;">Download done.</strong>"""
         except Exception as e:
@@ -403,24 +405,24 @@ def modify_doc(doc):
     def run_callback():
         try:
             global carrier_dict
-            
+
             df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
             if df.shape[0] == 0:
                 del df
                 carrier_dict ={}
                 div_spinner.text = """<strong style="color: red;">No Heat Generators aviable </strong>"""
-                return    
-            
+                return
+
             if float(to_install.value) > 0 and not invest_button.active:
                 div_spinner.text = """<strong style="color: red;">The installed capacities are not enough to cover the load</strong>"""
                 return
-            
+
             div_spinner.text = load_text
             output.tabs = []
             if type(grid.children[0]) != type(Div()):
                 grid.children = [Div()]
             div_spinner.text = ""
-    
+
 
             div_spinner.text = spinner_text
             print('calculation started...')
@@ -429,51 +431,51 @@ def modify_doc(doc):
             data["energy_carrier_prices"] = {}
             data["energy_carrier"] = {}
             data["threshold_heatpump"] = 0
-           
-            
+
+
             data1= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
             data1 = data1.fillna(0)
-    
+
             data_prices = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore')
             data_prices = data_prices.fillna(0)
 
             data_data = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore')
             data_data = data_data.fillna(0)
-    
+
             data_heat_storages = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore')
             data_heat_storages = data_heat_storages.fillna(0)
-            
+
             dic_hs = data_heat_storages.set_index("name").to_dict()
             for key in list(dic_hs):
                 data[heat_storage_list_mapper[key]] = dic_hs[key]
-    
-    
+
+
             dic1 = data1.set_index("name").to_dict()
             for key in list(dic1):
                 data[input_list_mapper[key]] = dic1[key]
-    
+
             dic2 = data_prices.set_index(input_price_list[0]).to_dict()
 
             for key in list(dic2):
                 data[input_price_list_mapper[key]] = dic2[key]
-    
-    
+
+
             data["P_co2"] = float(data_data[parameter_list[0]].values[0])
             data["interest_rate"] = float(data_data[parameter_list[1]].values[0])
             data["toatl_RF"] = float(data_data[parameter_list[2]].values[0])
             data["total_demand"] = float(data_data[parameter_list[3]].values[0])
-            
+
             for wk,mk in widget_to_model_keys_dict.items():
                 if mk == "electricity":
-                   data["energy_carrier_prices"][mk]= dict(zip(range(1,len(widgets[wk]["source"].data["y"])+1),widgets[wk]["source"].data["y"]))  
+                   data["energy_carrier_prices"][mk]= dict(zip(range(1,len(widgets[wk]["source"].data["y"])+1),widgets[wk]["source"].data["y"]))
                 else:
-                    data[mk]= dict(zip(range(1,len(widgets[wk]["source"].data["y"])+1),widgets[wk]["source"].data["y"])) 
-            
+                    data[mk]= dict(zip(range(1,len(widgets[wk]["source"].data["y"])+1),widgets[wk]["source"].data["y"]))
+
             data["tec_hs"] = list(data_heat_storages["name"].values)
             data["tec"] = list(data1["name"].values)
-    
+
             data["all_heat_geneartors"] = data["tec"] + data["tec_hs"]
-    
+
             data["energy_carrier"] = {**data["energy_carrier"],**carrier_dict}
             ##
             for i in _elec:
@@ -489,13 +491,13 @@ def modify_doc(doc):
                 if  mk == "electricity":
                     data["energy_carrier_prices"][mk] = ext
                 else:
-                    data[mk] = ext 
-            ## 
+                    data[mk] = ext
+            ##
             data["categorize"] = {}
             _dataframe= pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore')
             for j in select_tec_options:
                 data["categorize"][j] = _dataframe["name"][_dataframe["type"] == j].values.tolist()
-            
+
             solutions = None
             selection = [[],[]]
             inv_flag = False
@@ -532,16 +534,16 @@ def modify_doc(doc):
                     print("Ploting done")
                     print("Download output_graphics started...")
                     time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
-                    filename = "output_graphs.html" 
+                    filename = "output_graphs.html"
                     path_download = os.path.join(create_folder(time_id),filename)
                     output_file(path_download,title="Dispatch output")
                     save(output)
                     trigger_download(time_id,filename)
                     print("Graphics Downloa done")
                     print("Download output data started...")
-                    # -- Download JSON 
+                    # -- Download JSON
                     time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
-                    filename = "output_data.json" 
+                    filename = "output_data.json"
                     path_download = os.path.join(create_folder(time_id),filename)
                     with open(path_download, "w") as f:
                         json.dump(solutions, f)
@@ -572,22 +574,22 @@ def modify_doc(doc):
                 data2 = data2.fillna(0)
                 data2["index"] = data2.index
                 data_table.source.data.update(data2)
-    
+
                 data2 = excel_object.parse(sheet_name = sheets[1], index_col = 0,skiprows = range(14,50)).apply(pd.to_numeric, errors='ignore')
                 data2 = data2.fillna(0)
                 data_table_prices.source.data.update(data2)
-    
+
                 data2 = excel_object.parse(sheet_name = 'Data', index_col = 0).apply(pd.to_numeric, errors='ignore')
                 data2 = data2.fillna(0)
                 r = data2.shape[0]
                 data2 = excel_object.parse(sheet_name = 'Data', index_col = 0,skiprows = range(2,r+1)).apply(pd.to_numeric, errors='ignore')
                 data2 = data2.fillna(0)
                 data_table_data.source.data.update(data2)
-    
+
                 data2 = excel_object.parse(sheet_name = sheets[3], index_col = 0).apply(pd.to_numeric, errors='ignore')
                 data2 = data2.fillna(0)
                 data_table_heat_storage.source.data.update(data2)
-    
+
                 data2 = excel_object.parse(sheet_name = 'Energy Carrier', index_col = 0)
                 global carrier_dict
                 data2 = data2.set_index(data2["name"])
@@ -598,19 +600,19 @@ def modify_doc(doc):
                 print("Not a valid file to upload")
                 div_spinner.text = """<strong style="color: red;">Not a valid file to uploade</strong>"""
             print('Upload done')
-            
+
         except Exception as e:
             print(str(e))
             div_spinner.text = """<strong style="color: red;">Fatal Error @ Update </strong>"""
 # =============================================================================
     def args_callback(attrname, old, new):
-        
+
 
         _heat_generators= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
         _heat_generators = _heat_generators.fillna(0)
         _opt = list(_heat_generators["name"].values)
-        
-        # update energy carrier mapping if name of heat producer was changed 
+
+        # update energy carrier mapping if name of heat producer was changed
         new_key = [j for j in _opt if j not in list(carrier_dict)]
         if len(new_key):
             new_key = new_key[0]
@@ -620,20 +622,20 @@ def modify_doc(doc):
         if new_key and old_key:
             carrier_dict[new_key] = carrier_dict.pop(old_key)
         #
-        
+
         _options = ["Default"] + _opt
-        
+
         for i in data_kwargs:
             widgets[i]["tec"].options = _options
             c,year = widgets[i]["select"].value.split("_")
             y = data_kwargs[i]["data"][data_kwargs[i]["dic_inv"][c],int(year)]
             y_profil,s = profil(y)
-            
+
             if i != _hd:
                 widgets[i]["total"].value = str(round(s,2))
             else:
                 widgets[_hd]["total"].value = str(data_table_data.source.data[parameter_list[3]][0])
-                
+
             if widgets[i]["mean"].active != []:
                 widgets[i]["source"].data["y"] = [np.mean(y)]*8760
             else:
@@ -645,32 +647,32 @@ def modify_doc(doc):
                     y_new = y_profil * float(widgets[i]["total"].value) * widgets[i]["scale"].value + float(widgets[i]["offset"].value)
                     widgets[i]["source"].data["y"] = y_new.tolist()
                 else:
-                    y = np.array([float(widgets[i]["constant"].value)]*8760) + float(widgets[i]["offset"].value) 
+                    y = np.array([float(widgets[i]["constant"].value)]*8760) + float(widgets[i]["offset"].value)
                     y_new = y * widgets[i]["scale"].value
                     widgets[i]["source"].data["y"] = y_new.tolist()
-            
+
 # =============================================================================
     def create_folder(time_id):
-        """ This function creates a folder in the static directory and returns its path""" 
+        """ This function creates a folder in the static directory and returns its path"""
         path_download_dir = os.path.join(path_static,time_id)
         if not os.path.exists(path_download_dir):
             os.makedirs(path_download_dir)
-        return path_download_dir 
-# =============================================================================    
+        return path_download_dir
+# =============================================================================
     def trigger_download(time_id,filename):
         """ This function triggers the download of the file specified in the static folder """
         id_source.data = dict(id=[time_id],filename=[filename])
         if int(dummy.text[32] ) == 0:
             dummy.text= dummy.text.replace("0","1")
         else:
-            dummy.text= dummy.text.replace("1","0")    
-# =============================================================================    
+            dummy.text= dummy.text.replace("1","0")
+# =============================================================================
     def reset_callback():
         div_spinner.text = load_text
         output.tabs = []
         div_spinner.text = ""
         grid.children = [Div()]
-# =============================================================================    
+# =============================================================================
     def update_pmax(attrname, old, new):
         pmax.value = str(round(max(widgets[_hd]["source"].data["y"]),2))
         _data1= pd.DataFrame(data_table.source.data)[input_list[1]].apply(pd.to_numeric, errors='ignore')
@@ -680,30 +682,30 @@ def modify_doc(doc):
             to_install.value = str(round(x,2))
         else:
             to_install.value = "0"
-# =============================================================================        
+# =============================================================================
     def load_callback2(attrname, old, new):
         data_table_data.source.data[parameter_list[3]] = [new]
-# =============================================================================          
+# =============================================================================
     def ivest_callback(active):
         if active:
             div_spinner.text = """<strong style="color: red;">Mark Technologies by pressing "CTRL" +  "left mouse", Rows are marked yellow </strong>"""
         else:
-            div_spinner.text = ""  
+            div_spinner.text = ""
 # =============================================================================
     def add_external_data_to_heat_producers():
         for i in data_kwargs:
             if widgets[i]["ok"].clicks > 0 :
                 external_data[i][widgets[i]["tec"].value]= widgets[i]["source"].data["y"]
                 if widgets[i]["tec"].value == "Default":
-                    div_spinner.text = """<strong style="color: green;"> """+i+""" Data is set as """+widgets[i]["tec"].value+"""</strong>""" 
+                    div_spinner.text = """<strong style="color: green;"> """+i+""" Data is set as """+widgets[i]["tec"].value+"""</strong>"""
                 else:
-                    div_spinner.text = """<strong style="color: green;"> """+i+""" Data For """+widgets[i]["tec"].value+""" is added </strong>""" 
-                widgets[i]["ok"].clicks = 0 # this calls again this function 
+                    div_spinner.text = """<strong style="color: green;"> """+i+""" Data For """+widgets[i]["tec"].value+""" is added </strong>"""
+                widgets[i]["ok"].clicks = 0 # this calls again this function
 
 # =============================================================================
 #   Signal Emitting / Coupling of Main GUI
-# ============================================================================= 
-    for i in data_kwargs:   
+# =============================================================================
+    for i in data_kwargs:
         widgets[i]["select"].on_change('value', args_callback)
         widgets[i]["offset"].on_change("value", args_callback)
         widgets[i]["constant"].on_change("value", args_callback)
@@ -713,31 +715,31 @@ def modify_doc(doc):
         widgets[i]["ok"].clicks = 1 # Initi Default Values
     div_spinner.text = "" # Clear Info Screen for Default Values
     widgets[_hd]["total"].on_change("value",load_callback2)
-    
+
     data_table_data.source.on_change("data",args_callback)
     data_table.source.on_change("data",args_callback)
     data_table_heat_storage.source.on_change("data",args_callback)
-    
+
     widgets[_hd]["source"].on_change("data",update_pmax)
-    
+
     invest_button.on_click(ivest_callback)
-    
+
     id_source = ColumnDataSource(data=dict())
-    download_callback_js = CustomJS(args=dict(source=id_source), code=download_code) 
-    dummy.js_on_change('text', download_callback_js)  
-    
+    download_callback_js = CustomJS(args=dict(source=id_source), code=download_code)
+    dummy.js_on_change('text', download_callback_js)
+
     download_button.on_click(download_callback)
 
     file_source = ColumnDataSource({'file_contents':[], 'file_name':[]})
     file_source.on_change('data', upload_callback)
     upload_button.callback = CustomJS(args=dict(file_source=file_source), code =upload_code)
-    
+
     run_button.on_click(run_callback)
 
     reset_button.on_click(reset_callback)
 # =============================================================================
-#   Initilizing GUI with Default Values 
-# =============================================================================    
+#   Initilizing GUI with Default Values
+# =============================================================================
     # Pmax Initilizing
     update_pmax(None,None,None)
     # Total Demand initilize with input
@@ -754,7 +756,7 @@ def modify_doc(doc):
 
     tabs_geneator = Tabs(tabs=[] ,width = 800)
     tec_buttons = widgetbox(children = [select_tec])
-    
+
     children = [tec_buttons,widgetbox(tabs_geneator),row(children = [ok_button,cancel_button])]
 
     cop_label = TextInput(placeholder="COP", title="COP",disabled= True)
@@ -762,7 +764,7 @@ def modify_doc(doc):
     return_temp = Select(title="Return Temperature")
 
     energy_carrier_select = Select(options = energy_carrier_options, title="Energy Carrier",value = energy_carrier_options[0])
-    
+
     n_th_label = TextInput(placeholder="-", title="Thermal Efficiency")
     n_el_label = TextInput(placeholder="-", title="Electrical Efficiency")
 
@@ -797,7 +799,7 @@ def modify_doc(doc):
                                             row(children=[opex_fix_label,
                                                           opex_var_label])])
     model_param_layout = widgetbox(must_run_box,renewable_factor,installed_cap)
-    
+
     cop_panel = Panel(child=cop_layout, title="Coefficient of Performance, COP")
     tec_param_panel = Panel(child=tec_param_layout, title="Technical Parameters")
     finance_param_panel = Panel(child=finance_param_layout, title="Finance Parameters")
@@ -806,7 +808,7 @@ def modify_doc(doc):
     layout2 = [tec_param_panel, finance_param_panel , model_param_panel]
 # =============================================================================
 #  Callbacks for adding Technologies
-# =============================================================================    
+# =============================================================================
     def add_heat_generator():
         output.tabs = []
         div_spinner.text = load_text
@@ -814,18 +816,18 @@ def modify_doc(doc):
         select_tec.value = select_tec.options[0]
         div_spinner.text = ""
         installed_cap.end=int(float(pmax.value))+1
-# =============================================================================    
+# =============================================================================
     def cancel():
         div_spinner.text = load_text
         grid.children = [Div()]
         div_spinner.text = ""
-# =============================================================================    
+# =============================================================================
     def add_to_cds():
         global carrier_dict
         # if user refreshes site, create new dict
         _df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
         if _df.shape[0] == 0:
-            carrier_dict={}        
+            carrier_dict={}
         div_spinner.text = load_text
         df2 = pd.DataFrame(data_table.source.data)
         df2.set_index(df2["index"])
@@ -838,7 +840,7 @@ def modify_doc(doc):
                     carrier_dict[new_name(str(name_label.value),data_table.source.data["name"].tolist())] = energy_carrier_select.value
                 except:
                     new_data[x] = new_name(str(name_label.value),data_table.source.data["name"])
-                    carrier_dict[new_name(str(name_label.value),data_table.source.data["name"])] = energy_carrier_select.value 
+                    carrier_dict[new_name(str(name_label.value),data_table.source.data["name"])] = energy_carrier_select.value
             elif  x == 'must run [0-1]':
                 new_data[x] = str(int(widgets_dict[x].active))
             else:
@@ -850,8 +852,8 @@ def modify_doc(doc):
         data_table.source.data.update(df2)
         del df2
 #        grid.children = [Div()]
-        div_spinner.text = """<strong style="color: green;">Heat Generator ADDED</strong>"""  
-# =============================================================================    
+        div_spinner.text = """<strong style="color: green;">Heat Generator ADDED</strong>"""
+# =============================================================================
     def add_heat_pump():
 
         flow_temp.options = flow_temp_dic[tec_mapper_inv[select_tec2.value]]
@@ -862,7 +864,7 @@ def modify_doc(doc):
         n_th_label.value = cop_label.value
         n_th_label.disabled = True
         tabs_geneator.tabs = layout1
-# =============================================================================    
+# =============================================================================
     def add_tec(name,old,new):
         div_spinner.text = load_text
         n_th_label.disabled = False
@@ -907,7 +909,7 @@ def modify_doc(doc):
             tabs_geneator.tabs = layout2
 
         div_spinner.text = ""
-# =============================================================================    
+# =============================================================================
     def auto_load(name,old,new):
         if widgets_dict["name"][0].value not in widgets_dict["name"][1].value:
             name_label.value =  widgets_dict["name"][0].value
@@ -927,13 +929,13 @@ def modify_doc(doc):
             lt_label.value = str(data_tec[data_tec["name"] == select_tec2.value]["life time"].values[0])
             ik_label.value = str(data_tec[data_tec["name"] == select_tec2.value]["investment costs (EUR/MW_th)"].values[0])
             tabs_geneator.tabs = layout2
-# =============================================================================    
+# =============================================================================
     def update_slider(name,old,new):
         try:
             installed_cap.end=int(float(pmax.value))+1
         except:
             pass
-# =============================================================================    
+# =============================================================================
     def cop_callback(name,old,new):
         try: # because of empty fields at the start no COP can be found
             cop_label.value = str(heat_pumps[tec_mapper_inv[select_tec2.value]].loc[return_temp.value,flow_temp.value])
@@ -941,12 +943,12 @@ def modify_doc(doc):
             n_th_label.disabled = True
         except:
             pass
-# =============================================================================        
+# =============================================================================
     def change_name_if_carrier_changes(name,old,new):
-        name_label.value = name_label.value.replace(old,new)  
+        name_label.value = name_label.value.replace(old,new)
 # =============================================================================
 #   Signal Emitting / Coupling for adding Technologies
-# ============================================================================= 
+# =============================================================================
     button1.on_click(add_heat_generator)
     cancel_button.on_click(cancel)
     ok_button.on_click(add_to_cds)
@@ -954,8 +956,8 @@ def modify_doc(doc):
     select_tec2.on_change('value', auto_load)
     pmax.on_change("value",update_slider)
     flow_temp.on_change('value', cop_callback)
-    return_temp.on_change('value', cop_callback)        
-    energy_carrier_select.on_change('value', change_name_if_carrier_changes) 
+    return_temp.on_change('value', cop_callback)
+    energy_carrier_select.on_change('value', change_name_if_carrier_changes)
 # =============================================================================
 #   Set Global Layout
 # =============================================================================
@@ -972,8 +974,8 @@ def modify_doc(doc):
                  column([widgetbox(output)]),
                  widgetbox(tabs),
                  ],
-            sizing_mode='scale_width')  #XXX: scale_width -> invest_button not clickable 
-        
+            sizing_mode='scale_width')  #XXX: scale_width -> invest_button not clickable
+
 #    l = layout([
 #            [row([widgetbox(download_button,upload_button,run_button,reset_button,invest_button),
 #             widgetbox(div_spinner),widgetbox(pmax,Div(),to_install)])],
@@ -992,7 +994,7 @@ if __name__ == '__main__':
             allow_websocket_origin = [line.strip() for line in fd.readlines()]
 
     bokeh_app = Application(FunctionHandler(modify_doc))
-    bokeh_app.add(DirectoryHandler(filename = root_dir))
+    bokeh_app.add(DirectoryHandler(filename = path2data))
     server = Server({'/': bokeh_app}, io_loop=io_loop, allow_websocket_origin=allow_websocket_origin)
     server.start()
     print('Opening Dispath Application on http://localhost:5006/')
