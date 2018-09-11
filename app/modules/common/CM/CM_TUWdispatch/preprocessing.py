@@ -38,7 +38,9 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     j_pth =     [key for key in tec if key in data["categorize"]["Power To Heat"] ]
     j_st =      [key for key in tec if key in data["categorize"]["Solar Thermal"] ]
     j_waste =   [key for key in tec if key in data["categorize"]["waste treatment"] ]
-    j_chp =     [key for key in tec if key in data["categorize"]["CHP"] ]
+    j_chp_bp =  [key for key in tec if key in data["categorize"]["CHP-BP"] ]
+    j_chp_se =  [key for key in tec if key in data["categorize"]["CHP-SE"] ]
+    j_chp =     j_chp_bp + j_chp_se
     j_bp =      [key for key in tec if key in data["categorize"]["boiler"] ]
     j_wh =      [key for key in tec if key in data["categorize"]["Waste Heat"] ]
     j_gt =      [key for key in tec if key in data["categorize"]["Geo Thermal"] ]
@@ -140,7 +142,8 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     temperature = data["temp"]
 
     thresh = data["threshold_heatpump"]
-    all_heat_geneartors = data["all_heat_geneartors"]
+
+    all_heat_geneartors = tec+j_hs
 
     mr_j = {key:data["MR"][key] for key in tec}
 
@@ -153,7 +156,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
             IK_hs, cap_hs, c_ramp_chp, c_ramp_waste, alpha_hs,
             rf_j, rf_tot, OP_var_j, temperature, thresh,
             sale_electricity_price_t, OP_fix_hs, all_heat_geneartors,
-            mr_j]
+            mr_j,j_chp_se,j_chp_bp]
 
     keys = ['j', 'j_hp', 'j_pth', 'j_st', 'j_waste', 'j_chp', 'j_bp', 'j_wh',
             'j_gt', 'j_hs', 'demand_th_t', 'max_demad', 'radiation_t', 'IK_j',
@@ -164,6 +167,6 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
             'IK_hs', 'cap_hs', 'c_ramp_chp', 'c_ramp_waste', 'alpha_hs',
             'rf_j', 'rf_tot', 'OP_var_j', 'temperature_t', 'thresh',
             'sale_electricity_price_jt', 'OP_fix_hs', 'all_heat_geneartors',
-            'mr_j']
+            'mr_j' , 'j_chp_se' , 'j_chp_bp' ]
 
     return dict(zip(keys,args))

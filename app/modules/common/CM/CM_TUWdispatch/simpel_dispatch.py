@@ -187,8 +187,11 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
 
     #% With full heat extraction, a loss of power can occur which, only reduces the maximum power.
     def chp_geneartion_restriction1_jt_rule(m,j,t):
-        sv_chp = (m.ratioPMaxFW - m.ratioPMax) / (m.ratioPMax*m.ratioPMaxFW)
-        rule = m.x_el_jt[j,t] <= m.Cap_j[j]/m.ratioPMax - sv_chp * m.x_th_jt[j,t]
+        if j in val["j_chp_se"]:
+            sv_chp = (m.ratioPMaxFW - m.ratioPMax) / (m.ratioPMax*m.ratioPMaxFW)
+            rule = m.x_el_jt[j,t] <= m.Cap_j[j]/m.ratioPMax - sv_chp * m.x_th_jt[j,t]
+        else:
+            rule = pe.Constraint.Skip
         return rule
     m.chp_geneartion_restriction1_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction1_jt_rule)   # should be adopted using binary variables
 
@@ -200,13 +203,15 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     def chp_geneartion_restriction5_jt_rule(m,j,t):
         rule = m.Q_min_th_chp <=  m.x_th_jt[j,t]
         return rule
-    m.chp_geneartion_restriction5_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction5_jt_rule)
+#    m.chp_geneartion_restriction5_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction5_jt_rule)
 
     #% The ratio of the maximum heat decoupling to the maximum electrical power determines the decrease in the maximum heat decoupling
     #with the produced electrical net power.
     def chp_geneartion_restriction3_jt_rule(m,j,t):
-#        rule = m.x_el_jt[j,t] >= m.x_th_jt[j,t] / m.ratioPMaxFW    # should be adopted using binary variables
-        rule = m.x_el_jt[j,t] == m.x_th_jt[j,t] / m.n_th_j[j] * m.n_el_j[j]
+        if j in val["j_chp_se"]:
+            rule = m.x_el_jt[j,t] >= m.x_th_jt[j,t] / m.ratioPMaxFW    # should be adopted using binary variables
+        else:
+            rule = m.x_el_jt[j,t] == m.x_th_jt[j,t] / m.n_th_j[j] * m.n_el_j[j]
         return rule
     m.chp_geneartion_restriction3_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction3_jt_rule)
 
@@ -314,7 +319,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     #print("*****************\ntime to load data: " + str(datetime.now()-solv_start)+"\n*****************")
     print("*****************\nCreating Model...\n*****************")
     solv_start = datetime.now()
-    instance = m.create_instance(report_timing= True)  #TODO
+    instance = m.create_instance(report_timing= False)  #TODO
     print("*****************\ntime to create model: " + str(datetime.now()-solv_start)+"\n*****************")
     solv_start = datetime.now()
     print("*****************\nStart Solving...\n*****************")
@@ -322,7 +327,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
 #    opt.options['MIPGap'] = 0.5
 #    opt.options['Threads'] = 4
     #TODO
-    results = opt.solve(instance, load_solutions=False,tee=True,suffixes=['.*'])   # tee= Solver Progress, Suffix um z.B Duale Variablen anzuzeigen -> '.*' für alle
+    results = opt.solve(instance, load_solutions=False,tee=False,suffixes=['.*'])   # tee= Solver Progress, Suffix um z.B Duale Variablen anzuzeigen -> '.*' für alle
     instance.solutions.load_from(results)
     instance.solutions.store_to(results)
     print("*****************\ntime for solving: " + str(datetime.now()-solv_start)+"\n*****************")

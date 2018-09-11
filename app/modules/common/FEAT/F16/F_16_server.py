@@ -296,10 +296,13 @@ for sheet in pd.ExcelFile(path_parameter).sheet_names:
     flow_temp_dic[sheet] = heat_pumps[sheet].columns.values.tolist()
     return_temp_dic[sheet] = heat_pumps[sheet].index.values.tolist()
 
-select_tec_options = pd.read_excel(path_parameter,"Techologies")["Techologies"].values.tolist()
+select_tec_options_model = pd.read_excel(path_parameter,"Techologies")["Techologies"].values.tolist()
+select_tec_options = [x.replace("CHP-SE","CHP Steam Extraction").replace("CHP-BP","CHP Back Pressure") for x in select_tec_options_model]
+select_tec_mapper = dict(zip(select_tec_options,select_tec_options_model))
 tec_mapper_inv = invert_dict(tec_mapper)
 select_tec2_options= {"heat pump": list(tec_mapper.values()),
-                      "CHP": data_tec[data_tec["output"] == "CHP"]["name"].values.tolist(),
+                      "CHP Back Pressure": data_tec[data_tec["output"] == "CHP-BP"]["name"].values.tolist(),
+                      "CHP Steam Extraction": data_tec[data_tec["output"] == "CHP-SE"]["name"].values.tolist(),
                       "boiler":data_tec[data_tec["type"] == "boiler"]["name"].values.tolist()}
 energy_carrier_options = pd.read_excel(path_parameter,sheets[1],skiprows=[0])[input_price_list[0]].values.tolist()
 #%%
@@ -845,7 +848,7 @@ def modify_doc(doc):
                 new_data[x] = str(int(widgets_dict[x].active))
             else:
                 new_data[x] = str(widgets_dict[x].value)
-        new_data["type"] = select_tec.value
+        new_data["type"] = select_tec_mapper[select_tec.value]
         df2 = df2.append(new_data,ignore_index=True)
         df2 = df2.apply(pd.to_numeric, errors='ignore')
         df2["index"] = df2.index
@@ -899,7 +902,7 @@ def modify_doc(doc):
                     continue
                 widgets_dict[x].value = 0
 
-        if select_tec.value in ["heat pump","CHP","boiler"]:
+        if select_tec.value in ["heat pump","CHP Back Pressure", "CHP Steam Extraction", "boiler"]:
             select_tec2.title= "Select a "+str(select_tec.value)+":"
             select_tec2.options = select_tec2_options[select_tec.value]
             tec_buttons.children = [select_tec,select_tec2]

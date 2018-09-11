@@ -73,7 +73,7 @@ def xlsx2dat(external_data = ["radiation","temperature","load","price"] ,
                     continue
             savedat(profile, mapper, file, path2dat)
         except Exception as e:
-#            print(e,type(e))
+            print(e)
             continue
 # =============================================================================
 #
