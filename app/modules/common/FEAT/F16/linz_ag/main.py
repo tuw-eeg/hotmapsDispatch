@@ -87,6 +87,7 @@ def save_solution(solutions,path_download,name):
 # =============================================================================
 def loadExternalData(path2externalData=path2input, path2database=path2dat,
                      path2output=root_dir):
+    global answer
     answer = 0
     def check():
         global answer
@@ -94,10 +95,8 @@ def loadExternalData(path2externalData=path2input, path2database=path2dat,
     th = Thread(target=check, daemon=True)
     print("Load individual data to Database ?\n Press <1> for Yes ?\n")
     th.start()
-    th.join(5)
-    if answer == 0:
-        print("Time for Loading individual data to Database is expired,cntinuing...")
-    elif answer == "1":
+    th.join(10)
+    if answer == "1":
         print("Loading individual data to Database...")
         xlsx2dat(path2xlsx = path2externalData, path2dat = path2database)
         print("\nLoading Done")
@@ -151,7 +150,7 @@ if __name__ == "__main__":
             print(str(j)+"/"+str(sub_scenario_len))
             print("+++++++++++++++++")
             subScenario_name = str(subScMapper.name[subScMapper.Prefix==sub_sc].values[0])
-
+            print("Sub Szenario: " +subScenario_name)
             data,inv_flag = load_data(t_sc,sub_sc)
             solutions,instance,results = execute(data,
                                                  inv_flag,selection=[[],[]])

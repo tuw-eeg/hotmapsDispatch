@@ -4,12 +4,13 @@ Created on Tue Sep 26 11:52:51 2017
 
 @author: root
 """
-
+#%%
 import os
 import sys
 import pandas as pd
 import numpy as np
 import pickle
+from threading import Thread
 
 #%% Get current absolute file path
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
@@ -100,10 +101,10 @@ def overwrite(old,new,value,mapper):
         else:
             old[mapper[key]]=list(dic[key].values())[0]
 #%%
-def write_fit(string,profil):
+def find_FiT(string):
     """
-    This function return a dict that uses the string input to specify the
-
+    This function extracts from the string two values for the Feed in Tarif
+    and for the constant value.
     Parameters:
         string:     str
                     String that specifies the feed in Tarif or Offset
@@ -112,15 +113,14 @@ def write_fit(string,profil):
                         h... constant hourly
                         f... Offset hourly
                     like: "20f + 35.05h"
-    Return:
-        dictionary  dict
-                    Returns the dict with spezified Feed in Tarif and or
-                    Fix Price for the given profile
+    Return
+        (fit,constant)  tuple
+                        fit         float
+                        constant    float/str ("nan")
     """
     feed_in_tarif = 0
     fix_price = "nan"
     string = string.strip()
-
     if  string != "0" and string !="" and string != "0.0":
         for string in string.split("+"):
             string = string.strip()
@@ -139,8 +139,29 @@ def write_fit(string,profil):
                     print("User Input for constant hourly price is wrong,... using variable prices")
                     fix_price = "nan"
             else:
-                print("User Input for electricity is wrong")
+                print("User Input for modyfing profiles is wrong")
+                print("""String that specifies the feed in Tarif or Offset\nHas to be in this form "XXf + XXh"":\n\tXX... value (float)\n\th... constant hourly\n\tf... Offset hourly\n\tlike: "20f + 35.05h""")
                 sys.exit()
+
+    return feed_in_tarif,fix_price
+
+def write_fit(string,profil):
+    """
+    This function return a dict that uses the string input to
+    modulate te profile
+
+    Parameters:
+        string:     str
+                    String that specifies the feed in Tarif or Offset
+
+        profile:    dict
+                    profile from .dat Database
+    Return:
+        dictionary  dict
+                    Returns the dict with spezified Feed in Tarif and or
+                    Fix Price for the given profile
+    """
+    feed_in_tarif,fix_price = find_FiT(string)
     if fix_price == "nan":
         return dict(zip(range(1,8760+1),(np.array(list(profil.values()))+feed_in_tarif).tolist()))
     else:
@@ -148,21 +169,22 @@ def write_fit(string,profil):
 #%%
 def extract(string):
     """
-    string has to be in the form : "ID-xx , XXf +XXh"
+    string has to be in the form : "ID#xx , XXf +XXh"
     where <ID> is a string that corrospond with the data in the dat file,
     <xx> is an int, <XX> is a float
-    example: "Wien-2016, 20f + -10.1h"
+    example: "Wien#2016, 20f + -10.1h"
     """
     if type(string) != str:
         return "no external data specified"
 
     strings = string.split(",")
 
+
     if len(strings) == 2:
         data = strings[0]
         fit = strings[1].strip()
 
-        datas = data.split("-")
+        datas = data.split("#")
         if len(datas) !=2:
             return "invalid format for external data"
         iD = datas[0].strip()
@@ -176,7 +198,7 @@ def extract(string):
 
     elif len(strings) ==1:
 
-        fit_or_data = string.split("-")
+        fit_or_data = string.split("#")
 
         if len(fit_or_data) == 2:
             iD = fit_or_data[0].strip()
@@ -192,16 +214,16 @@ def extract(string):
         return "to many arguments for external data specified"
 #%%
 def load_external_default_values(path,scenario=0):
-    default = pd.read_excel(path,"Default - External Data").fillna(0)
+    default = mangle_dupe(pd.read_excel(path,"Default - External Data").fillna(0))
 
-    if scenario > default.shape[0]-1 or scenario < 0:
-        print("This scenarion is not aviable")
-        print("Exiting Calculation")
-        sys.exit()
+    try:
+        default = default.iloc[[scenario],:]
+    except:
+        default = askToGo(default,name="Default - External Data",y=[0])
 
     default_vals = {}
-    for column in default.columns.tolist():
-        x = extract(default[column][scenario])
+    for column in default.columns:
+        x = extract(default[column].values[0])
         if type(x) == str:
             print(x + "@ " + column)
             print("Exiting Calculation")
@@ -214,14 +236,61 @@ def profile_jt(**kwargs):
     iD,fit = extract(kwargs["fit_string"])
     if iD == (0,0):
         iD = kwargs["default_id"]
-    if fit == "0.0" or fit == "0":
-        fit = kwargs["default_fit"]
+        if fit == "0.0" or fit == "0":
+            fit = kwargs["default_fit"]
+        else:
+            f1,h1 = find_FiT(fit)
+            f2,h2 = find_FiT(kwargs["default_fit"])
+            f = f1 + f2
+            h = "nan" if [h1,h2] == ["nan", "nan"] else (h2 if h1 == "nan" else (h1 if h2 == "nan" else h1 + h2))
+            if h == "nan":
+                fit = str(f)+"f"
+            else:
+                 fit = str(f)+"f"+"+"+str(h)+"h"
+#    print(kwargs["j"],iD,fit)
     dic_profil = write_fit(fit,return_dict(kwargs["profile_string"],iD))
     for t,val in dic_profil.items():
         output[kwargs["j"],t] = val
     return output
 #%%
-def load_data(path_parameter2 = path_parameter2, default_scenario=0):
+def askToGo(df,name,y="",x=""):
+    global answer # need to be global to work, I don't know why
+    answer = 0
+    def check():
+        global answer
+        answer = input()
+    th = Thread(target=check, daemon=True)
+    print("This Scenario is not in the Excelsheet <"+name+"> aviable")
+    print("Do you wish to continue with default values ?")
+    print("Press <1> to abbort calculation")
+    print("continue automatically in 10 sec or press any key")
+    th.start()
+    th.join(10)
+    if answer == "1":
+        del th
+        print("\n\n\n\nForce Exiting !!...\n\n\n\n")
+        sys.exit()
+    else:
+        del th
+        print("continuing...\n\n\n\n\n")
+        if type(y)== str and type(x) == str:
+            return  df.iloc[:,:]
+        elif type(y)== str and type(x) == list:
+            return df.iloc[:,x]
+        elif type(y)== list and type(x) == str:
+            return df.iloc[y,:]
+        elif type(y)== list and type(x) == list:
+
+            return df.iloc[y,x]
+        else:
+            print("Loading failed !\n Wrong Indexing \n Exit calculation")
+            sys.exit()
+#%%
+def mangle_dupe(df):
+     df.columns = [c.split(".")[0] for c in df.columns]
+     return df
+#%%
+def load_data(path_parameter2 = path_parameter2, default_scenario=2):
     """
     This function returns the data for the dispatch model
     - Default Values are specified in DH_technology_cost.xlsx
@@ -270,14 +339,28 @@ def load_data(path_parameter2 = path_parameter2, default_scenario=0):
     data = {**data_hg, **data_prices_ef,**data_params, **data_hs}
 
     # Load user input form "\FEAT\F16\input.xlsx"
-    try:
-        data_input_params = pd.read_excel(path_parameter2,"Data",skiprows=range(3,5)).fillna(0).drop([np.nan])
-    except:
-        data_input_params = pd.read_excel(path_parameter2,"Data").fillna(0)
-
+    data_input_params = mangle_dupe(pd.read_excel(path_parameter2,"Data").fillna(0))
+    data_input_ef = mangle_dupe(pd.read_excel(path_parameter2,"emmision factors").fillna(0))
+    data_input_prices = mangle_dupe(pd.read_excel(path_parameter2,"energy carrier prices").fillna(0))
     data_input_hg = pd.read_excel(path_parameter2,"Heat Generators").fillna(0)
-    data_input_prices_ef = pd.read_excel(path_parameter2,"prices and emmision factors").fillna(0)
     data_input_hs = pd.read_excel(path_parameter2,"Heat Storage").fillna(0)
+
+    try:
+        data_input_params = data_input_params.iloc[[default_scenario],:]
+    except:
+        data_input_params = askToGo(data_input_params,name="Data",y=[0])
+
+    try:
+        data_input_ef = data_input_ef.iloc[:,[0,default_scenario+1]]
+    except:
+        data_input_ef = askToGo(data_input_ef,name="emmision factors", x=[0,1])
+
+    try:
+        data_input_prices = data_input_prices.iloc[:,[0,default_scenario+1]]
+    except:
+        data_input_prices = askToGo(data_input_prices,name="energy carrier prices",x=[0,1])
+
+
 
     # Generate Mapping tables to distinguish the input data
     input_list_mapper = return_mapper()
@@ -285,11 +368,12 @@ def load_data(path_parameter2 = path_parameter2, default_scenario=0):
     parameter_list_mapper = return_mapper("financal and other parameteres")
     hs_mapper = return_mapper("Heat Storage")
 
-     # Overwrite default values with user input data
+    # Overwrite default values with user input data
     # skip columns that are not in the inital excel
     x=[x for x in data_input_hg.columns.tolist() if x in list(input_list_mapper)]
     overwrite(data,data_input_hg[x],"name",input_list_mapper)
-    overwrite(data,data_input_prices_ef,"energy carrier",input_price_list_mapper)
+    overwrite(data,data_input_ef,"energy carrier",input_price_list_mapper)
+    overwrite(data,data_input_prices,"energy carrier",input_price_list_mapper)
     overwrite(data,data_input_params,"",parameter_list_mapper)
     overwrite(data,data_input_hs,"name",hs_mapper)
 
