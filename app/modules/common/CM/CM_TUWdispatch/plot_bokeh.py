@@ -292,7 +292,7 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     else:
         s = gridplot([[p],[p2],[p3]],plot_width=1000, plot_height=300,
                  toolbar_options=dict(logo=None))
-    return s
+    return s,p
 #%%
 def load_duration_curve(t,dic,y,legend,decison_var,path2output,cmap):
     """
@@ -805,9 +805,9 @@ def plot_solutions(show_plot=False,path2json=path2json,solution=-1):
         cmap = colormapping(dic["Technologies:"])
         dic["Marginal Costs"] = dic["Marginal Costs:"]
 
-        p1 = stack_chart(tw,dic,y1,legend,decison_var,path2output,cmap,"w")
-        p2 = stack_chart(ts,dic,y2,legend,decison_var,path2output,cmap,"s")
-        p3 = stack_chart(t,dic,y3,legend,decison_var,path2output,cmap)
+        p1,_ = stack_chart(tw,dic,y1,legend,decison_var,path2output,cmap,"w")
+        p2,_ = stack_chart(ts,dic,y2,legend,decison_var,path2output,cmap,"s")
+        p3,_ = stack_chart(t,dic,y3,legend,decison_var,path2output,cmap)
         p4 = load_duration_curve(t,dic,y3,legend,decison_var,path2output,cmap)
         decison_var = "Thermal Generation Mix:"
         p5 = pie_chart(dic[decison_var],path2output,decison_var,cmap)

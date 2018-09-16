@@ -11,7 +11,7 @@ import numpy as np
 from bokeh.io import show, output_file
 from bokeh.models import ColumnDataSource
 from bokeh.plotting import figure
-from bokeh.palettes import Category10,Category20
+from bokeh.palettes import Category10,Category20,Spectral
 from bokeh.transform import dodge
 from bokeh.models import Legend
 from math import pi,radians,degrees,sin,cos
@@ -19,9 +19,95 @@ from bokeh.models import HoverTool
 from bokeh.layouts import gridplot,layout,widgetbox
 from bokeh.models.widgets import Panel, Tabs, Div
 from imageHTML import header_html
+import os,sys
+path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.
+                                                       abspath(__file__)))))
+if path not in sys.path:
+    sys.path.append(path)
+from CM.CM_TUWdispatch.eng_format import EngNumber,EngUnit
+from CM.CM_TUWdispatch.plot_bokeh import stack_chart,matrix,colormapping,costBarStack_chart,plot_table
 # =============================================================================
 #
 # =============================================================================
+#%%
+def table(**kwargs):
+        
+    decision_vars = ["Anual Total Costs",
+                         "Anual Total Costs (with costs of existing power plants and heat storages)",
+                         "Electricity Production by CHP",
+                         "Thermal Production by CHP",
+                         "Mean Value Heat Price",
+                         "Mean Value Heat Price (with costs of existing power plants and heat storages)",
+                         "Median Value Heat Price",
+                         "Electrical Consumption of Heatpumps and Power to Heat devices",
+                         "Maximum Electrical Load of Heatpumps and Power to Heat devices",
+                         "Revenue From Electricity:",
+                         "Ramping Costs",
+                         "Operational Cost:",
+                         "Anual Investment Cost",
+                         "Anual Investment Cost (of existing power plants)",
+                         "Electrical Peak Load Costs",
+                         "Variable Cost CHP's",
+                         "Fuel Costs",
+                         ]
+    return plot_table(decision_vars,dic,"")
+
+def costLineUp(**kwargs):
+
+    decision_vars = ["Anual Investment Cost:",
+                         "Anual Investment Cost (of existing power plants and heat storages)",
+                         "Operational Cost:", "Fuel Costs:", "Revenue From Electricity:"]
+    return costBarStack_chart(dic,decision_vars,"",cmap)
+#%%
+def stackPlot(**kwargs):
+    """
+    Params: 
+        solutions       dict
+                        dictionary of dictionarys of the Dispatch model
+        
+        t               range
+        
+        sc_names        list 
+        
+        sub_sc_names    list
+    
+    Return:
+        gridlayout with same x-Axis
+    """
+    p=[]
+    for sc in kwargs["sc_names"]:
+        for sub_sc in kwargs["sub_sc"]:
+            dic = kwargs["solutions"][sc][sub_sc]
+            if dic:
+                decison_var="Thermal Power Energymix:"
+                legend = list(dic[decison_var].keys())
+                y = matrix(dic,decison_var,legend,kwargs["t"])
+                cmap = colormapping(dic["Technologies:"])
+                dic["Marginal Costs"] = dic["Marginal Costs:"]
+                p.append(stack_chart(kwargs["t"],dic,y,legend,decison_var,"_",cmap)[1])
+        
+    for i in range(1,len(p)):
+        p[i].x_range = p[0].x_range
+    
+    column=[]
+    row=[]
+    for i,p_i in enumerate(p):
+        p_i.toolbar.logo = None
+        p_i.toolbar_location = "above"
+        p_i.plot_width = 850
+        row.append(p_i)
+        if i%2:
+            column.append(row)
+            row = []
+            
+    
+    l = layout(children=column)
+    
+    return l
+    
+    
+    
+
 #%% Color mapping
 def color(i,j):
     if i<=10:
@@ -30,6 +116,17 @@ def color(i,j):
         return Category10[i][j]
     else:
         return Category20[i][j]
+# =============================================================================
+#
+# =============================================================================
+#%% Color mapping2
+def color2(i,j):
+    if i<=11:
+        if i<3:
+            i=3
+        return Spectral[i][j]
+    else:
+        return color(i,j)
 # =============================================================================
 #
 # =============================================================================
@@ -46,19 +143,21 @@ def lcoeHeating(**kwargs):
         data_LCOE:          dict
                             keys are Names of Scencarios
                             values are lists of LCOE's of Subscenario
-    """
+    """    
+    space=0.13
+    width = 0.12
     data_LCOE = { ** {'Sub Scenarios' : kwargs["sub_sc_names"]} ,
                   ** kwargs["data_LCOE"]}
 
     source_LCOE = ColumnDataSource(data=data_LCOE)
-
+    
     p = figure(x_range=kwargs["sub_sc_names"],
-               title="Levelized Cost of Energy (Heating)",
-               toolbar_location=None, tools="")
-
-    legend_items = [(sc,[p.vbar( x=dodge( 'Sub Scenarios', -0.25+i*0.25,
+               title="Levelized Cost of Energy (Heating)")
+    
+    legend_items = [(sc,[p.vbar( x=dodge( 'Sub Scenarios', 
+                                         -space*(len(kwargs["sc_names"])-1)/2+i*space,
                                          range=p.x_range),
-                                top=sc, width=0.2, source=source_LCOE,
+                                top=sc, width=width, source=source_LCOE,
                                 color = color(len(kwargs["sc_names"])+1,i))
                     ]) for i,sc in enumerate(kwargs["sc_names"])]
 
@@ -69,6 +168,8 @@ def lcoeHeating(**kwargs):
     p.legend.click_policy="hide"
     p.xaxis.axis_label = "Sub Szenarios"
     p.yaxis.axis_label = "LCOE in €/MWh_th"
+    p.toolbar.logo = None
+    p.toolbar_location = None
     p.plot_width = 850
 #    p.plot_height = 850
 #    p.sizing_mode = "scale_width"
@@ -126,7 +227,7 @@ def pieTGM(**kwargs):
 #
 # =============================================================================
 #%%
-def crazyPlot(x=0,y=0,teta_offset=10,num_of_circular_axes = 6, bar_width=0.5,
+def crazyPlot(x=0,y=0,teta_offset=10,num_of_circular_axes = 6, bar_width=0.4,
               **kwargs):
     """
     Params:
@@ -161,10 +262,14 @@ def crazyPlot(x=0,y=0,teta_offset=10,num_of_circular_axes = 6, bar_width=0.5,
                                 a list of scneario names
 
         cost_line_up_names      list
-                                a list of parameters from the
+                                a list of cost parameters
 
-        max_val                 float
-                                maximum value of the data
+        max_val                 dict
+                                maximum value of each sub scenario
+        
+        title                   str
+                                name of figure               
+        
 
     """
     hover = HoverTool(tooltips=[
@@ -191,7 +296,7 @@ def crazyPlot(x=0,y=0,teta_offset=10,num_of_circular_axes = 6, bar_width=0.5,
                title="Cost Line Up - "+ kwargs["title"])
 
     for r in np.linspace(r_i, r_o, num=num_of_circular_axes,endpoint=True).tolist():
-        p.text(x=0, y=int(r)+1, text=[round(r-r_i,2)],text_font_size="9pt",
+        p.text(x=0, y=int(r)+1, text=[str(EngNumber(float(round(r-r_i,2))))],text_font_size="9pt",
                text_align="center", text_baseline="middle")
         p.circle(x=x, y=y, radius=r,fill_color=None, line_color="black",alpha=0.2)
 
@@ -204,50 +309,53 @@ def crazyPlot(x=0,y=0,teta_offset=10,num_of_circular_axes = 6, bar_width=0.5,
                                              legend = val,
                                              start_angle=start_angle,
                                              end_angle=start_angle+teta_step,
-                                             color=color(len(sc_names),i),
+                                             color=color2(len(sc_names),i),
                                              alpha=0.6)]
         start_angle += teta_step
 
     teta_sub_step = {sc: teta_step/len(heatgeneartors[sc]) for sc in sc_names}
     teta_text = {sc: teta_sub_step[sc] /2 for sc in sc_names}
     start_angle = radians(90+teta_offset)
-    i=0
-    text = heatgeneartors.copy()
+   
     for sc in sc_names:
-        for j in range(len(heatgeneartors[sc])):
+        for j,hg in enumerate(heatgeneartors[sc]):
             angle = start_angle+teta_text[sc]
             if angle > 2*pi:
                 angle -= 2*pi
             if pi/2< angle <3*pi/2:
                 angle += pi
-            if j < len(heatgeneartors)*len(sc_names):
-                p.text(x=x + r_o*cos(start_angle+teta_text[sc]),
-                       y=y + r_o*sin(start_angle+teta_text[sc]),
-                       text = [text[sc][i]], angle=angle,
-                       text_font_size="12pt", text_align="center",
-                       text_baseline="middle")
-
+                
+            p.text(x=x + r_o*cos(start_angle+teta_text[sc]),
+                   y=y + r_o*sin(start_angle+teta_text[sc]),
+                   text = [hg], angle=angle,
+                   text_font_size="12pt", text_align="center",
+                   text_baseline="middle")
+            
             p.ray(x=x+cos(start_angle)*r_i, y=y+sin(start_angle)*r_i,
                   length=r_o, angle=start_angle,line_width=2,color = "black")
 
             start_angle += teta_sub_step[sc]
-            i +=1
+    # last ray for beauty
+    p.ray(x=x+cos(start_angle)*r_i, y=y+sin(start_angle)*r_i,
+                  length=r_o, angle=start_angle,line_width=2,color = "black")
 
 
     teta_sub_sub_step = {sc: teta_sub_step[sc] / len(cost_line_up_names) for sc in sc_names}
     mid_point_bar = {sc:  teta_sub_sub_step[sc] / 2 for sc in sc_names}
     bar_step = {sc:2*mid_point_bar[sc]*bar_width for sc in sc_names}
-
-
     start_angle = radians(90+teta_offset)
     sav_pos = start_angle
-    glyphs = {sc:[] for sc in sc_names}
-    glyphs_cost = {cost:[] for cost in cost_line_up_names}
+    # TODO:extra legend
+#    glyphs = {sc:[] for sc in sc_names}
+#    glyphs_cost = {cost:[] for cost in cost_line_up_names}
+
     for sc in sc_names:
-        for i,cost in enumerate(cost_line_up_names):
-            for hg in heatgeneartors[sc]:
+        for hg in heatgeneartors[sc]:
+            for i,cost in enumerate(cost_line_up_names):
+                
                 angle = start_angle
                 angle += mid_point_bar[sc] - bar_step[sc]/2
+                
                 glyph = p.annular_wedge(x=x, y=y, inner_radius=r_i,
                                         outer_radius=r_i+data[cost][sc][hg],
                                         start_angle=angle,
@@ -260,12 +368,19 @@ def crazyPlot(x=0,y=0,teta_offset=10,num_of_circular_axes = 6, bar_width=0.5,
                                                    "scenario":[sc],
                                                    "type":[cost],
                                                    "value":[data[cost][sc][hg]]})
-                glyphs_cost[cost] += [glyph]
-                glyphs[sc] += [glyph]
-                hover.renderers += [glyph]
-                start_angle += teta_sub_step[sc]
-        sav_pos += teta_sub_sub_step[sc]
-        start_angle = sav_pos
+                # make only for this list hover aviable
+                hover.renderers += [glyph] 
+                
+                #TODO:extra legend
+#                glyphs_cost[cost] += [glyph]
+#                glyphs[sc] += [glyph]
+                
+                start_angle += teta_sub_sub_step[sc]
+                
+            sav_pos += teta_sub_step[sc]
+            start_angle = sav_pos
+            
+                
 
 
     #TODO: extra legend
@@ -289,27 +404,10 @@ def crazyPlot(x=0,y=0,teta_offset=10,num_of_circular_axes = 6, bar_width=0.5,
     p.toolbar_location = None
     return p
 #%%
-#p = lcoeHeating(data_LCOE=data_LCOE, sub_sc_names=sub_sc_names, sc_names= sc_names)
-#output_file("LCOE (Heating).html")
-#show(p)
-#
-#p = pieTGM(sc_name = sc_names[0], sub_sc_name = sub_sc_names[0],
-#           heatgeneartors=heatgeneartors,
-#           tgm = tgms[sc_names[0],sub_sc_names[0]])
-#output_file("Pie Chart Theraml Generattion Mix.html")
-#show(p)
-#
-#
-#p = crazyPlot(data = data[sub_sc], heatgeneartors=heatgeneartors, sc_names=sc_names,
-#          cost_line_up_names=cost_line_up_names,max_val = max_val,title=sub_sc)
-#output_file("a.html")
-#show(p)
-
-#%%
 # =============================================================================
 #
 # =============================================================================
-def genPlot(**kwargs):
+def compareScnearioPlot(**kwargs):
     lcoe = layout (children = [lcoeHeating(data_LCOE=kwargs["data_LCOE"],
                                 sub_sc_names=kwargs["sub_sc_names"],
                                 sc_names= kwargs["sc_names"])])
@@ -326,7 +424,7 @@ def genPlot(**kwargs):
                                       heatgeneartors=kwargs["heatgeneartors"],
                                       sc_names=kwargs["sc_names"],
                                       cost_line_up_names=kwargs["cost_line_up_names"],
-                                      max_val = kwargs["max_val"],
+                                      max_val = kwargs["max_val"][sub_sc],
                                       title=sub_sc)
                 )
         if (i+1) % 2 == 0:
@@ -347,42 +445,85 @@ def genPlot(**kwargs):
 # =============================================================================
 #
 # =============================================================================
-if __name__ == "__main__":
-    #%% Creating Dummy Data
-    sc_names = ["Base Scenario","No Nuclear Low CO2 Scenario"]
-    sub_sc_names = ["Moderate Price","Current Price",
-                    "High Price","Low Price"]
-    heatgeneartors = ["boiler","PV","CHP-BP","CHP-SE","Heat Storage","Heat Pump"]
-    cost_line_up_names = ["OPEX", "CAPEX", "Fuel costs", "Revenue Eletricity"]
-    cost_line_up_vals= {}
-    tgms = {}
-    data_LCOE = {}
-    for sc in sc_names:
-        data_LCOE[sc] = [rd.randint(1,20) for _ in range(len(sub_sc_names))]
-        for sub_sc in sub_sc_names:
-            _tgm_percentage = (np.random.dirichlet(np.ones(len(heatgeneartors)),size=1)*100).astype(int).tolist()[0]
-            _tgm_percentage[-1] +=  100-sum(_tgm_percentage)
-            tgms[(sc,sub_sc)] = _tgm_percentage
-            for hg in heatgeneartors:
-                cost_line_up_vals[(sc,sub_sc,hg)]=dict(zip(cost_line_up_names,[rd.randint(0,10e4) for _ in range(len(cost_line_up_names))]))
-
-    data = {sub_sc:{cost:{sc: {hg:cost_line_up_vals[sc,sub_sc,hg][cost]
-                                for hg in heatgeneartors}
-                        for sc in sc_names}
-                    for cost in cost_line_up_names}
-            for sub_sc in sub_sc_names}
-    max_val = int(max([max(v.values()) for _,v in cost_line_up_vals.items()]))
-
-    if False:
-        t = genPlot(data_LCOE= data_LCOE,
-                     sub_sc_names= sub_sc_names,
-                     sc_names = sc_names,
-                     cost_line_up_names = cost_line_up_names,
-                     max_val = max_val,
-                     heatgeneartors = heatgeneartors,
-                     tgms = tgms,
-                     data = data
-                     )
-
-        output_file("output_scenarios_compare.html")
-        show(t)
+#if __name__ == "__main__":
+##%% Creating Dummy Data
+## =============================================================================
+##     Comparing Szenarios
+## =============================================================================
+#    sc_names = ["Base Scenario","No Nuclear Low CO2 Scenario"]
+#    sub_sc_names = ["Moderate Price","Current Price",
+#                    "High Price","Low Price"]
+#    hg1 = ["boiler","PV","CHP-BP","CHP-SE","Heat Storage","Heat Pump"]
+#    hg2 = list(reversed(["boiler","PV","CHP-BP"]))
+#    heatgeneartors = dict(zip(sc_names,[hg1,hg2]))
+#    
+#    for i,key in enumerate(heatgeneartors):
+#        if i%2:
+#            heatgeneartors[key] = list(reversed(heatgeneartors[key]))
+#            
+#    cost_line_up_names = ["OPEX", "CAPEX", "Fuel costs", "Revenue Eletricity"]
+#    cost_line_up_vals= {}
+#    tgms = {}
+#    data_LCOE = {}
+#    max_val = {sub_sc:[] for sub_sc in sub_sc_names}
+#    for sc in sc_names:
+#        data_LCOE[sc] = {sub_sc:rd.randint(1,20) for sub_sc in sub_sc_names}
+#        for sub_sc in sub_sc_names:
+#            _tgm_percentage = (np.random.dirichlet(np.ones(len(heatgeneartors[sc])),size=1)*100).astype(int).tolist()[0]
+#            _tgm_percentage[-1] +=  100-sum(_tgm_percentage)
+#            tgms[(sc,sub_sc)] = dict(zip(heatgeneartors[sc],_tgm_percentage))
+#            for hg in heatgeneartors[sc]:
+#                cost_line_up_vals[(sc,sub_sc,hg)]=dict(zip(cost_line_up_names,[rd.randint(0,10e4) for _ in range(len(cost_line_up_names))]))
+#            
+#    data = {sub_sc:{cost:{sc: {hg:cost_line_up_vals[sc,sub_sc,hg][cost]
+#                                for hg in heatgeneartors[sc]}
+#                        for sc in sc_names}
+#                    for cost in cost_line_up_names}
+#            for sub_sc in sub_sc_names}
+#
+#    for sub_sc in sub_sc_names:
+#        for sc in sc_names:
+#            max_val[sub_sc].append(max([max(cost_line_up_vals[sc,sub_sc,hg].values()) for hg in heatgeneartors[sc]]))
+#        max_val[sub_sc] = max(max_val[sub_sc])
+#    
+#    data_lcoe = {key:[dic[sub_sc] for sub_sc in sub_sc_names] for key,dic in data_LCOE.items()}
+##%%  
+## =============================================================================
+##    Comparing Sub Szenarios     
+## =============================================================================
+#    data_2 = {sc:{cost:{sub_sc: {hg:cost_line_up_vals[sc,sub_sc,hg][cost]
+#                            for hg in heatgeneartors[sc]}
+#                    for sub_sc in sub_sc_names}
+#                for cost in cost_line_up_names}
+#        for sc in sc_names}
+#    
+#    sc = sc_names[0]
+#    data_2 = data_2[sc]
+#    
+#    heatgeneartors2 = dict(zip(sub_sc_names,[heatgeneartors[sc]]*len(sub_sc_names)))
+#    for i,key in enumerate(heatgeneartors2):
+#        if i%2:
+#            heatgeneartors2[key] = list(reversed(heatgeneartors2[key]))
+#    max_val2 = {sc:[] for sc in sc_names}
+#    for sc in sc_names:
+#        for sub_sc in sub_sc_names:
+#            max_val2[sc].append(max([max(cost_line_up_vals[sc,sub_sc,hg].values()) for hg in heatgeneartors[sc]]))
+#        max_val2[sc] = max(max_val2[sc])
+#
+#    data_lcoe_2 = {sub_sc:[data_LCOE[sc][sub_sc] for sc in sc_names] for sub_sc in sub_sc_names}
+#    
+#    
+##%%    
+#    if False:
+#        t = compareScnearioPlot(data_LCOE= data_lcoe, 
+#                                 sub_sc_names= sub_sc_names,
+#                                 sc_names = sc_names,
+#                                 cost_line_up_names = cost_line_up_names,
+#                                 max_val = max_val,
+#                                 heatgeneartors = heatgeneartors,
+#                                 tgms = tgms,
+#                                 data = data
+#                     )
+#
+#        output_file(r"C:\Users\Nesa\Desktop\output_scenarios_compare.html")
+#        show(t)

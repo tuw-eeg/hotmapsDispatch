@@ -12,7 +12,7 @@ import pandas as pd
 from bokeh.plotting import output_file,save
 from bokeh.models.widgets import Tabs
 from threading import Thread
-from plotScenarios import genPlot
+from plotScenarios import compareScnearioPlot
 from bokeh.io import show, output_file
 #%% ===========================================================================
 #
@@ -128,6 +128,9 @@ if __name__ == "__main__":
     sub_scenario_len= sum([pd.read_excel(_,"Default - External Data").
                              fillna(0).shape[0] for _ in tec_scenarios])
     j=0
+# =============================================================================
+#     
+# =============================================================================
     cost_line_up_names = {"OPEX":"Operational Cost:",
                           "CAPEX":"Anual Investment Cost (of existing power plants and heat storages)",
                           "Fuel costs":"Fuel Costs:",
@@ -137,6 +140,10 @@ if __name__ == "__main__":
     data_lcoe = {sc: {sub_sc :None for sub_sc in subScMapper.name} for sc in scMapper.name}
     heat_generators = {sc:None for sc in scMapper.name}
     max_vals = {sub_sc:[] for sub_sc in subScMapper.name}
+# =============================================================================
+#     
+# =============================================================================
+    dict_of_solutions =  {sc:{sub_sc: None for sub_sc in subScMapper.name} for sc in scMapper.name}
     for t_sc in tec_scenarios:
         file_name = os.path.basename(t_sc).split(".")[0].strip()
         scenario_name = str(scMapper.name[scMapper.file==file_name].values[0])
@@ -154,6 +161,7 @@ if __name__ == "__main__":
             data,inv_flag = load_data(t_sc,sub_sc)
             solutions,instance,results = execute(data,
                                                  inv_flag,selection=[[],[]])
+            dict_of_solutions[scenario_name][subScenario_name] = solutions
 # =============================================================================
 #
 # =============================================================================
@@ -187,18 +195,18 @@ if __name__ == "__main__":
 # =============================================================================
 #
 # =============================================================================
-#    t = genPlot( data_LCOE= data_lcoe  ,
-#                 sub_sc_names= subScMapper.name.tolist(),
-#                 sc_names = scMapper.name.tolist(),
-#                 cost_line_up_names = list(cost_line_up_names),
-#                 max_val = max_vals,
-#                 heatgeneartors = heat_generators,
-#                 tgms = tgms,
-#                 data = cost_data
-#                 )
-#
-#    output_file(os.path.join(path2output,"output_scenarios_compare.html"))
-#    save(t)
+    t = compareScnearioPlot( data_LCOE= data_LCOE  ,
+                 sub_sc_names= subScMapper.name.tolist(),
+                 sc_names = scMapper.name.tolist(),
+                 cost_line_up_names = list(cost_line_up_names),
+                 max_val = max_vals,
+                 heatgeneartors = heat_generators,
+                 tgms = tgms,
+                 data = cost_data
+                 )
+
+    output_file(os.path.join(path2output,"output_scenarios_compare.html"))
+    save(t)
 
     print("\n\nSee calculation output in: <"+path2output+">")
 
