@@ -173,7 +173,7 @@ def compare(scMapper,subScMapper,solutions,path2output=path2output):
                  data = cost_data,
                  solutions = solutions,
                  cost_line_up_vals = cost_line_up_vals,
-                 t= range(0,200)
+                 t= range(0,8760)
                  )
 
     output_file(os.path.join(path2output,"output_scenarios_compare.html"))
