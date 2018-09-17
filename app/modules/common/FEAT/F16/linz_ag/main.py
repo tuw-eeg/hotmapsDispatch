@@ -134,35 +134,36 @@ def compare(scMapper,subScMapper,solutions,path2output=path2output):
     data_lcoe = {sc: {sub_sc :None for sub_sc in subScMapper.name} for sc in scMapper.name}
     heat_generators = {sc:None for sc in scMapper.name}
     max_vals = {sub_sc:[] for sub_sc in subScMapper.name}
+    cost_line_up_vals = {}
+# =============================================================================
+#
+# =============================================================================
+    for sc in scMapper.name:
+        for sub_sc in subScMapper.name:
+            sol = solutions[sc][sub_sc]
+            if sol:
+                heat_generators[sc] = sol["all_heat_geneartors"]
     
+                for cost,modelname in cost_line_up_names.items():
+                    cost_data[sub_sc][cost][sc] = sol[modelname]
+                    max_vals[sub_sc].append(max(list(sol[modelname].values())))
+    
+                tgms[sc,sub_sc] = sol["Thermal Generation Mix:"]
+    
+                data_lcoe[sc][sub_sc] = sol["Mean Value Heat Price (with costs of existing power plants and heat storages)"]
+                for hg in heat_generators[sc]:
+                    cost_line_up_vals[sc,sub_sc,hg] = dict()
+                    for key,sol_key in cost_line_up_names.items():
+                        cost_line_up_vals[sc,sub_sc,hg][key] = sol[sol_key][hg] 
 # =============================================================================
 #
 # =============================================================================
-    for sc in scMapper.name:
-        for sub_sc in subScMapper.name:
-            heat_generators[sc] = solutions[sc][sub_sc]["all_heat_geneartors"]
-
-            for cost,modelname in cost_line_up_names.items():
-                cost_data[sub_sc][cost][sc] = solutions[sc][sub_sc][modelname]
-                max_vals[sub_sc].append(max(list(solutions[sc][sub_sc][modelname].values())))
-
-            tgms[sc,sub_sc] = solutions[sc][sub_sc]["Thermal Generation Mix:"]
-
-            data_lcoe[sc][sub_sc] = solutions[sc][sub_sc]["Mean Value Heat Price (with costs of existing power plants and heat storages)"]
-# =============================================================================
-#
-# =============================================================================
-    data_LCOE = {sc: [] for sc in scMapper.name}
-    for sc in scMapper.name:
-        for sub_sc in subScMapper.name:
-            data_LCOE[sc].append(data_lcoe[sc].get(sub_sc,0))
-
 
     max_vals = {i:max(val) for i,val in max_vals.items()}
 # =============================================================================
 #
 # =============================================================================
-    t = compareScnearioPlot( data_LCOE= data_LCOE  ,
+    t = compareScnearioPlot( data_LCOE= data_lcoe  ,
                  sub_sc_names= subScMapper.name.tolist(),
                  sc_names = scMapper.name.tolist(),
                  cost_line_up_names = list(cost_line_up_names),
@@ -171,7 +172,8 @@ def compare(scMapper,subScMapper,solutions,path2output=path2output):
                  tgms = tgms,
                  data = cost_data,
                  solutions = solutions,
-                 t= range(0,8760)
+                 cost_line_up_vals = cost_line_up_vals,
+                 t= range(0,200)
                  )
 
     output_file(os.path.join(path2output,"output_scenarios_compare.html"))
@@ -233,7 +235,9 @@ if __name__ == "__main__":
         print("\n\tCalculation of Scenario: "+ scenario_name+" Done !")
         print('~~~~~~~~~~~~~~~~~')
 
-    
+# =============================================================================
+#     
+# =============================================================================
     print("\n\n\nCreating Compare Figures...")
     compare(scMapper,subScMapper,dict_of_solutions)
 

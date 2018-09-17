@@ -469,15 +469,65 @@ def crazyPlot(x=0,y=0,teta_offset=10,num_of_circular_axes = 6, bar_width=0.4,
 # =============================================================================
 #
 # =============================================================================
+def invertCostData(sc_names,sub_sc_names,heatgeneartors,cost_line_up_names,
+                   cost_line_up_vals):
+    
+    data_2 = {sc:{cost:{sub_sc: {hg:cost_line_up_vals[sc,sub_sc,hg][cost]
+                            for hg in heatgeneartors[sc]}
+                    for sub_sc in sub_sc_names}
+                for cost in cost_line_up_names}
+        for sc in sc_names}
+    max_val2 = {sc:[] for sc in sc_names}
+    for sc in sc_names:
+        for sub_sc in sub_sc_names:
+            max_val2[sc].append(max([max(cost_line_up_vals[sc,sub_sc,hg].values()) for hg in heatgeneartors[sc]]))
+        max_val2[sc] = max(max_val2[sc])
+
+    return data_2,max_val2
+#%%
+# =============================================================================
+#     
+# =============================================================================
 def compareScnearioPlot(**kwargs):
-    lcoe = layout (children = [lcoeHeating(data_LCOE=kwargs["data_LCOE"],
+    """
+    Params:
+        sc_names            list
+        
+        sub_sc_names        list
+        
+        data_LCOE           dict
+        
+        tgms                dict
+        
+        data                dict
+        
+        heatgeneartors      dict
+        
+        cost_line_up_names  dict
+        
+        cost_line_up_names  list
+        
+        max_val             dict
+        
+        solutions           dict
+        
+        
+    """
+        
+    data_LCOE = {sc: [] for sc in  kwargs["sc_names"]}
+    for sc in  kwargs["sc_names"]:
+        for sub_sc in kwargs["sub_sc_names"]:
+            data_LCOE[sc].append(kwargs["data_LCOE"][sc].get(sub_sc,0))
+   
+    lcoe = layout (children = [lcoeHeating(data_LCOE=data_LCOE,
                                 sub_sc_names=kwargs["sub_sc_names"],
-                                sc_names= kwargs["sc_names"])])
-
-
-#    tgm = layout(children = [[pieTGM(sc_name = sc, sub_sc_name = sub_sc,
-#                   tgm = kwargs["tgms"][sc,sub_sc]) for sc in kwargs["sc_names"]] for sub_sc in kwargs["sub_sc_names"]])
-#    
+                                sc_names= kwargs["sc_names"])])         
+    data_lcoe_2 = {sub_sc:[kwargs["data_LCOE"][sc][sub_sc] for sc in kwargs["sc_names"]] for sub_sc in kwargs["sub_sc_names"]}
+   
+    lcoe_2 = layout (children = [lcoeHeating(data_LCOE=data_lcoe_2,
+                                sub_sc_names=kwargs["sc_names"],
+                                sc_names= kwargs["sub_sc_names"])])
+    
     column=[[Div(width = 500)]+[Div(text= font_style+"<p>"+sc+"</p>",width = 650) for sc in kwargs["sc_names"]]]
     for sub_sc in kwargs["sub_sc_names"]:
         row=[Div(text= font_style+"<p>"+sub_sc+"</p>")]
@@ -512,20 +562,43 @@ def compareScnearioPlot(**kwargs):
     cost.append(temp_liste)
     cost = layout(children = cost)
     
-    cost2 = costLineUp(solutions=kwargs["solutions"],sc_names=kwargs["sc_names"],sub_sc_names=kwargs["sub_sc_names"])
-    results = table(solutions=kwargs["solutions"],sc_names=kwargs["sc_names"],sub_sc_names=kwargs["sub_sc_names"])
-    stack = stackPlot(solutions=kwargs["solutions"],sc_names=kwargs["sc_names"],sub_sc_names=kwargs["sub_sc_names"],t=kwargs["t"])
-    
-    tab_lcoe = Panel(child=lcoe, title="Levelized Cost of Energy")
+    cost3 = {}
+    data_2,max_val2 = invertCostData(kwargs["sc_names"],
+                                     kwargs["sub_sc_names"],
+                                     kwargs["heatgeneartors"],
+                                     kwargs["cost_line_up_names"],
+                                     kwargs["cost_line_up_vals"])
+    for sc in kwargs["sc_names"]:
+        heatgeneartors2 = dict(zip(kwargs["sub_sc_names"],[kwargs["heatgeneartors"][sc]]*len(kwargs["sub_sc_names"])))
+        for i,key in enumerate(heatgeneartors2):
+            if i%2:
+                heatgeneartors2[key] = list(reversed(heatgeneartors2[key]))
+                
+        cost3[sc] = crazyPlot(data = data_2[sc],heatgeneartors=heatgeneartors2,
+                                 sc_names=kwargs["sub_sc_names"],
+                                 cost_line_up_names=kwargs["cost_line_up_names"],
+                                 max_val = max_val2[sc],title=sc)
+    if kwargs["solutions"]:
+        cost2 = costLineUp(solutions=kwargs["solutions"],sc_names=kwargs["sc_names"],sub_sc_names=kwargs["sub_sc_names"])
+        results = table(solutions=kwargs["solutions"],sc_names=kwargs["sc_names"],sub_sc_names=kwargs["sub_sc_names"])
+        stack = stackPlot(solutions=kwargs["solutions"],sc_names=kwargs["sc_names"],sub_sc_names=kwargs["sub_sc_names"],t=kwargs["t"])
+        tab_cost2 = [Panel(child=cost2, title="Cost Line Up")]
+        tab_results = [Panel(child=results, title="Results")]
+        tab_stack = [Panel(child=stack, title="Thermal Energy Mix")]
+    else:
+        tab_cost2 = []
+        tab_results = []
+        tab_stack = []
+        
+    tab_lcoe = Panel(child=lcoe, title="Levelized Cost of Energy - (Scenario VS Portfolio)")
+    tab_lcoe_2 = Panel(child=lcoe_2, title="Levelized Cost of Energy")
     tab_tgm = Panel(child=tgm, title="Thermal Geneartion Mix")
-    tab_cost = Panel(child=cost, title="Cost Line Up")
-    
-    tab_cost2 = Panel(child=cost2, title="Cost Line Up2")
-    tab_results = Panel(child=results, title="Results")
-    tab_stack = Panel(child=stack, title="Thermal Energy Mix")
+    tab_cost = Panel(child=cost, title="Cost Line Up (Szenario VS Portfolios)")
+    tab_cost3 = [ Panel(child=glyph, title="Cost Line Up (Portfolio: " + sz+")" ) for sz,glyph in cost3.items()]
+
     
     div = widgetbox(Div(text= header_html))
-    tab = Tabs( tabs=[ tab_lcoe, tab_tgm, tab_cost, tab_cost2, tab_results, tab_stack])
+    tab = Tabs( tabs=[tab_lcoe_2, tab_lcoe] + [tab_tgm] + tab_results + tab_stack + tab_cost2 + [tab_cost] + tab_cost3)
     l = layout (children = [[div],[tab]], sizing_mode = "scale_width")
 
     return l
@@ -533,85 +606,62 @@ def compareScnearioPlot(**kwargs):
 # =============================================================================
 #
 # =============================================================================
-#if __name__ == "__main__":
-##%% Creating Dummy Data
-## =============================================================================
-##     Comparing Szenarios
-## =============================================================================
-#    sc_names = ["Base Scenario","No Nuclear Low CO2 Scenario"]
-#    sub_sc_names = ["Moderate Price","Current Price",
-#                    "High Price","Low Price"]
-#    hg1 = ["boiler","PV","CHP-BP","CHP-SE","Heat Storage","Heat Pump"]
-#    hg2 = list(reversed(["boiler","PV","CHP-BP"]))
-#    heatgeneartors = dict(zip(sc_names,[hg1,hg2]))
-#    
-#    for i,key in enumerate(heatgeneartors):
-#        if i%2:
-#            heatgeneartors[key] = list(reversed(heatgeneartors[key]))
-#            
-#    cost_line_up_names = ["OPEX", "CAPEX", "Fuel costs", "Revenue Eletricity"]
-#    cost_line_up_vals= {}
-#    tgms = {}
-#    data_LCOE = {}
-#    max_val = {sub_sc:[] for sub_sc in sub_sc_names}
-#    for sc in sc_names:
-#        data_LCOE[sc] = {sub_sc:rd.randint(1,20) for sub_sc in sub_sc_names}
-#        for sub_sc in sub_sc_names:
-#            _tgm_percentage = (np.random.dirichlet(np.ones(len(heatgeneartors[sc])),size=1)*100).astype(int).tolist()[0]
-#            _tgm_percentage[-1] +=  100-sum(_tgm_percentage)
-#            tgms[(sc,sub_sc)] = dict(zip(heatgeneartors[sc],_tgm_percentage))
-#            for hg in heatgeneartors[sc]:
-#                cost_line_up_vals[(sc,sub_sc,hg)]=dict(zip(cost_line_up_names,[rd.randint(0,10e4) for _ in range(len(cost_line_up_names))]))
-#            
-#    data = {sub_sc:{cost:{sc: {hg:cost_line_up_vals[sc,sub_sc,hg][cost]
-#                                for hg in heatgeneartors[sc]}
-#                        for sc in sc_names}
-#                    for cost in cost_line_up_names}
-#            for sub_sc in sub_sc_names}
-#
-#    for sub_sc in sub_sc_names:
-#        for sc in sc_names:
-#            max_val[sub_sc].append(max([max(cost_line_up_vals[sc,sub_sc,hg].values()) for hg in heatgeneartors[sc]]))
-#        max_val[sub_sc] = max(max_val[sub_sc])
-#    
-#    data_lcoe = {key:[dic[sub_sc] for sub_sc in sub_sc_names] for key,dic in data_LCOE.items()}
-##%%  
-## =============================================================================
-##    Comparing Sub Szenarios     
-## =============================================================================
-#    data_2 = {sc:{cost:{sub_sc: {hg:cost_line_up_vals[sc,sub_sc,hg][cost]
-#                            for hg in heatgeneartors[sc]}
-#                    for sub_sc in sub_sc_names}
-#                for cost in cost_line_up_names}
-#        for sc in sc_names}
-#    
-#    sc = sc_names[0]
-#    data_2 = data_2[sc]
-#    
-#    heatgeneartors2 = dict(zip(sub_sc_names,[heatgeneartors[sc]]*len(sub_sc_names)))
-#    for i,key in enumerate(heatgeneartors2):
-#        if i%2:
-#            heatgeneartors2[key] = list(reversed(heatgeneartors2[key]))
-#    max_val2 = {sc:[] for sc in sc_names}
-#    for sc in sc_names:
-#        for sub_sc in sub_sc_names:
-#            max_val2[sc].append(max([max(cost_line_up_vals[sc,sub_sc,hg].values()) for hg in heatgeneartors[sc]]))
-#        max_val2[sc] = max(max_val2[sc])
-#
-#    data_lcoe_2 = {sub_sc:[data_LCOE[sc][sub_sc] for sc in sc_names] for sub_sc in sub_sc_names}
-#    
-#    
-##%%    
-#    if False:
-#        t = compareScnearioPlot(data_LCOE= data_lcoe, 
-#                                 sub_sc_names= sub_sc_names,
-#                                 sc_names = sc_names,
-#                                 cost_line_up_names = cost_line_up_names,
-#                                 max_val = max_val,
-#                                 heatgeneartors = heatgeneartors,
-#                                 tgms = tgms,
-#                                 data = data
-#                     )
-#
-#        output_file(r"C:\Users\Nesa\Desktop\output_scenarios_compare.html")
-#        show(t)
+if __name__ == "__main__":
+    
+#%% Creating Dummy Data
+# =============================================================================
+#     Comparing Szenarios
+# =============================================================================
+    print("Starting PlotScenario Main...")
+    sc_names = ["Base Scenario","No Nuclear Low CO2 Scenario"]
+    sub_sc_names = ["Moderate Price","Current Price",
+                    "High Price","Low Price"]
+    hg1 = ["boiler","PV","CHP-BP","CHP-SE","Heat Storage","Heat Pump"]
+    hg2 = list(reversed(["boiler","PV","CHP-BP"]))
+    heatgeneartors = dict(zip(sc_names,[hg1,hg2]))
+    
+    for i,key in enumerate(heatgeneartors):
+        if i%2:
+            heatgeneartors[key] = list(reversed(heatgeneartors[key]))
+            
+    cost_line_up_names = ["OPEX", "CAPEX", "Fuel costs", "Revenue Eletricity"]
+    cost_line_up_vals= {}
+    tgms = {}
+    data_LCOE = {}
+    max_val = {sub_sc:[] for sub_sc in sub_sc_names}
+    for sc in sc_names:
+        data_LCOE[sc] = {sub_sc:rd.randint(1,20) for sub_sc in sub_sc_names}
+        for sub_sc in sub_sc_names:
+            _tgm_percentage = (np.random.dirichlet(np.ones(len(heatgeneartors[sc])),size=1)*100).astype(int).tolist()[0]
+            _tgm_percentage[-1] +=  100-sum(_tgm_percentage)
+            tgms[(sc,sub_sc)] = dict(zip(heatgeneartors[sc],_tgm_percentage))
+            for hg in heatgeneartors[sc]:
+                cost_line_up_vals[(sc,sub_sc,hg)]=dict(zip(cost_line_up_names,[rd.randint(0,10e4) for _ in range(len(cost_line_up_names))]))
+            
+    data = {sub_sc:{cost:{sc: {hg:cost_line_up_vals[sc,sub_sc,hg][cost]
+                                for hg in heatgeneartors[sc]}
+                        for sc in sc_names}
+                    for cost in cost_line_up_names}
+            for sub_sc in sub_sc_names}
+
+    for sub_sc in sub_sc_names:
+        for sc in sc_names:
+            max_val[sub_sc].append(max([max(cost_line_up_vals[sc,sub_sc,hg].values()) for hg in heatgeneartors[sc]]))
+        max_val[sub_sc] = max(max_val[sub_sc])
+#%%    
+    if True:
+        print("Creating Plot With Dummy Data...")
+        t = compareScnearioPlot(data_LCOE= data_LCOE, 
+                                 sub_sc_names= sub_sc_names,
+                                 sc_names = sc_names,
+                                 cost_line_up_names = cost_line_up_names,
+                                 max_val = max_val,
+                                 heatgeneartors = heatgeneartors,
+                                 tgms = tgms,
+                                 data = data,
+                                 solutions = None,
+                                 cost_line_up_vals = cost_line_up_vals
+                     )
+        print("Done!")
+        output_file(r"C:\Users\Nesa\Desktop\output_scenarios_compare.html")
+        show(t)
