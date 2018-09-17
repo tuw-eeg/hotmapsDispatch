@@ -54,33 +54,42 @@ def create_folder(name,path=path2output):
 #%% ===========================================================================
 #
 # =============================================================================
-def save_solution(solutions,path_download,name):
+def check_solution(solutions):
     if solutions == "Error1":
         print( 'No Capacities installed !!!')
+        return False
     elif solutions == "Error2":
         print("The installed capacities are not enough to cover the load !!!" )
+        return False
     elif solutions == "Error3":
         print("Error: Infeasible or Unbounded model !!!")
+        return False
     elif solutions == None:
         print("Error: Something get Wrong")
+        return False
     else:
         print('calculation done')
-        tabs = plot_solutions(show_plot=False,solution=solutions)
-        output = Tabs(tabs=tabs)
-        if output == "Error4":
-            print("Error @ Ploting  !!!")
-        else:
-            print("Saving output graphics...")
-            filename = name+".html"
-            output_file(os.path.join(path_download,filename),
-                        title="Dispatch output "+ name)
-            save(output)
-            print("Saving output data..")
-            # -- Download JSON
-            filename = name+".json"
-            with open(os.path.join(path_download,filename), "w") as f:
-                json.dump(solutions, f)
-            print("Saving done")
+        return True
+# =============================================================================
+#     
+# =============================================================================
+def save_solution(solutions,path_download,name):
+    tabs = plot_solutions(show_plot=False,solution=solutions)
+    output = Tabs(tabs=tabs)
+    if output == "Error4":
+        print("Error @ Ploting  !!!")
+    else:
+        print("Saving output graphics...")
+        filename = name+".html"
+        output_file(os.path.join(path_download,filename),
+                    title="Dispatch output "+ name)
+        save(output)
+    print("Saving output data..")
+    # -- Download JSON
+    filename = name+".json"
+    with open(os.path.join(path_download,filename), "w") as f:
+        json.dump(solutions, f)
+    print("Saving done")
 
 #%% ===========================================================================
 #
@@ -106,6 +115,67 @@ def loadExternalData(path2externalData=path2input, path2database=path2dat,
     else:
         print("continuing...")
     del th
+#%%
+# =============================================================================
+# 
+# =============================================================================
+#%%
+def compare(scMapper,subScMapper,solutions,path2output=path2output):
+    
+# =============================================================================
+#     
+# =============================================================================
+    cost_line_up_names = {"OPEX":"Operational Cost:",
+                          "CAPEX":"Anual Investment Cost (of existing power plants and heat storages)",
+                          "Fuel costs":"Fuel Costs:",
+                          "Revenue Eletricity":"Revenue From Electricity:"}
+    cost_data = {sub_sc: { cost: {sc: None for sc in scMapper.name} for cost in cost_line_up_names } for sub_sc in subScMapper.name}
+    tgms = {(sc,sub_sc) : None for sub_sc in subScMapper.name for sc in scMapper.name}
+    data_lcoe = {sc: {sub_sc :None for sub_sc in subScMapper.name} for sc in scMapper.name}
+    heat_generators = {sc:None for sc in scMapper.name}
+    max_vals = {sub_sc:[] for sub_sc in subScMapper.name}
+    
+# =============================================================================
+#
+# =============================================================================
+    for sc in scMapper.name:
+        for sub_sc in subScMapper.name:
+            heat_generators[sc] = solutions[sc][sub_sc]["all_heat_geneartors"]
+
+            for cost,modelname in cost_line_up_names.items():
+                cost_data[sub_sc][cost][sc] = solutions[sc][sub_sc][modelname]
+                max_vals[sub_sc].append(max(list(solutions[sc][sub_sc][modelname].values())))
+
+            tgms[sc,sub_sc] = solutions[sc][sub_sc]["Thermal Generation Mix:"]
+
+            data_lcoe[sc][sub_sc] = solutions[sc][sub_sc]["Mean Value Heat Price (with costs of existing power plants and heat storages)"]
+# =============================================================================
+#
+# =============================================================================
+    data_LCOE = {sc: [] for sc in scMapper.name}
+    for sc in scMapper.name:
+        for sub_sc in subScMapper.name:
+            data_LCOE[sc].append(data_lcoe[sc].get(sub_sc,0))
+
+
+    max_vals = {i:max(val) for i,val in max_vals.items()}
+# =============================================================================
+#
+# =============================================================================
+    t = compareScnearioPlot( data_LCOE= data_LCOE  ,
+                 sub_sc_names= subScMapper.name.tolist(),
+                 sc_names = scMapper.name.tolist(),
+                 cost_line_up_names = list(cost_line_up_names),
+                 max_val = max_vals,
+                 heatgeneartors = heat_generators,
+                 tgms = tgms,
+                 data = cost_data,
+                 solutions = solutions,
+                 t= range(0,8760)
+                 )
+
+    output_file(os.path.join(path2output,"output_scenarios_compare.html"))
+    save(t)    
 #%% ===========================================================================
 # MAIN-FUNCTION
 # =============================================================================
@@ -131,18 +201,6 @@ if __name__ == "__main__":
 # =============================================================================
 #     
 # =============================================================================
-    cost_line_up_names = {"OPEX":"Operational Cost:",
-                          "CAPEX":"Anual Investment Cost (of existing power plants and heat storages)",
-                          "Fuel costs":"Fuel Costs:",
-                          "Revenue Eletricity":"Revenue From Electricity:"}
-    cost_data = {sub_sc: { cost: {sc: None for sc in scMapper.name} for cost in cost_line_up_names } for sub_sc in subScMapper.name}
-    tgms = {(sc,sub_sc) : None for sub_sc in subScMapper.name for sc in scMapper.name}
-    data_lcoe = {sc: {sub_sc :None for sub_sc in subScMapper.name} for sc in scMapper.name}
-    heat_generators = {sc:None for sc in scMapper.name}
-    max_vals = {sub_sc:[] for sub_sc in subScMapper.name}
-# =============================================================================
-#     
-# =============================================================================
     dict_of_solutions =  {sc:{sub_sc: None for sub_sc in subScMapper.name} for sc in scMapper.name}
     for t_sc in tec_scenarios:
         file_name = os.path.basename(t_sc).split(".")[0].strip()
@@ -161,54 +219,26 @@ if __name__ == "__main__":
             data,inv_flag = load_data(t_sc,sub_sc)
             solutions,instance,results = execute(data,
                                                  inv_flag,selection=[[],[]])
-            dict_of_solutions[scenario_name][subScenario_name] = solutions
-# =============================================================================
-#
-# =============================================================================
-            heat_generators[scenario_name] = solutions["all_heat_geneartors"]
-
-            for cost,modelname in cost_line_up_names.items():
-                cost_data[subScenario_name][cost][scenario_name] = solutions[modelname]
-                max_vals[subScenario_name].append(max(list(solutions[modelname].values())))
-
-            tgms[scenario_name,subScenario_name] = solutions["Thermal Generation Mix:"]
-
-            data_lcoe[scenario_name][subScenario_name] = solutions["Mean Value Heat Price (with costs of existing power plants and heat storages)"]
-# =============================================================================
-#
-# =============================================================================
-            name = scenario_name+"_"+subScenario_name
-            path_download = create_folder(os.path.join(scenario_name,subScenario_name))
-            save_solution(solutions,path_download,name)
+            if check_solution(solutions):
+                dict_of_solutions[scenario_name][subScenario_name] = solutions
+    
+                name = scenario_name+"_"+subScenario_name
+                path_download = create_folder(os.path.join(scenario_name,subScenario_name))
+                save_solution(solutions,path_download,name)
+            else:
+                dict_of_solutions[scenario_name][subScenario_name] = None
+                print("Error @ "+subScenario_name+" # "+scenario_name)
 
         print('~~~~~~~~~~~~~~~~~')
         print("\n\tCalculation of Scenario: "+ scenario_name+" Done !")
         print('~~~~~~~~~~~~~~~~~')
 
-    data_LCOE = {sc: [] for sc in scMapper.name}
-    for sc in scMapper.name:
-        for sub_sc in subScMapper.name:
-            data_LCOE[sc].append(data_lcoe[sc].get(sub_sc,0))
-
-
-    max_vals = {i:max(val) for i,val in max_vals.items()}
-# =============================================================================
-#
-# =============================================================================
-    t = compareScnearioPlot( data_LCOE= data_LCOE  ,
-                 sub_sc_names= subScMapper.name.tolist(),
-                 sc_names = scMapper.name.tolist(),
-                 cost_line_up_names = list(cost_line_up_names),
-                 max_val = max_vals,
-                 heatgeneartors = heat_generators,
-                 tgms = tgms,
-                 data = cost_data
-                 )
-
-    output_file(os.path.join(path2output,"output_scenarios_compare.html"))
-    save(t)
+    
+    print("\n\n\nCreating Compare Figures...")
+    compare(scMapper,subScMapper,dict_of_solutions)
 
     print("\n\nSee calculation output in: <"+path2output+">")
+
 
 
 

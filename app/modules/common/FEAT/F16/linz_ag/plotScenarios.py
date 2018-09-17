@@ -4,28 +4,25 @@ Created on Tue Sep 11 12:18:11 2018
 
 @author: root
 """
-
-
 import random as rd
 import numpy as np
 from bokeh.io import show, output_file
-from bokeh.models import ColumnDataSource
 from bokeh.plotting import figure
 from bokeh.palettes import Category10,Category20,Spectral
 from bokeh.transform import dodge
-from bokeh.models import Legend
+from bokeh.models import Legend,DataTable,TableColumn,ColumnDataSource
 from math import pi,radians,degrees,sin,cos
 from bokeh.models import HoverTool
 from bokeh.layouts import gridplot,layout,widgetbox
 from bokeh.models.widgets import Panel, Tabs, Div
-from imageHTML import header_html
+from imageHTML import header_html,font_style
 import os,sys
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__)))))
 if path not in sys.path:
     sys.path.append(path)
 from CM.CM_TUWdispatch.eng_format import EngNumber,EngUnit
-from CM.CM_TUWdispatch.plot_bokeh import stack_chart,matrix,colormapping,costBarStack_chart,plot_table
+from CM.CM_TUWdispatch.plot_bokeh import stack_chart,matrix,colormapping,costBarStack_chart,plotExtra_table
 # =============================================================================
 #
 # =============================================================================
@@ -50,14 +47,78 @@ def table(**kwargs):
                          "Variable Cost CHP's",
                          "Fuel Costs",
                          ]
-    return plot_table(decision_vars,dic,"")
+    
+    vals = {sc+"-"+sub_sc: None for sub_sc in kwargs["sub_sc_names"] for sc in kwargs["sc_names"]}
+    
+    for sub_sc in kwargs["sub_sc_names"]:
+        for sc in kwargs["sc_names"]:
+            dic = kwargs["solutions"][sc][sub_sc]
+            if dic:
+                val = []
+                for decision_var in decision_vars:
+                    if type(dic[decision_var]) == dict:
+                        val.append(sum(dic[decision_var].values()))
+                    elif type(dic[decision_var]) == list:
+                        val.append(sum(dic[decision_var]))
+                    else:
+                        val.append(dic[decision_var])
+                try:
+                    formatted_val = [str(EngNumber(item)) for item in val]
+                except:
+                    formatted_val = []
+                    for item in val:
+                        formatted_val.append("%.3e"%item)
+                vals[sc+"-"+sub_sc]=formatted_val
+            else:
+                del vals[sc+"-"+sub_sc]
+    
+    data = {**{"topic": decision_vars},**vals}
+            
+    source = ColumnDataSource(data)
+    cols = [TableColumn(field=key, title="Value of "+key) for key in vals]
+    columns = [TableColumn(field="topic", title="Topic")] + cols
+            
+    data_table = DataTable(source=source, columns=columns, width=1500, height=800)
+    
+    return widgetbox(data_table)
 
 def costLineUp(**kwargs):
-
+    """
+    Params: 
+        solutions       dict
+                        dictionary of dictionarys of the Dispatch model
+        
+        sc_names        list 
+        
+        sub_sc_names    list
+    
+    Return:
+        layout with same x-Axis
+    """
     decision_vars = ["Anual Investment Cost:",
                          "Anual Investment Cost (of existing power plants and heat storages)",
                          "Operational Cost:", "Fuel Costs:", "Revenue From Electricity:"]
-    return costBarStack_chart(dic,decision_vars,"",cmap)
+    column=[[Div(width = 550)]+[Div(text= font_style+"<p>"+sc+"</p>",width = 850) for sc in kwargs["sc_names"]]]
+    for sub_sc in kwargs["sub_sc_names"]:
+        row=[Div(text= font_style+"<p>"+sub_sc+"</p>")]
+        for sc in kwargs["sc_names"]:
+            dic = kwargs["solutions"][sc][sub_sc]
+            if dic:
+                cmap = colormapping(dic["Technologies:"])
+                p_i_1 = costBarStack_chart(dic,decision_vars,"",cmap)
+                p_i_2 = plotExtra_table(decision_vars,dic,"")
+                p_i_1.plot_width = 850
+                p_i_1.plot_height = 250
+                p_i_2.height = 250
+                p_i_2.width = 850
+                row.append([[p_i_1],[p_i_2]])
+            else:
+                row.append(Div(width=850))
+        column.append(row)
+                
+    l = layout(children=column)
+    
+    return l
 #%%
 def stackPlot(**kwargs):
     """
@@ -72,11 +133,14 @@ def stackPlot(**kwargs):
         sub_sc_names    list
     
     Return:
-        gridlayout with same x-Axis
+        layout with same x-Axis
     """
+    
     p=[]
-    for sc in kwargs["sc_names"]:
-        for sub_sc in kwargs["sub_sc"]:
+    column=[[Div(width = 550)]+[Div(text= font_style+"<p>"+sc+"</p>",width = 850) for sc in kwargs["sc_names"]]]
+    for sub_sc in kwargs["sub_sc_names"]:
+        row=[Div(text= font_style+"<p>"+sub_sc+"</p>")]
+        for sc in kwargs["sc_names"]:
             dic = kwargs["solutions"][sc][sub_sc]
             if dic:
                 decison_var="Thermal Power Energymix:"
@@ -84,23 +148,21 @@ def stackPlot(**kwargs):
                 y = matrix(dic,decison_var,legend,kwargs["t"])
                 cmap = colormapping(dic["Technologies:"])
                 dic["Marginal Costs"] = dic["Marginal Costs:"]
-                p.append(stack_chart(kwargs["t"],dic,y,legend,decison_var,"_",cmap)[1])
-        
+                p_i = stack_chart(kwargs["t"],dic,y,legend,decison_var,"_",cmap)[1]
+                p_i.toolbar.logo = None
+                p_i.toolbar_location = "above"
+                p_i.plot_width = 850
+                row.append(p_i)
+                p.append(p_i)
+            else:
+                row.append(Div(width=850))
+        column.append(row)
+                
     for i in range(1,len(p)):
         p[i].x_range = p[0].x_range
     
-    column=[]
-    row=[]
-    for i,p_i in enumerate(p):
-        p_i.toolbar.logo = None
-        p_i.toolbar_location = "above"
-        p_i.plot_width = 850
-        row.append(p_i)
-        if i%2:
-            column.append(row)
-            row = []
+
             
-    
     l = layout(children=column)
     
     return l
@@ -413,10 +475,27 @@ def compareScnearioPlot(**kwargs):
                                 sc_names= kwargs["sc_names"])])
 
 
-    tgm = layout(children = [[pieTGM(sc_name = sc, sub_sc_name = sub_sc,
-                   heatgeneartors= kwargs["heatgeneartors"],
-                   tgm = kwargs["tgms"][sc,sub_sc]) for sc in kwargs["sc_names"]] for sub_sc in kwargs["sub_sc_names"]])
-
+#    tgm = layout(children = [[pieTGM(sc_name = sc, sub_sc_name = sub_sc,
+#                   tgm = kwargs["tgms"][sc,sub_sc]) for sc in kwargs["sc_names"]] for sub_sc in kwargs["sub_sc_names"]])
+#    
+    column=[[Div(width = 500)]+[Div(text= font_style+"<p>"+sc+"</p>",width = 650) for sc in kwargs["sc_names"]]]
+    for sub_sc in kwargs["sub_sc_names"]:
+        row=[Div(text= font_style+"<p>"+sub_sc+"</p>")]
+        for sc in kwargs["sc_names"]:
+            tgm = kwargs["tgms"][sc,sub_sc]
+            if tgm:
+                p_i=pieTGM(sc_name = sc, sub_sc_name = sub_sc,
+                       tgm =tgm )
+                p_i.toolbar.logo = None
+                p_i.toolbar_location = None
+                p_i.plot_width = 650
+                p_i.plot_height = 650
+                row.append(p_i)
+            else:
+                row.append(Div(width = 650))
+        column.append(row)
+    tgm = layout(children=column)
+    
     cost = []
     temp_liste = []
     for i,sub_sc in enumerate(kwargs["sub_sc_names"]):
@@ -427,17 +506,26 @@ def compareScnearioPlot(**kwargs):
                                       max_val = kwargs["max_val"][sub_sc],
                                       title=sub_sc)
                 )
-        if (i+1) % 2 == 0:
+        if i%2:
             cost.append(temp_liste)
             temp_liste = []
     cost.append(temp_liste)
     cost = layout(children = cost)
-
+    
+    cost2 = costLineUp(solutions=kwargs["solutions"],sc_names=kwargs["sc_names"],sub_sc_names=kwargs["sub_sc_names"])
+    results = table(solutions=kwargs["solutions"],sc_names=kwargs["sc_names"],sub_sc_names=kwargs["sub_sc_names"])
+    stack = stackPlot(solutions=kwargs["solutions"],sc_names=kwargs["sc_names"],sub_sc_names=kwargs["sub_sc_names"],t=kwargs["t"])
+    
     tab_lcoe = Panel(child=lcoe, title="Levelized Cost of Energy")
     tab_tgm = Panel(child=tgm, title="Thermal Geneartion Mix")
     tab_cost = Panel(child=cost, title="Cost Line Up")
+    
+    tab_cost2 = Panel(child=cost2, title="Cost Line Up2")
+    tab_results = Panel(child=results, title="Results")
+    tab_stack = Panel(child=stack, title="Thermal Energy Mix")
+    
     div = widgetbox(Div(text= header_html))
-    tab = Tabs( tabs=[ tab_lcoe, tab_tgm, tab_cost ])
+    tab = Tabs( tabs=[ tab_lcoe, tab_tgm, tab_cost, tab_cost2, tab_results, tab_stack])
     l = layout (children = [[div],[tab]], sizing_mode = "scale_width")
 
     return l

@@ -220,3 +220,14 @@ alt="logo-r" src='data:image/png;base64,"""+logo_right+"""'></a></td>
 </table>
 </div>
 """
+#%%
+# =============================================================================
+# 
+# =============================================================================
+font_style="""
+<style>
+h1 { color: #111; font-family: 'Open Sans Condensed', sans-serif; font-size: 64px; font-weight: 700; line-height: 64px; margin: 0 0 0; padding: 20px 30px; text-align: center; text-transform: uppercase; }
+p { color: #f2f2f2; background: #ff4a4a; font-size: 15px; line-height: 15px; font-weight: 700; margin: 0 1px 12px; float: left; padding: 12px; margin: 0 1px 12px; font-family: 'Libre Baskerville', serif; }
+</style>
+"""
+

@@ -602,7 +602,7 @@ def plotExtra_table (decision_vars,dic,path2output):
     columns = [TableColumn(field=x, title=x) for x in dic["Technologies:"]]
     columns = column0+columns
 
-    data_table = DataTable(source=source, columns=columns, width=800, height=800)
+    data_table = DataTable(source=source, columns=columns, width=800, height=200)
 #    output_file(path2output+"\data_table.html")
     return widgetbox(data_table)
 
