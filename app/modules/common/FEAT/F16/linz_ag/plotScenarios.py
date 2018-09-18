@@ -6,17 +6,21 @@ Created on Tue Sep 11 12:18:11 2018
 """
 import random as rd
 import numpy as np
-from bokeh.io import show, output_file
+from bokeh.io import show, output_file,save
 from bokeh.plotting import figure
 from bokeh.palettes import Category10,Category20,Spectral
 from bokeh.transform import dodge
 from bokeh.models import Legend,DataTable,TableColumn,ColumnDataSource
 from math import pi,radians,degrees,sin,cos
-from bokeh.models import HoverTool
+from bokeh.models import HoverTool, LinearAxis, Range1d
 from bokeh.layouts import gridplot,layout,widgetbox
 from bokeh.models.widgets import Panel, Tabs, Div
 from imageHTML import header_html,font_style
 import os,sys
+#%%
+# =============================================================================
+# 
+# =============================================================================
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__)))))
 if path not in sys.path:
@@ -26,6 +30,74 @@ from CM.CM_TUWdispatch.plot_bokeh import stack_chart,matrix,colormapping,costBar
 # =============================================================================
 #
 # =============================================================================
+#%%
+def heatElectPrice(**kwargs):
+    """
+    Params:
+        dic     solution dic
+        
+        t       range
+    """
+    electricity = np.array(kwargs["dic"]["Electricity Price"])[kwargs["t"]]
+    heat_p = np.array(kwargs["dic"]["Heat Price"])[kwargs["t"]]
+    
+    p = figure(title="Heat Price and electricity Price",
+                x_axis_label = "Time in Hours",
+                y_axis_label = "€/MWh",
+                tools = "pan,wheel_zoom,box_zoom,reset,save",
+                y_range=(np.min(heat_p)-1,np.percentile(heat_p, 90)+1))
+
+    p.extra_y_ranges = {"2nd": Range1d(start=min(electricity)-1, 
+                                       end=max(electricity)+1)}
+    e_line = p.line(kwargs["t"],list(electricity),line_width=0.5, y_range_name="2nd",
+                    muted_alpha=0.2,color =Category10[3][1] )
+    h_line = p.line(kwargs["t"],list(heat_p),line_width=0.5, muted_alpha=0.2,
+                    color =Category10[3][0] )
+    p.add_layout(LinearAxis(y_range_name="2nd",axis_label='Electricity price in €/MWh'), 
+                 'right')
+    p.toolbar.logo = None
+    
+    items = [("Electricity Price",   [e_line] ), ("Heat Price",   [h_line] )]
+    legend = Legend(items=items,location=(10, 10))
+    p.add_layout(legend, 'right')   
+    p.legend.click_policy = "hide" # "mute"
+    
+    return p
+#%%
+def pricePlots(**kwargs):
+    """
+    Params: 
+    solutions       dict
+                    dictionary of dictionarys of the Dispatch model
+    
+    t               range
+    
+    sc_names        list 
+    
+    sub_sc_names    list
+    """
+    p=[]
+    column=[[Div(width = 550)]+[Div(text= font_style+"<p>"+sc+"</p>",width = 850) for sc in kwargs["sc_names"]]]
+    for sub_sc in kwargs["sub_sc_names"]:
+        row=[Div(text= font_style+"<p>"+sub_sc+"</p>")]
+        for sc in kwargs["sc_names"]:
+            dic = kwargs["solutions"][sc][sub_sc]
+            if dic:
+                p_i = heatElectPrice(dic=dic, t=kwargs["t"])
+                p_i.toolbar.logo = None
+                p_i.toolbar_location = "above"
+                p_i.plot_width = 850
+                p_i.plot_height = 350 
+                row.append(p_i)
+                p.append(p_i)
+            else:
+                row.append(Div(width=850))
+        column.append(row)            
+    for i in range(1,len(p)):
+        p[i].x_range = p[0].x_range
+            
+    l = layout(children=column)
+    return l
 #%%
 def table(**kwargs):
         
@@ -81,7 +153,7 @@ def table(**kwargs):
     data_table = DataTable(source=source, columns=columns, width=1500, height=800)
     
     return widgetbox(data_table)
-
+#%%
 def costLineUp(**kwargs):
     """
     Params: 
@@ -166,9 +238,6 @@ def stackPlot(**kwargs):
     l = layout(children=column)
     
     return l
-    
-    
-    
 
 #%% Color mapping
 def color(i,j):
@@ -582,23 +651,26 @@ def compareScnearioPlot(**kwargs):
         cost2 = costLineUp(solutions=kwargs["solutions"],sc_names=kwargs["sc_names"],sub_sc_names=kwargs["sub_sc_names"])
         results = table(solutions=kwargs["solutions"],sc_names=kwargs["sc_names"],sub_sc_names=kwargs["sub_sc_names"])
         stack = stackPlot(solutions=kwargs["solutions"],sc_names=kwargs["sc_names"],sub_sc_names=kwargs["sub_sc_names"],t=kwargs["t"])
-        tab_cost2 = [Panel(child=cost2, title="Cost Line Up")]
+        prices = pricePlots(solutions=kwargs["solutions"],sc_names=kwargs["sc_names"],sub_sc_names=kwargs["sub_sc_names"],t=kwargs["t"])
+        tab_prices = [Panel(child=prices, title="Prices")]
+        tab_cost2 = [Panel(child=cost2, title="Cost Line Up (CLU)")]
         tab_results = [Panel(child=results, title="Results")]
         tab_stack = [Panel(child=stack, title="Thermal Energy Mix")]
     else:
         tab_cost2 = []
         tab_results = []
         tab_stack = []
+        tab_prices = []
         
-    tab_lcoe = Panel(child=lcoe, title="Levelized Cost of Energy - (Scenario VS Portfolio)")
-    tab_lcoe_2 = Panel(child=lcoe_2, title="Levelized Cost of Energy")
+    tab_lcoe = Panel(child=lcoe, title="LCOE -(Scenario VS Portfolio)")
+    tab_lcoe_2 = Panel(child=lcoe_2, title="Levelized Cost of Energy (LCOE)")
     tab_tgm = Panel(child=tgm, title="Thermal Geneartion Mix")
-    tab_cost = Panel(child=cost, title="Cost Line Up (Szenario VS Portfolios)")
-    tab_cost3 = [ Panel(child=glyph, title="Cost Line Up (Portfolio: " + sz+")" ) for sz,glyph in cost3.items()]
+    tab_cost = Panel(child=cost, title="CLU - (Szenario VS Portfolios)")
+    tab_cost3 = [ Panel(child=glyph, title="CLU - (Portfolio: " + sz+")" ) for sz,glyph in cost3.items()]
 
     
     div = widgetbox(Div(text= header_html))
-    tab = Tabs( tabs=[tab_lcoe_2, tab_lcoe] + [tab_tgm] + tab_results + tab_stack + tab_cost2 + [tab_cost] + tab_cost3)
+    tab = Tabs( tabs=[tab_lcoe_2, tab_lcoe] + [tab_tgm] + tab_results + tab_stack + tab_prices+ tab_cost2 + [tab_cost] + tab_cost3)
     l = layout (children = [[div],[tab]], sizing_mode = "scale_width")
 
     return l
@@ -649,19 +721,19 @@ if __name__ == "__main__":
             max_val[sub_sc].append(max([max(cost_line_up_vals[sc,sub_sc,hg].values()) for hg in heatgeneartors[sc]]))
         max_val[sub_sc] = max(max_val[sub_sc])
 #%%    
-    if True:
-        print("Creating Plot With Dummy Data...")
-        t = compareScnearioPlot(data_LCOE= data_LCOE, 
-                                 sub_sc_names= sub_sc_names,
-                                 sc_names = sc_names,
-                                 cost_line_up_names = cost_line_up_names,
-                                 max_val = max_val,
-                                 heatgeneartors = heatgeneartors,
-                                 tgms = tgms,
-                                 data = data,
-                                 solutions = None,
-                                 cost_line_up_vals = cost_line_up_vals
-                     )
-        print("Done!")
-        output_file(r"C:\Users\Nesa\Desktop\output_scenarios_compare.html")
-        show(t)
+    
+    print("Creating Plot With Dummy Data...")
+    t = compareScnearioPlot(data_LCOE= data_LCOE, 
+                             sub_sc_names= sub_sc_names,
+                             sc_names = sc_names,
+                             cost_line_up_names = cost_line_up_names,
+                             max_val = max_val,
+                             heatgeneartors = heatgeneartors,
+                             tgms = tgms,
+                             data = data,
+                             solutions = None,
+                             cost_line_up_vals = cost_line_up_vals
+                 )
+    print("Done!")
+    output_file("output_scenarios_compare.html")
+    show(t)

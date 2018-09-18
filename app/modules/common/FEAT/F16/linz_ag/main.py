@@ -7,13 +7,12 @@ Created on Tue Sep 26 11:52:51 2017
 #%% ===========================================================================
 #
 # =============================================================================
-import os,sys,json,datetime,glob,xlrd
+import os,sys,json,glob
 import pandas as pd
 from bokeh.plotting import output_file,save
 from bokeh.models.widgets import Tabs
 from threading import Thread
 from plotScenarios import compareScnearioPlot
-from bokeh.io import show, output_file
 #%% ===========================================================================
 #
 # =============================================================================
