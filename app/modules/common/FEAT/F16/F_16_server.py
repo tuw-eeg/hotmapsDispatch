@@ -997,7 +997,7 @@ if __name__ == '__main__':
             allow_websocket_origin = [line.strip() for line in fd.readlines()]
 
     bokeh_app = Application(FunctionHandler(modify_doc))
-    bokeh_app.add(DirectoryHandler(filename = path2data))
+#    bokeh_app.add(DirectoryHandler(filename = path2data))
     server = Server({'/': bokeh_app}, io_loop=io_loop, allow_websocket_origin=allow_websocket_origin)
     server.start()
     print('Opening Dispath Application on http://localhost:5006/')

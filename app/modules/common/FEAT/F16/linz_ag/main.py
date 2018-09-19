@@ -177,6 +177,16 @@ def compare(scMapper,subScMapper,solutions,path2output=path2output):
 
     output_file(os.path.join(path2output,"output_scenarios_compare.html"))
     save(t)    
+#%%
+def getSolutions(sc_names,sub_sc_names,path2output=path2output):
+    solutions = {}
+    for sc in sc_names:
+        solutions[sc] = dict()
+        for sub_sc in sub_sc_names:
+            with open(os.path.join(path2output,sc,sub_sc,sc+"_"+sub_sc+".json")) as f:
+                solutions[sc][sub_sc] = json.load(f)
+    return solutions
+               
 #%% ===========================================================================
 # MAIN-FUNCTION
 # =============================================================================
@@ -190,8 +200,8 @@ if __name__ == "__main__":
 #
 # =============================================================================
     print('calculation started')
-    scMapper = pd.read_excel(path2scMapper)
-    subScMapper = pd.read_excel(path2scMapper,"sub-scenarios")
+    scMapper = pd.read_excel(path2scMapper).astype(str)
+    subScMapper = pd.read_excel(path2scMapper,"sub-scenarios").astype(str)
     print("\n Caution No Creation-and-Solver Progress will be shown ! \
           \n please be patient, this will take some time\n\n Calculation \
           started...")
