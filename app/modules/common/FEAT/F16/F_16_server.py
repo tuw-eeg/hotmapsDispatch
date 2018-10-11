@@ -498,6 +498,7 @@ def modify_doc(doc):
             ##
             data["categorize"] = {}
             _dataframe= pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore')
+            select_tec_options = [x.replace("CHP Steam Extraction","CHP-SE").replace("CHP Back Pressure","CHP-BP") for x in select_tec_options_model]
             for j in select_tec_options:
                 data["categorize"][j] = _dataframe["name"][_dataframe["type"] == j].values.tolist()
 
@@ -538,11 +539,13 @@ def modify_doc(doc):
                     print("Download output_graphics started...")
                     time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
                     filename = "output_graphs.html"
+                    
                     path_download = os.path.join(create_folder(time_id),filename)
                     output_file(path_download,title="Dispatch output")
                     save(output)
-                    trigger_download(time_id,filename)
-                    print("Graphics Downloa done")
+                    path_download_html = os.path.join("static",time_id,filename)
+#                    trigger_download(time_id,filename)
+                    print("Graphics Download done")
                     print("Download output data started...")
                     # -- Download JSON
                     time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
@@ -550,10 +553,33 @@ def modify_doc(doc):
                     path_download = os.path.join(create_folder(time_id),filename)
                     with open(path_download, "w") as f:
                         json.dump(solutions, f)
-                    trigger_download(time_id,filename)
+                    path_download_json = os.path.join("static",time_id,filename)
+#                    trigger_download(time_id,filename)
                     print("Download output data done")
                     # --
-                    div_spinner.text = """<strong style="color: green;">Calculation done</strong>"""
+                    div_spinner.text = """
+                    <style>
+                    a:link, a:visited {
+                        background-color: white;
+                        color: green;
+                        border: 2px solid green;
+                        padding: 10px 20px;
+                        text-align: center;
+                        text-decoration: none;
+                        display: inline-block;
+                    }
+                    
+                    a:hover, a:active {
+                        background-color: green;
+                        color: white;
+                    }
+                    </style>
+                    <strong style="color: green">
+                    <p>Calculation done<p>
+                    <p><a href="""+"'"+path_download_html+"'"""" download="output.html">Download HTML File </a> <p>
+                    <p><a href="""+"'"+path_download_json+"'"""" download="output.json">Download JSON File </a>  <p>
+                    </strong>
+                    """
         except Exception as e:
             print(str(e))
             print(e)
@@ -988,6 +1014,8 @@ def modify_doc(doc):
 #            ], sizing_mode='scale_both')
 
     doc.add_root(l)
+    
+    return doc
 #%%
 if __name__ == '__main__':
     allow_websocket_origin=None
@@ -997,7 +1025,7 @@ if __name__ == '__main__':
             allow_websocket_origin = [line.strip() for line in fd.readlines()]
 
     bokeh_app = Application(FunctionHandler(modify_doc))
-#    bokeh_app.add(DirectoryHandler(filename = path2data))
+    bokeh_app.add(DirectoryHandler(filename = path2data))
     server = Server({'/': bokeh_app}, io_loop=io_loop, allow_websocket_origin=allow_websocket_origin)
     server.start()
     print('Opening Dispath Application on http://localhost:5006/')

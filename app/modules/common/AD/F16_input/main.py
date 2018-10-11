@@ -290,7 +290,7 @@ def mangle_dupe(df):
      df.columns = [c.split(".")[0] for c in df.columns]
      return df
 #%%
-def load_data(path_parameter2 = path_parameter2, default_scenario=2):
+def load_data(path_parameter2 = path_parameter2, default_scenario=0):
     """
     This function returns the data for the dispatch model
     - Default Values are specified in DH_technology_cost.xlsx

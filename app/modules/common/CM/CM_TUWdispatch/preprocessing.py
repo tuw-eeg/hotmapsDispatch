@@ -12,6 +12,7 @@ class SliceMaker(object):
 
 #XXX: Catogorize
 def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
+    print(data["categorize"])
     if inv_flag:
         tec = []
         for s in selection[0]:
