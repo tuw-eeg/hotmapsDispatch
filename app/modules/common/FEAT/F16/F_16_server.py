@@ -11,7 +11,7 @@ import pandas as pd
 import numpy as np
 from bokeh.application.handlers import FunctionHandler,DirectoryHandler
 from bokeh.application import Application
-from bokeh.layouts import widgetbox,row,column#,layout
+from bokeh.layouts import widgetbox,row,column,layout
 from bokeh.models import ColumnDataSource,TableColumn,DataTable,CustomJS,TextInput, Slider
 from bokeh.server.server import Server
 from bokeh.models.widgets import Panel, Tabs, Button,Div,Toggle,Select,CheckboxGroup
@@ -32,8 +32,9 @@ if bokeh.__version__ != '0.12.10':
     print("Please install bokeh==0.12.10")
     sys.exit()
 
-import tornado
-if tornado.version != '4.5.3':
+import tornado 
+# früher (4.5.3) aber Download funktioniert dann nicht
+if tornado.version != '4.4.2':  
     print("Your current tornado version ist not compatible (Your Version:" +tornado.version +")")
     print("Please install tornado==4.5.3")
     sys.exit()
@@ -55,7 +56,7 @@ path_upload_js = os.path.join(root_dir, "upload.js")
 path_spinner_html = os.path.join(root_dir, "spinner2.html")
 path_spinner_load_html = os.path.join(root_dir, "spinner.html")
 #%%
-io_loop = IOLoop.current()
+
 global data_table,data_table_prices,data_table_data,f,carrier_dict
 carrier_dict ={}
 #%%
@@ -364,7 +365,7 @@ def modify_doc(doc):
             if df.shape[0] == 0:
                 del df
                 carrier_dict ={}
-                div_spinner.text = """<strong style="color: red;">Nothing to download </strong>"""
+                div_spinner.text = """<div align="center"> <strong style="color: red;">Nothing to download </strong> </div>"""
                 return
     #        df = df.fillna(0)
             time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
@@ -400,10 +401,10 @@ def modify_doc(doc):
     #TODO wait untill download has finished and delete folder
     #       or extra script that delete te content of the static folder after 2 hours or something else
     #        shutil.rmtree(path_download_dir, ignore_errors=True)
-            div_spinner.text = """<strong style="color: green;">Download done.</strong>"""
+            div_spinner.text = """<div align="center"> <strong style="color: green;">Download done.</strong> </div>"""
         except Exception as e:
             print(str(e))
-            div_spinner.text = """<strong style="color: red;">Fatal Error @ Download </strong>"""
+            div_spinner.text = """<div align="center"> <strong style="color: red;">Fatal Error @ Download </strong> </div>"""
 # =============================================================================
     def run_callback():
         try:
@@ -413,11 +414,11 @@ def modify_doc(doc):
             if df.shape[0] == 0:
                 del df
                 carrier_dict ={}
-                div_spinner.text = """<strong style="color: red;">No Heat Generators aviable </strong>"""
+                div_spinner.text = """<div align="center"> <strong style="color: red;">No Heat Generators aviable </strong> </div>"""
                 return
 
             if float(to_install.value) > 0 and not invest_button.active:
-                div_spinner.text = """<strong style="color: red;">The installed capacities are not enough to cover the load</strong>"""
+                div_spinner.text = """<div align="center"> <strong style="color: red;">The installed capacities are not enough to cover the load</strong> </div>"""
                 return
 
             div_spinner.text = load_text
@@ -511,28 +512,28 @@ def modify_doc(doc):
                 selection1 = data_table_heat_storage.source.selected["1d"]["indices"]
                 selection = [selection0,selection1]
                 if selection[0] == []:
-                    div_spinner.text = """<strong style="color: red;">Error: Please specify the technologies for the invesment model !!!</strong>"""
+                    div_spinner.text = """<div align="center"> <strong style="color: red;">Error: Please specify the technologies for the invesment model !!!</strong></div>"""
                     return
             solutions,_,_ = execute(data,inv_flag,selection)
             print('calculation done')
             print ("Ploting started..")
             if solutions == "Error1":
-                div_spinner.text = """<strong style="color: red;">Error: No Capacities are installed !!!</strong>"""
+                div_spinner.text = """<div align="center"> <strong style="color: red;">Error: No Capacities are installed !!!</strong></div>"""
             elif solutions == "Error2":
-                div_spinner.text = """<strong style="color: red;">Error: The installed capacities are not enough to cover the load !!!</strong>"""
+                div_spinner.text = """<div align="center"> <strong style="color: red;">Error: The installed capacities are not enough to cover the load !!!</strong></div>"""
             elif solutions == "Error3":
                 print("Error in Saving Solution to JSON !!!")
                 print("Cause: Infeasible or unbounded model !!!")
-                div_spinner.text = """<strong style="color: red;">Error: Infeasible or unbounded model !!!</strong>"""
+                div_spinner.text = """<div align="center"><strong style="color: red;">Error: Infeasible or unbounded model !!!</strong></div>"""
             elif solutions == None:
                 print("Error: Something get Wrong")
-                div_spinner.text = """<strong style="color: red;">Error: Something get Wrong</strong>"""
+                div_spinner.text = """<div align="center"> <strong style="color: red;">Error: Something get Wrong</strong></div>"""
             else:
                 output_tabs = plot_solutions(solution=solutions)
 
                 if output_tabs == "Error4":
                     print("Error @ Ploting  !!!")
-                    div_spinner.text = """<strong style="color: red;">Error: @ Ploting !!!</strong>"""
+                    div_spinner.text = """<div align="center"> <strong style="color: red;">Error: @ Ploting !!!</strong></div>"""
                 else:
                     output.tabs = output_tabs
                     print("Ploting done")
@@ -543,7 +544,7 @@ def modify_doc(doc):
                     path_download = os.path.join(create_folder(time_id),filename)
                     output_file(path_download,title="Dispatch output")
                     save(output)
-                    path_download_html = os.path.join("static",time_id,filename)
+                    path_download_html = os.path.join("download","static",time_id,filename)
 #                    trigger_download(time_id,filename)
                     print("Graphics Download done")
                     print("Download output data started...")
@@ -553,11 +554,11 @@ def modify_doc(doc):
                     path_download = os.path.join(create_folder(time_id),filename)
                     with open(path_download, "w") as f:
                         json.dump(solutions, f)
-                    path_download_json = os.path.join("static",time_id,filename)
+                    path_download_json = os.path.join("download","static",time_id,filename)
 #                    trigger_download(time_id,filename)
                     print("Download output data done")
                     # --
-                    div_spinner.text = """
+                    div_spinner.text = """<div align="center"> 
                     <style>
                     a:link, a:visited {
                         background-color: white;
@@ -579,12 +580,13 @@ def modify_doc(doc):
                     <p><a href="""+"'"+path_download_html+"'"""" download="output.html">Download HTML File </a> <p>
                     <p><a href="""+"'"+path_download_json+"'"""" download="output.json">Download JSON File </a>  <p>
                     </strong>
+                    </div>
                     """
         except Exception as e:
             print(str(e))
             print(e)
             print(type(e))
-            div_spinner.text = """<strong style="color: red;">Fatal Error @ Running </strong>"""
+            div_spinner.text = """<div align="center"><strong style="color: red;">Fatal Error @ Running </strong></div>"""
 # =============================================================================
     def upload_callback(attr, old, new):
         try:
@@ -624,15 +626,15 @@ def modify_doc(doc):
                 data2 = data2.set_index(data2["name"])
                 del data2["name"]
                 carrier_dict = data2.to_dict()["carrier"]
-                div_spinner.text = """<strong style="color: green;">Upload done</strong>"""
+                div_spinner.text = """<div align="center"><strong style="color: green;">Upload done</strong></div>"""
             else:
                 print("Not a valid file to upload")
-                div_spinner.text = """<strong style="color: red;">Not a valid file to uploade</strong>"""
+                div_spinner.text = """<div align="center"><strong style="color: red;">Not a valid file to uploade</strong></div>"""
             print('Upload done')
 
         except Exception as e:
             print(str(e))
-            div_spinner.text = """<strong style="color: red;">Fatal Error @ Update </strong>"""
+            div_spinner.text = """<div align="center"><strong style="color: red;">Fatal Error @ Update </strong></div>"""
 # =============================================================================
     def args_callback(attrname, old, new):
 
@@ -717,7 +719,7 @@ def modify_doc(doc):
 # =============================================================================
     def ivest_callback(active):
         if active:
-            div_spinner.text = """<strong style="color: red;">Mark Technologies by pressing "CTRL" +  "left mouse", Rows are marked yellow </strong>"""
+            div_spinner.text = """<div align="center"><strong style="color: red;">Mark Technologies by pressing "CTRL" +  "left mouse", Rows are marked yellow </strong></div>"""
         else:
             div_spinner.text = ""
 # =============================================================================
@@ -726,9 +728,9 @@ def modify_doc(doc):
             if widgets[i]["ok"].clicks > 0 :
                 external_data[i][widgets[i]["tec"].value]= widgets[i]["source"].data["y"]
                 if widgets[i]["tec"].value == "Default":
-                    div_spinner.text = """<strong style="color: green;"> """+i+""" Data is set as """+widgets[i]["tec"].value+"""</strong>"""
+                    div_spinner.text = """<div align="center"><strong style="color: green;"> """+i+""" Data is set as """+widgets[i]["tec"].value+"""</strong></div>"""
                 else:
-                    div_spinner.text = """<strong style="color: green;"> """+i+""" Data For """+widgets[i]["tec"].value+""" is added </strong>"""
+                    div_spinner.text = """<div align="center"><strong style="color: green;"> """+i+""" Data For """+widgets[i]["tec"].value+""" is added </strong></div>"""
                 widgets[i]["ok"].clicks = 0 # this calls again this function
 
 # =============================================================================
@@ -777,7 +779,7 @@ def modify_doc(doc):
 # =============================================================================
 #  GUI Elements for adding Technologies
 # =============================================================================
-    grid = column(children=[Div()])
+    grid = column(children=[Div()],height=300)
     ok_button = Button(label='✓ ADD', button_type='success',width=60)
     cancel_button = Button(label='	🞮 CANCEL', button_type='danger',width=60)
     select_tec = Select(title="Add Heat Generator:", options = select_tec_options )
@@ -881,7 +883,7 @@ def modify_doc(doc):
         data_table.source.data.update(df2)
         del df2
 #        grid.children = [Div()]
-        div_spinner.text = """<strong style="color: green;">Heat Generator ADDED</strong>"""
+        div_spinner.text = """<div align="center"> <strong style="color: green;">Heat Generator ADDED</strong> </div>"""
 # =============================================================================
     def add_heat_pump():
 
@@ -1006,18 +1008,22 @@ def modify_doc(doc):
             sizing_mode='scale_width')  #XXX: scale_width -> invest_button not clickable
 
 #    l = layout([
-#            [row([widgetbox(download_button,upload_button,run_button,reset_button,invest_button),
-#             widgetbox(div_spinner),widgetbox(pmax,Div(),to_install)])],
-#            [grid],
-#            [widgetbox(output)],
-#            [widgetbox(tabs)],
-#            ], sizing_mode='scale_both')
+#                    [widgetbox(download_button,upload_button,run_button,
+#                               reset_button,invest_button),
+#                     widgetbox(div_spinner,width=1000),widgetbox(pmax,Div(),to_install)],
+#                   [grid],
+#                   [widgetbox(dummy)],
+#                   [widgetbox(output,width=1500)],
+#                   [widgetbox(tabs,width=1500)],
+#            ])
 
     doc.add_root(l)
     
     return doc
 #%%
 if __name__ == '__main__':
+#    from bokeh.server.views.static_handler import StaticHandler
+    io_loop = IOLoop.current()
     allow_websocket_origin=None
     f_allow_websocket_origin = os.path.join(root_dir, 'allow_websocket_origin.txt')
     if os.path.exists(f_allow_websocket_origin):
@@ -1025,10 +1031,14 @@ if __name__ == '__main__':
             allow_websocket_origin = [line.strip() for line in fd.readlines()]
 
     bokeh_app = Application(FunctionHandler(modify_doc))
-    bokeh_app.add(DirectoryHandler(filename = path2data))
-    server = Server({'/': bokeh_app}, io_loop=io_loop, allow_websocket_origin=allow_websocket_origin)
+    bokeh_app_2 = Application(DirectoryHandler(filename = path2data))
+
+    server = Server({'/': bokeh_app, '/download':bokeh_app_2}, io_loop=io_loop, 
+                    allow_websocket_origin=allow_websocket_origin)#,
+#                    extra_patterns=[('/static/.*', StaticHandler,dict(path=path_static))])
     server.start()
     print('Opening Dispath Application on http://localhost:5006/')
+    
     try:
         io_loop.start()
     except:

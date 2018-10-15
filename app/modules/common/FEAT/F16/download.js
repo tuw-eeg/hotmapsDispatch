@@ -1,6 +1,6 @@
 var data = source.data;
 var filename = data['filename'][0]
-var path = '/static/'.concat(data['id'][0]).concat('/').concat(filename)
+var path = 'download/static/'.concat(data['id'][0]).concat('/').concat(filename)
 fetch(path, {cache: 'no-store'}).then(response => response.blob())
                     .then(blob => {
                         //addresses IE
