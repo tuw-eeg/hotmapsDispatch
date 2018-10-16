@@ -205,6 +205,7 @@ NSwxOTcuNjg4LDQ3LjUxMywxOTcuNzg2LDQwLjM3eiIvPg0KCTwvZz4NCjwvZz4NCjwvc3ZnPg0K"""
 #
 # =============================================================================
 header_html ="""
+
 <div>
 <table style="width: 100%;">
 <tbody>
@@ -220,4 +221,12 @@ alt="logo-r" src='data:image/png;base64,"""+logo_right+"""'></td>
 </tbody>
 </table>
 </div>
+<style>
+body {
+    background-image: url("/download/static/background.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+</style>
+
 """

@@ -39,7 +39,7 @@ if tornado.version != '4.4.2':
     print("Please install tornado==4.5.3")
     sys.exit()
 #%%
-from AD.F16_input.main import load_data
+#from AD.F16_input.main import load_data
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
 import CM.CM_TUWdispatch.run_cm as dispatch
 
@@ -139,7 +139,7 @@ def generate_tables(columns,name="",):
     source = ColumnDataSource(data)
     #,width=1550,height=700
     table = DataTable(source=source,columns=col,width=1550,
-                           editable=True,row_headers =True)
+                           editable=True,row_headers =True,height=250)
     return table
 # ===========================================================================
 def modification_tools(**kwargs):
@@ -1011,10 +1011,9 @@ def modify_doc(doc):
 #            sizing_mode='scale_width')  #XXX: scale_width -> invest_button not clickable
 
     l = layout([[header],
-                    [row(children=[
-                            column(children=[download_button,upload_button,run_button,
+                    [row([column([download_button,upload_button,run_button,
                                reset_button,invest_button]),
-                     widgetbox(div_spinner,width=1000),column([pmax,to_install])])],
+                     widgetbox(div_spinner,width=500),column([pmax,to_install])])],
                    [grid],
                    [widgetbox(dummy)],
                    [widgetbox(output,width=1500)],
@@ -1042,8 +1041,9 @@ if __name__ == '__main__':
 #                    extra_patterns=[('/static/.*', StaticHandler,dict(path=path_static))])
     server.start()
     print('Opening Dispath Application on http://localhost:5006/')
-    
+
     try:
         io_loop.start()
     except:
         pass
+    
