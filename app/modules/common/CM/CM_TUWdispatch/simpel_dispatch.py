@@ -83,7 +83,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.OP_fix_hs = pe.Param(m.j_hs,initialize=val["OP_fix_hs"])
 
     m.mr_j = pe.Param(m.j, initialize = val["mr_j"])
-
+    m.em_j = pe.Param(m.j, initialize = val["em_j"])
 
     #%% Variablen
     m.x_th_jt = pe.Var(m.j,m.t,within=pe.NonNegativeReals)

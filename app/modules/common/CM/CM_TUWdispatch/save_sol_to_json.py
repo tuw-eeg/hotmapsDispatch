@@ -153,7 +153,9 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
                 solution["Thermal Generation Mix:"]  = pd.DataFrame(_dic["Thermal Power Energymix:"]).sum().to_dict()
         except:
             pass
-
+        solution["Total CO2 Emission"]= {j:solution["Thermal Generation Mix"][j]*instance.em_j[j]/instance.n_th_j[j] for j in instance.j} 
+        solution["CO2 Emission Heat"] = {j: solution["Total CO2 Emission"][j]*instance.n_th_j[j]/(instance.n_th_j[j]+instance.n_el_j[j]) for j in instance.j} 
+        solution["CO2 Emission Electricity"] = {j: solution["Total CO2 Emission"][j]*instance.n_el_j[j]/(instance.n_th_j[j]+instance.n_el_j[j]) for j in instance.j} 
 
 #        solfile = os.path.join(path2solution, "solution.json")
 #        with open(solfile, "w") as f:

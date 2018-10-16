@@ -10,7 +10,7 @@ Created on Mon Sep 10 17:25:59 2018
 Params:
 
     Here you can insert three logos encoded as base64 string, using python's
-    base64 library or using fore example an online tool like:
+    base64 library or using for example an online tool like:
     https://www.fastix.org/test/Data-URL-Generator.php
         logo_right      string
         logo_left       string

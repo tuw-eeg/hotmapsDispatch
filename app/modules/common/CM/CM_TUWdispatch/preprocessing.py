@@ -12,7 +12,6 @@ class SliceMaker(object):
 
 #XXX: Catogorize
 def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
-    print(data["categorize"])
     if inv_flag:
         tec = []
         for s in selection[0]:
@@ -147,7 +146,9 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     all_heat_geneartors = tec+j_hs
 
     mr_j = {key:data["MR"][key] for key in tec}
-
+    
+    em_j = {j: data["em"][data["energy_carrier"][j]] for j in tec}
+    
     args = [tec, j_hp, j_pth, j_st, j_waste, j_chp, j_bp, j_wh,
             j_gt, j_hs, demand_th_t, max_demad, radiation_t, IK_j,
             OP_fix_j, n_el_j, electricity_price_t, P_min_el_chp,
@@ -157,7 +158,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
             IK_hs, cap_hs, c_ramp_chp, c_ramp_waste, alpha_hs,
             rf_j, rf_tot, OP_var_j, temperature, thresh,
             sale_electricity_price_t, OP_fix_hs, all_heat_geneartors,
-            mr_j,j_chp_se,j_chp_bp]
+            mr_j,j_chp_se,j_chp_bp,em_j]
 
     keys = ['j', 'j_hp', 'j_pth', 'j_st', 'j_waste', 'j_chp', 'j_bp', 'j_wh',
             'j_gt', 'j_hs', 'demand_th_t', 'max_demad', 'radiation_t', 'IK_j',
@@ -168,6 +169,6 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
             'IK_hs', 'cap_hs', 'c_ramp_chp', 'c_ramp_waste', 'alpha_hs',
             'rf_j', 'rf_tot', 'OP_var_j', 'temperature_t', 'thresh',
             'sale_electricity_price_jt', 'OP_fix_hs', 'all_heat_geneartors',
-            'mr_j' , 'j_chp_se' , 'j_chp_bp' ]
+            'mr_j' , 'j_chp_se' , 'j_chp_bp','em_j' ]
 
     return dict(zip(keys,args))

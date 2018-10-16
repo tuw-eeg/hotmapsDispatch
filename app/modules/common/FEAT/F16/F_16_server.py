@@ -992,30 +992,34 @@ def modify_doc(doc):
 # =============================================================================
 #   Set Global Layout
 # =============================================================================
-    l = column([
-                row([
-                        widgetbox(download_button,upload_button,run_button,
-                                  reset_button,invest_button),
-                          widgetbox(div_spinner),
-                          widgetbox(Div()),
-                          widgetbox(pmax,Div(),to_install)]),
-                 widgetbox(Div(height=25)),
-                 grid,
-                 widgetbox(dummy),
-                 column([widgetbox(output)]),
-                 widgetbox(tabs),
-                 ],
-            sizing_mode='scale_width')  #XXX: scale_width -> invest_button not clickable
+    from imageHTML import header_html
+    header = widgetbox(Div(text= header_html))
+    
+#    l = column([header,
+#                row([
+#                        widgetbox(download_button,upload_button,run_button,
+#                                  reset_button,invest_button),
+#                          widgetbox(div_spinner),
+#                          widgetbox(Div()),
+#                          widgetbox(pmax,Div(),to_install)]),
+#                 widgetbox(Div(height=25)),
+#                 grid,
+#                 widgetbox(dummy),
+#                 column([widgetbox(output)]),
+#                 widgetbox(tabs),
+#                 ],
+#            sizing_mode='scale_width')  #XXX: scale_width -> invest_button not clickable
 
-#    l = layout([
-#                    [widgetbox(download_button,upload_button,run_button,
-#                               reset_button,invest_button),
-#                     widgetbox(div_spinner,width=1000),widgetbox(pmax,Div(),to_install)],
-#                   [grid],
-#                   [widgetbox(dummy)],
-#                   [widgetbox(output,width=1500)],
-#                   [widgetbox(tabs,width=1500)],
-#            ])
+    l = layout([[header],
+                    [row(children=[
+                            column(children=[download_button,upload_button,run_button,
+                               reset_button,invest_button]),
+                     widgetbox(div_spinner,width=1000),column([pmax,to_install])])],
+                   [grid],
+                   [widgetbox(dummy)],
+                   [widgetbox(output,width=1500)],
+                   [widgetbox(tabs,width=1500)],
+            ],sizing_mode='scale_width')
 
     doc.add_root(l)
     
