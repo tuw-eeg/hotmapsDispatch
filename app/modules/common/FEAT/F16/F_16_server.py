@@ -32,12 +32,12 @@ if bokeh.__version__ != '0.12.10':
     print("Please install bokeh==0.12.10")
     sys.exit()
 
-import tornado 
-# früher (4.5.3) aber Download funktioniert dann nicht
-if tornado.version != '4.4.2':  
-    print("Your current tornado version ist not compatible (Your Version:" +tornado.version +")")
-    print("Please install tornado==4.5.3")
-    sys.exit()
+#import tornado 
+## früher (4.5.3) aber Download funktioniert dann nicht
+#if tornado.version != '4.4.2':  
+#    print("Your current tornado version ist not compatible (Your Version:" +tornado.version +")")
+#    print("Please install tornado==4.4.2")
+#    sys.exit()
 #%%
 #from AD.F16_input.main import load_data
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
@@ -512,9 +512,11 @@ def modify_doc(doc):
                 selection1 = data_table_heat_storage.source.selected["1d"]["indices"]
                 selection = [selection0,selection1]
                 if selection[0] == []:
-                    div_spinner.text = """<div align="center"> <strong style="color: red;">Error: Please specify the technologies for the invesment model !!!</strong></div>"""
+                    div_spinner.text = """<div align="center"> <strong style="color: red;"><p>Error: Please specify the technologies for the invesment model !!!<p>
+                    <p>Mark Heat Generators by pressing "CTRL" + "left mouse"<p><p>Selection is marked yellow<p></strong></div>"""
                     return
             solutions,_,_ = execute(data,inv_flag,selection)
+
             print('calculation done')
             print ("Ploting started..")
             if solutions == "Error1":
@@ -557,6 +559,7 @@ def modify_doc(doc):
                     path_download_json = os.path.join("download","static",time_id,filename)
 #                    trigger_download(time_id,filename)
                     print("Download output data done")
+                    print("Render in Browser...")
                     # --
                     div_spinner.text = """<div align="center"> 
                     <style>
@@ -582,6 +585,7 @@ def modify_doc(doc):
                     </strong>
                     </div>
                     """
+                    print("Calculation is Done !")
         except Exception as e:
             print(str(e))
             print(e)
@@ -1025,8 +1029,8 @@ def modify_doc(doc):
     return doc
 #%%
 if __name__ == '__main__':
-#    from bokeh.server.views.static_handler import StaticHandler
-    io_loop = IOLoop.current()
+
+#    io_loop = IOLoop.current()  #FIXME
     allow_websocket_origin=None
     f_allow_websocket_origin = os.path.join(root_dir, 'allow_websocket_origin.txt')
     if os.path.exists(f_allow_websocket_origin):
@@ -1034,16 +1038,35 @@ if __name__ == '__main__':
             allow_websocket_origin = [line.strip() for line in fd.readlines()]
 
     bokeh_app = Application(FunctionHandler(modify_doc))
-    bokeh_app_2 = Application(DirectoryHandler(filename = path2data))
+    bokeh_app_2 = Application(DirectoryHandler(filename = path2data)) # for downloading files
 
-    server = Server({'/': bokeh_app, '/download':bokeh_app_2}, io_loop=io_loop, 
-                    allow_websocket_origin=allow_websocket_origin)#,
-#                    extra_patterns=[('/static/.*', StaticHandler,dict(path=path_static))])
-    server.start()
-    print('Opening Dispath Application on http://localhost:5006/')
-
-    try:
-        io_loop.start()
-    except:
-        pass
+#    server = Server({'/': bokeh_app, '/download':bokeh_app_2}, io_loop=io_loop, 
+#                    allow_websocket_origin=allow_websocket_origin) #FIXME
+#    server.start() #FIXME
     
+    
+# =============================================================================
+#     tornado multi process  #FIXME
+# =============================================================================
+    # 0: auto, chooses number of cpu cores
+    # 4: starts 4 processes
+    num_procs = 0
+    server = Server({'/': bokeh_app, '/download':bokeh_app_2}, 
+                    num_procs=num_procs, 
+                    allow_websocket_origin=allow_websocket_origin)
+    server.start()
+    server.io_loop.start()
+# =============================================================================
+#     
+# =============================================================================
+    
+    
+    
+    print('Open Dispath Application on http://localhost:5006/')
+    
+    # for starting server via sypder-ide #FIXME
+#    try:
+#        io_loop.start()
+#    except:
+#        pass
+

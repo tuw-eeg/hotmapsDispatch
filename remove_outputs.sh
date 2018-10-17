@@ -7,5 +7,5 @@ AGE=60
 # 0 * * * * /path/to/Dispatch/remove_outputs.sh
 
 cd "$(dirname "$0")"
-find ./app/modules/common/FEAT/F16/static/ -type d -name "20??-??-??-??-??-??-*" -cmin +$AGE -exec rm -rf \{\} \;
+find ./app/modules/common/AD/F16_input/static/ -type d -name "20??-??-??-??-??-??-*" -cmin +$AGE -exec rm -rf \{\} \;
 
