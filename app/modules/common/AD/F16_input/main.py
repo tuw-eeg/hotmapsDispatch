@@ -427,10 +427,8 @@ def load_data(path_parameter2 = path_parameter2, default_scenario=0):
     data["tec_hs"] = tec_hs
 
     data["all_heat_geneartors"] = data["tec"] + data["tec_hs"]
-
+        
     return data, inv_flag
-
-
 if __name__ == "__main__":
     print('Loading Data...')
     val,flag = load_data()

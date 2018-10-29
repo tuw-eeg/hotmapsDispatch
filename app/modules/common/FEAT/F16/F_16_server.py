@@ -32,12 +32,12 @@ if bokeh.__version__ != '0.12.10':
     print("Please install bokeh==0.12.10")
     sys.exit()
 
-#import tornado 
-## früher (4.5.3) aber Download funktioniert dann nicht
-#if tornado.version != '4.4.2':  
-#    print("Your current tornado version ist not compatible (Your Version:" +tornado.version +")")
-#    print("Please install tornado==4.4.2")
-#    sys.exit()
+import tornado 
+# früher (4.4.2) 
+if tornado.version != '4.5.3':  
+    print("Your current tornado version ist not compatible (Your Version:" +tornado.version +")")
+    print("Please install tornado==4.5.3")
+    sys.exit()
 #%%
 #from AD.F16_input.main import load_data
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
@@ -1023,50 +1023,54 @@ def modify_doc(doc):
                    [widgetbox(output,width=1500)],
                    [widgetbox(tabs,width=1500)],
             ],sizing_mode='scale_width')
-
+    
+    doc.title="Dispatch Model"
     doc.add_root(l)
+    
     
     return doc
 #%%
 if __name__ == '__main__':
 
-#    io_loop = IOLoop.current()  #FIXME
+    
     allow_websocket_origin=None
     f_allow_websocket_origin = os.path.join(root_dir, 'allow_websocket_origin.txt')
     if os.path.exists(f_allow_websocket_origin):
         with open(f_allow_websocket_origin) as fd:
             allow_websocket_origin = [line.strip() for line in fd.readlines()]
-
+            
     bokeh_app = Application(FunctionHandler(modify_doc))
-    bokeh_app_2 = Application(DirectoryHandler(filename = path2data)) # for downloading files
-
-#    server = Server({'/': bokeh_app, '/download':bokeh_app_2}, io_loop=io_loop, 
-#                    allow_websocket_origin=allow_websocket_origin) #FIXME
-#    server.start() #FIXME
-    
+    bokeh_app_2 = Application(DirectoryHandler(filename = path2data)) #FIXME: for downloading files
     
 # =============================================================================
-#     tornado multi process  #FIXME
+#     tornado multi process  #FIXME: only for Linux
 # =============================================================================
-    # 0: auto, chooses number of cpu cores
-    # 4: starts 4 processes
-    num_procs = 0
-    server = Server({'/': bokeh_app, '/download':bokeh_app_2}, 
-                    num_procs=num_procs, 
-                    allow_websocket_origin=allow_websocket_origin)
-    server.start()
-    server.io_loop.start()
+    try:
+        # 0: auto, chooses number of cpu cores
+        # 4: starts 4 processes
+        num_procs = 0
+        server = Server({'/': bokeh_app, '/download':bokeh_app_2}, 
+                        num_procs=num_procs, 
+                        allow_websocket_origin=allow_websocket_origin)
+        server.start()
+        server.io_loop.start()
 # =============================================================================
 #     
 # =============================================================================
-    
-    
-    
+    except:
+        print("Start single Thread...")
+        io_loop = IOLoop.current()
+        server = Server({'/': bokeh_app, '/download':bokeh_app_2}, io_loop=io_loop, 
+                        allow_websocket_origin=allow_websocket_origin)
+        server.start() 
+# =============================================================================
+# 
+# =============================================================================
     print('Open Dispath Application on http://localhost:5006/')
     
-    # for starting server via sypder-ide #FIXME
-#    try:
-#        io_loop.start()
-#    except:
-#        pass
+    #FIXME:  Error while starting server via sypder-ide
+    try:
+        io_loop.start()
+    except:
+        pass
 

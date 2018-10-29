@@ -13,7 +13,7 @@ import pandas as pd
 import matplotlib.pylab as plt
 from matplotlib.colors import to_hex
 from bokeh.plotting import figure, show, output_file,save
-from bokeh.models import ColumnDataSource,Legend, DataTable,TableColumn
+from bokeh.models import ColumnDataSource,Legend, DataTable,TableColumn,HoverTool
 from bokeh.layouts import widgetbox, gridplot, layout
 from bokeh.models.widgets import Panel, Tabs
 from bokeh.core.properties import value
@@ -21,7 +21,24 @@ import os
 import itertools
 from math import pi
 import sys
+from bokeh.palettes import Category10,Category20,Spectral
 
+#%% Color mapping
+def color_mapping(i,j):
+    if i<=10:
+        if i<3:
+            i=3
+        return Category10[i][j]
+    else:
+        return Category20[i][j]
+#%% Color mapping2
+def color_mapping2(i,j):
+    if i<=11:
+        if i<3:
+            i=3
+        return Spectral[i][j]
+    else:
+        return color_mapping(i,j)
 #%%
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
@@ -29,7 +46,7 @@ if path not in sys.path:
     sys.path.append(path)
 
 #%%
-from CM.CM_TUWdispatch.eng_format import EngNumber,EngUnit
+from CM.CM_TUWdispatch.eng_format import EngNumber#,EngUnit
 
 #%%
 def get_cmap(n, name='tab20'):
@@ -287,10 +304,10 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     p3.toolbar.logo = None
     p3.grid.minor_grid_line_color = '#eeeeee'
     if flag:
-        s = gridplot([[p],[p2],[p3],[p4]],plot_width=1000, plot_height=300,
+        s = gridplot([[p],[p2],[p3],[p4]],plot_width=1000, plot_height=400,
                  toolbar_options=dict(logo=None))
     else:
-        s = gridplot([[p],[p2],[p3]],plot_width=1000, plot_height=300,
+        s = gridplot([[p],[p2],[p3]],plot_width=1000, plot_height=400,
                  toolbar_options=dict(logo=None))
     return s,p
 #%%
@@ -461,8 +478,7 @@ def bar_chart(dic,path2output,decison_var,cmap):
     p.add_layout(legend, 'right')
     p.legend.click_policy = "mute" # "mute"
     return p
-
-
+#%%
 def costBarStack_chart(dic,decison_vars,path2output,cmap):
     """
     This function returns a bokeh figure that shows the costs as a bar chart.
@@ -517,7 +533,6 @@ def costBarStack_chart(dic,decison_vars,path2output,cmap):
     p.add_layout(new_legend, 'right')
 
     return p
-
 
 #%%
 def plot_table (decision_vars,dic,path2output):
@@ -602,7 +617,7 @@ def plotExtra_table (decision_vars,dic,path2output):
     columns = [TableColumn(field=x, title=x) for x in dic["Technologies:"]]
     columns = column0+columns
 
-    data_table = DataTable(source=source, columns=columns, width=800, height=200)
+    data_table = DataTable(source=source, columns=columns, width=1200, height=500)
 #    output_file(path2output+"\data_table.html")
     return widgetbox(data_table)
 
@@ -626,13 +641,85 @@ def tab_panes(path2output,**kwargs):
     tabs = [Panel(child=p, title=name) for name, p in kwargs.items()]
     tabs = Tabs(tabs=tabs)
     return tabs
+#%%
+def co2_barplot(decision_vars,dic,cmap):
+    tec = list(dic[decision_vars[0]].keys())
+    #FIXME: Use Numberformater
+    columns = [TableColumn(field="tec", title="Heat Producers")] + [TableColumn(field=key, title=key) for key in decision_vars] 
+    data = {**{key:[str(EngNumber(round(dic[key][j],2))) for j in tec] for key in decision_vars},**dict(tec=tec),}
+    source = ColumnDataSource(data)
+    data_table = DataTable(source=source, columns=columns, width=500, height=400)
+    
+    hover = HoverTool(tooltips=[
+    ("heat producer", "@hp"),
+    ("Total CO2 Emission", "@co2_total kg"),
+    ("CO2 Emission from Heat", "@co2_heat kg"),
+    ("CO2 Emission from Electricity", "@co2_electricity kg")
+    ], mode='mouse')
+        
+    p = figure(title = "CO2 Emissions of Technologies by Heat and Electricity",
+           plot_width=700   ,
+           plot_height=400,
+           tools = [hover,"pan,wheel_zoom,box_zoom,reset,save"])
+    
 
+
+    p.xaxis.visible = False
+    p.xgrid.visible = False
+    p.grid.minor_grid_line_color = '#eeeeee'
+    p.toolbar.logo = None
+    p.toolbar_location = None
+    
+    val = [sum([dic[key][j] for key in decision_vars]) for j in tec]
+    for index in [i for i,v in enumerate(val) if v == 0]:
+        val.pop(index)
+        tec.pop(index)
+    legend_items = []
+    l = len(decision_vars)
+    fill_alpha= np.linspace(1,1/l,l,True)
+    for i,j in enumerate(tec):
+        save=0
+        items = []
+        for k,key in enumerate(decision_vars):
+            items += [p.rect(x=5+i*15, y = save+dic[key][j]/2 , width=10, 
+                   height= dic[key][j] , fill_alpha= fill_alpha[k],
+                   color=cmap[j],muted_alpha=0.2)]
+            save += dic[key][j]
+        legend_items += [(j,items)]
+        hover.renderers += [ p.rect(x=5+i*15, y = val[i]/2 , width=10, 
+                   height= val[i] , fill_alpha= None,
+                   color=None, source =  {"hp":[j],
+                                                   "co2_total":[ str(EngNumber(round(val[i],2)))],
+                                                   "co2_heat":[str(EngNumber(round(dic[decision_vars[0]][j],2)))],
+                                                   "co2_electricity":[str(EngNumber(round(dic[decision_vars[1]][j],2)))]})]
+    legend = Legend(items=legend_items,location=(10, 10))
+    p.add_layout(legend, 'right')
+    p.legend.click_policy = "hide" # "mute"
+    
+    return layout([p,data_table])
+#%%
+def cmapping(tec,path2cmap=-1):
+    l = len(tec)
+    cmap = {j:Category20[3][i] if l<3 else Category20[l][i] for i,j in enumerate(tec)} 
+    if path2cmap == -1:
+        return cmap
+    elif os.path.isfile(path2cmap):
+        with open(path2cmap,"rb") as file:
+            cmap = pickle.load(file)
+            return cmap
+    else:            
+        with open(path2cmap,"wb") as file:
+            pickle.dump(cmap,file)
+        return cmap
 #%% Setting Global default paramters and default paths
 path2json = os.path.join(path, "AD", "F16_input", "Solution", "solution.json")
 path2output = os.path.join(path, "AD", "F16_input", "Output_Graphics")
 path_parameter = os.path.join(path, "AD", "F16_input", "DH_technology_cost.xlsx")
+path2cmap = os.path.join(path, "AD", "F16_input", "cmap.dat")
 #%%
-def plot_solutions(show_plot=False,path2json=path2json,solution=-1):
+def plot_solutions(show_plot=False, path2json=path2json, 
+                   path2output=path2output, solution=-1, 
+                   cmap= -1):
     """
     This function geneartes a HTML file representeing the results of the model
     and saves it in "\AD\F16_input\Output_Graphics" as "output.html".
@@ -758,16 +845,7 @@ def plot_solutions(show_plot=False,path2json=path2json,solution=-1):
         if solution == -1:
             try:
                 with open(path2json) as f:
-                    dic = json.load(f)
-    
-#                if os.path.isdir(path2output) == False:
-#                    print("Create Dictionary...")
-#                    cmap = colormapping(dic["all_heat_geneartors"])
-#                    os.mkdir(path2output)
-#                    print("Created: "+ path2output)
-#                    with open(os.path.join(path2output,"cmap.spec"),"wb") as file:
-#                        pickle.dump(cmap,file)
-    
+                    dic = json.load(f)    
             except FileNotFoundError:
                 print("\n*********\nThere is no JSON File in this path: "+
                       path2json+"\n*********\n")
@@ -784,25 +862,10 @@ def plot_solutions(show_plot=False,path2json=path2json,solution=-1):
         y2 = matrix(dic,decison_var,legend,ts)
         y3 = matrix(dic,decison_var,legend,t)
         
-#        try:
-#            with open(os.path.join(path2output,"cmap.spec"),"rb") as file:
-#                cmap = pickle.load(file)
-#        except:
-#            print("Create Dictionary...")
-#            cmap = colormapping(dic["all_heat_geneartors"])
-#            os.mkdir(path2output)
-#            print("Created: "+ path2output)
-#            with open(os.path.join(path2output,"cmap.spec"),"wb") as file:
-#                pickle.dump(cmap,file)
-#                
-#    
-#        cmap2 = colormapping(dic["Technologies:"])
-#        if cmap != cmap2:
-#            cmap = cmap2
-#            with open(os.path.join(path2output,"cmap.spec"),"wb") as file:
-#                pickle.dump(cmap,file)
+        if cmap == -1:
+            cmap = cmapping(dic["Technologies:"])
+
         
-        cmap = colormapping(dic["Technologies:"])
         dic["Marginal Costs"] = dic["Marginal Costs:"]
 
         p1,_ = stack_chart(tw,dic,y1,legend,decison_var,path2output,cmap,"w")
@@ -816,7 +879,11 @@ def plot_solutions(show_plot=False,path2json=path2json,solution=-1):
         p6 = pie_chart(dic[decison_var],path2output,decison_var,cmap)
         p7 = bar_chart(dic[decison_var],path2output,decison_var,cmap)
         decison_var = "Specific Capital Costs of installed Capacities:"
-
+        
+        decison_var="Full Load Hours:"
+        p_full_load_hours_rel = pie_chart(dic[decison_var],path2output,decison_var,cmap)
+        p_full_load_hours_abs = bar_chart(dic[decison_var],path2output,decison_var,cmap)
+        
         decision_vars = ["Anual Total Costs",
                          "Anual Total Costs (with costs of existing power plants and heat storages)",
                          "Electricity Production by CHP",
@@ -834,25 +901,31 @@ def plot_solutions(show_plot=False,path2json=path2json,solution=-1):
                          "Electrical Peak Load Costs",
                          "Variable Cost CHP's",
                          "Fuel Costs",
+                         "Total CO2 Emissions",
                          ]
         p9 = plot_table(decision_vars,dic,path2output)
 
-        l1 = layout([[p5,p10],[p6,p7]])
+        l1 = layout([[p5,p10],[p6,p7],[p_full_load_hours_rel,p_full_load_hours_abs]])
 
         decision_vars = ["Anual Investment Cost:",
                          "Anual Investment Cost (of existing power plants and heat storages)",
                          "Operational Cost:", "Fuel Costs:", "Revenue From Electricity:"]
         p8 = costBarStack_chart(dic,decision_vars,path2output,cmap)
-
+        decision_vars += ["Total CO2 Emission:","Full Load Hours:"]
         p11 = plotExtra_table(decision_vars,dic,path2output)
         l2 = layout([[p8],[p11]])
-
+        
+        decision_vars = ["CO2 Emission Heat","CO2 Emission Electricity"]
+        
+        p_co2 = co2_barplot(decision_vars,dic,cmap)
+        
         kwargs = {"Thermal Power Energymix (TPE)": p3,
                   "TPE Winter": p1,
                   "TPE Summer": p2,
                   "Load Duration Curve": p4,
                   "TPE and Plant Capatcities": l1,
                   "Specific Capital Costs of IC":l2,
+                  "CO2 Emissions":p_co2,
                   "Results":p9}
         tabs = tab_panes(path2output,**kwargs)
         

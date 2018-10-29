@@ -304,8 +304,8 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
         c_var = c_var
         c_peak_el = m.P_el_max*10000
         c_ramp = sum ([m.ramp_j_waste_t[j,t] * m.c_ramp_waste for j in m.j_waste for t in m.t]) + sum ([m.ramp_j_chp_t[j,t] * m.c_ramp_chp for j in m.j_chp for t in m.t])
-        c_hs_penalty_load = sum([m.x_load_hs_t[hs,t]*1e-6  for hs in m.j_hs for t in m.t])      # for modeling reasons
-        c_hs_penalty_unload = sum([m.x_unload_hs_t[hs,t]*1e-6  for hs in m.j_hs for t in m.t])  # for modeling reasons
+        c_hs_penalty_load = sum([m.x_load_hs_t[hs,t]*5e-2  for hs in m.j_hs for t in m.t])      # for modeling reasons
+        c_hs_penalty_unload = sum([m.x_unload_hs_t[hs,t]*5e-2  for hs in m.j_hs for t in m.t])  # for modeling reasons
         c_tot = c_inv + c_var + c_op_fix + c_op_var + c_peak_el + c_ramp +c_hs_penalty_load + c_hs_penalty_unload
 
         rev_gen_electricity = sum([m.x_el_jt[j,t]*(m.sale_electricity_price_jt[j,t]) for j in m.j for t in m.t])
