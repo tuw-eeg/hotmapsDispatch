@@ -695,8 +695,10 @@ def co2_barplot(decision_vars,dic,cmap):
     legend = Legend(items=legend_items,location=(10, 10))
     p.add_layout(legend, 'right')
     p.legend.click_policy = "hide" # "mute"
-    
-    return layout([p,data_table])
+    if tec == []:
+        return layout([widgetbox(data_table)])    
+    else:
+        return layout([p,widgetbox(data_table)])
 #%%
 def cmapping(tec,path2cmap=-1):
     l = len(tec)
