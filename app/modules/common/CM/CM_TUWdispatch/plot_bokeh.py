@@ -671,9 +671,9 @@ def co2_barplot(decision_vars,dic,cmap):
     p.toolbar_location = None
     
     val = [sum([dic[key][j] for key in decision_vars]) for j in tec]
-    for index in [i for i,v in enumerate(val) if v == 0]:
-        val.pop(index)
-        tec.pop(index)
+    index = [i for i,v in enumerate(val) if v == 0]
+    val = [v for i,v in enumerate(val) if i not in index] 
+    tec = [t for i,t in enumerate(tec) if i not in index]  
     legend_items = []
     l = len(decision_vars)
     fill_alpha= np.linspace(1,1/l,l,True)

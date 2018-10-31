@@ -12,7 +12,7 @@ import numpy as np
 from bokeh.application.handlers import FunctionHandler,DirectoryHandler
 from bokeh.application import Application
 from bokeh.layouts import widgetbox,row,column,layout
-from bokeh.models import ColumnDataSource,TableColumn,DataTable,CustomJS,TextInput, Slider
+from bokeh.models import ColumnDataSource,TableColumn,DataTable,CustomJS,TextInput, Slider,NumberFormatter
 from bokeh.server.server import Server
 from bokeh.models.widgets import Panel, Tabs, Button,Div,Toggle,Select,CheckboxGroup
 import os,sys,io,base64,pickle,datetime,json#,shutil
@@ -163,7 +163,7 @@ def modification_tools(**kwargs):
             Slider(start=0, end=10, value=1, step=.1,title=kwargs.setdefault("scale","Scale Price:")),
             CheckboxGroup(labels=[kwargs.setdefault("mean","use mean electricity price")]),
             TextInput(value="1", title=kwargs.setdefault("total","Total Price"), disabled=True),
-            Select(title=kwargs.setdefault("tec","add to heat producer"), value="Default", options=[]),
+            Select(title=kwargs.setdefault("tec","Add to"), value="Default", options=[]),
             Button(label='✓', button_type='success',width=60)
             ]
     return args
@@ -320,7 +320,7 @@ def modify_doc(doc):
     data_table_data = generate_tables(parameter_list,sheets[2])
     data_table_heat_storage = generate_tables(list(heat_storage_list_mapper),sheets[3])
     widgets= { i : generate_widgets(data_kwargs[i]) for i in data_kwargs}
-    dummy = Div(text="""<strong style="color: #FFFFFF;">1</strong>""")
+    dummy = Div(text="""<strong style=" display: none;">1</strong>""")
     download_button = Button(label='Download Power Plant Parameters', button_type='success')
     run_button = Button(label='Run Dispatch Model', button_type='primary')
     upload_button = Button(label="Upload Power Plant Parameters", button_type="danger")
@@ -993,6 +993,94 @@ def modify_doc(doc):
     flow_temp.on_change('value', cop_callback)
     return_temp.on_change('value', cop_callback)
     energy_carrier_select.on_change('value', change_name_if_carrier_changes)
+#%%
+# =============================================================================
+#  GUI Elements for Loading External Data
+# =============================================================================
+    distribution_options = ["Dirichlet Distribution","Normal Distribution",
+                                     "Linear Distribution"]
+    
+    individual_data_upload_button = Button(label="Upload External Data", button_type="danger")
+    create_individual_data = Select(title="Create Data", value="Dirichlet Distribution", 
+                            options=distribution_options)    
+    dirichlet_options = [TextInput(title="sum Σ", value="1", placeholder= ">0")]
+    normal_options = [TextInput(title="sigma σ", value="1", placeholder= "-"),
+                      TextInput(title="my µ", value="1", placeholder= "-")]     
+    linear_options = [TextInput(title="start", value="-1", placeholder= "-"),
+                      TextInput(title="stop", value="1", placeholder= "-")]         
+    modtools = list(modification_tools(offset="Set a Offset", 
+                                       constant="Set to a Constant Value", 
+                                       scale ="Scale", 
+                                       mean = "Use mean value", 
+                                       total = "Set Sum of all values", 
+                                       tec = "Add to"))
+    individual_data_name = TextInput(title="Set a name for your Data", value="individual", placeholder= "-")
+    
+    individual_data_data_table = DataTable(source= ColumnDataSource(dict(x=[],
+                                                                         y=[])),
+                           columns=[TableColumn(field="y", title="Value", 
+                                                formatter= NumberFormatter(format='‘0[.]00'))],
+                           width=400, height=400)    
+    TOOLS = [PanTool(),WheelZoomTool(),BoxZoomTool(),ResetTool(),SaveTool()]
+    individual_data_fig = figure(tools=TOOLS)
+    individual_data_fig.line('x', 'y', source=individual_data_data_table.source, line_alpha=0.6)
+    individual_data_fig.toolbar.logo = None
+    
+
+# =============================================================================
+# 
+# =============================================================================
+    modtools += [individual_data_name]
+    
+    
+
+    def dirichlet(summe):
+        return np.random.dirichlet(np.ones(8760)/10)*summe
+    def normal(my,sigma):
+        return np.random.normal(my,sigma,8760)
+    def linear(start,stop):
+        return np.linspace(start,stop,8760,endpoint=True)
+    
+    
+    create_options = dict(zip(distribution_options,
+                              zip([dirichlet_options,normal_options,linear_options],[dirichlet,normal,linear])))
+    
+    modtools[5].value = widgets_keys[0]
+    modtools[5].options = widgets_keys
+    modtools[6].label = '✓ Save'
+    modtools[4].disabled=False
+    for i in [4,0]:
+        modtools[i].value=None
+        modtools[i].placeholder="-"
+    
+    dummy_col = {"Default":column(Div()), 
+                 **dict(zip(distribution_options,
+                            [column(dirichlet_options),
+                             column(normal_options),
+                             column(linear_options)]))}
+# =============================================================================
+#  Widget Layout for Loading External Data
+# =============================================================================    
+    r1 = row(children=[column([individual_data_upload_button,
+                               create_individual_data]),
+                        dummy_col["Default"]])
+    
+    r2 = row(children=[widgetbox(individual_data_data_table),individual_data_fig,
+     column([modtools[i] for i in [4,0,1,2,3,5,7,6]])])
+    
+    individual_data_layout = column(children=[r1,r2])
+    tabs.tabs += [Panel(child=individual_data_layout,title="Load Individual Data")]
+# =============================================================================
+# 
+# =============================================================================
+    def setLayout(name,old,new):
+        r1.children[-1]=dummy_col[create_individual_data.value]
+# =============================================================================
+#   Signal Emitting / Coupling for Loading External Data
+# =============================================================================
+
+    create_individual_data.on_change('value', setLayout)
+
 # =============================================================================
 #   Set Global Layout
 # =============================================================================
