@@ -998,72 +998,108 @@ def modify_doc(doc):
 #  GUI Elements for Loading External Data
 # =============================================================================
     distribution_options = ["Dirichlet Distribution","Normal Distribution",
-                                     "Linear Distribution"]
-    
+                                     "Linear Distribution","None"]
     individual_data_upload_button = Button(label="Upload External Data", button_type="danger")
-    create_individual_data = Select(title="Create Data", value="Dirichlet Distribution", 
-                            options=distribution_options)    
-    dirichlet_options = [TextInput(title="sum Σ", value="1", placeholder= ">0")]
-    normal_options = [TextInput(title="sigma σ", value="1", placeholder= "-"),
-                      TextInput(title="my µ", value="1", placeholder= "-")]     
-    linear_options = [TextInput(title="start", value="-1", placeholder= "-"),
-                      TextInput(title="stop", value="1", placeholder= "-")]         
-    modtools = list(modification_tools(offset="Set a Offset", 
+    create_individual_data = Select(title="Create Data", value="None", 
+                            options=distribution_options)
+    create_widgets = [TextInput(title="", value="", placeholder= "",
+                                disabled=True),
+                      TextInput(title="", value="", placeholder= "",
+                                disabled=True)]             
+    modtools = modification_tools(offset="Set a Offset", 
                                        constant="Set to a Constant Value", 
                                        scale ="Scale", 
                                        mean = "Use mean value", 
                                        total = "Set Sum of all values", 
-                                       tec = "Add to"))
-    individual_data_name = TextInput(title="Set a name for your Data", value="individual", placeholder= "-")
-    
+                                       tec = "Add to")
+    individual_data_name = TextInput(title="Set a name for your Data", 
+                                     value="individual", placeholder= "-")
     individual_data_data_table = DataTable(source= ColumnDataSource(dict(x=[],
                                                                          y=[])),
-                           columns=[TableColumn(field="y", title="Value", 
-                                                formatter= NumberFormatter(format='‘0[.]00'))],
-                           width=400, height=400)    
-    TOOLS = [PanTool(),WheelZoomTool(),BoxZoomTool(),ResetTool(),SaveTool()]
-    individual_data_fig = figure(tools=TOOLS)
+                           columns=[TableColumn(field="y", title="Value",
+                                                width=200)],
+                           width=200, height=650,fit_columns=True,
+                           editable=True)    
+    individual_data_fig = figure(plot_height=650,plot_width=750,
+                                 x_axis_label='Time in hours', y_axis_label='Value',
+                                 min_border_left = 55 , min_border_bottom = 55,
+                                 tools=["pan,wheel_zoom,box_zoom,reset,save"],)
     individual_data_fig.line('x', 'y', source=individual_data_data_table.source, line_alpha=0.6)
     individual_data_fig.toolbar.logo = None
-    
-
 # =============================================================================
 # 
 # =============================================================================
     modtools += [individual_data_name]
+    dic_modtools = dict(zip(["offset","constant","scale","mean","total","add",
+                            "save","name"],
+                            modtools))
     
-    
+    def setLabel(widgets,**kwargs):
+        for i in range(2):
+            widgets[i].title = kwargs["title"][i]
+            widgets[i].value = kwargs["value"][i]
+            widgets[i].placeholder = kwargs["placeholder"][i]
+            widgets[i].disabled = kwargs["disabled"][i]
 
-    def dirichlet(summe):
-        return np.random.dirichlet(np.ones(8760)/10)*summe
+    dirichlet_options = dict(title=["sum Σ",""], value=["1",""], 
+                             placeholder=[">0","-"],disabled=[False,True])
+    normal_options = dict(title=["sigma σ","my µ"], value=["1","1"], 
+                          placeholder=["-","-"], disabled=[False,False])
+    linear_options = dict(title=["start","stop"], value=["-1","1"], 
+                          placeholder=["-","-"], disabled=[False,False])
+    none_options = dict(title=["",""], value=["",""], 
+                          placeholder=["-","-"], disabled=[True,True])
+    def dirichlet(summe,_):
+        x = np.random.dirichlet(np.ones(8760)/5)*summe
+        print(sum(x))
+        x[-1] += summe - sum(x)
+        print(sum(x))
+        return x
     def normal(my,sigma):
         return np.random.normal(my,sigma,8760)
     def linear(start,stop):
         return np.linspace(start,stop,8760,endpoint=True)
+    def noneFunc(__,_):
+        return ""
     
+    def plotDistribution(a1,a2,function):
+        try:
+            a1= float(a1)
+        except:
+            a1 = 0
+        try:
+            a2 = float(a2)
+        except:
+            a2 = 0
+        
+        y = function(a1,a2)
+        x = np.arange(8760)
+        if type(y) == str:
+            x=[]
+            y=[]
+        else:
+            y = np.round(y,3)
+        individual_data_data_table.source.data = dict(x=x,y=y)
     
+        
     create_options = dict(zip(distribution_options,
-                              zip([dirichlet_options,normal_options,linear_options],[dirichlet,normal,linear])))
+                              zip([dirichlet_options,normal_options,
+                                   linear_options,none_options],
+                                  [dirichlet,normal,linear,noneFunc])))
     
-    modtools[5].value = widgets_keys[0]
-    modtools[5].options = widgets_keys
-    modtools[6].label = '✓ Save'
-    modtools[4].disabled=False
-    for i in [4,0]:
-        modtools[i].value=None
-        modtools[i].placeholder="-"
-    
-    dummy_col = {"Default":column(Div()), 
-                 **dict(zip(distribution_options,
-                            [column(dirichlet_options),
-                             column(normal_options),
-                             column(linear_options)]))}
+    dic_modtools["add"].value = widgets_keys[0]
+    dic_modtools["add"].options = widgets_keys
+    dic_modtools["save"].label = '✓ Save'
+    dic_modtools["total"].disabled=False
+    for i in ["total","offset"]:
+        dic_modtools[i].value=""
+        dic_modtools[i].placeholder="-"
 # =============================================================================
 #  Widget Layout for Loading External Data
 # =============================================================================    
     r1 = row(children=[column([individual_data_upload_button,
                                create_individual_data]),
-                        dummy_col["Default"]])
+                        column(create_widgets)])
     
     r2 = row(children=[widgetbox(individual_data_data_table),individual_data_fig,
      column([modtools[i] for i in [4,0,1,2,3,5,7,6]])])
@@ -1073,14 +1109,81 @@ def modify_doc(doc):
 # =============================================================================
 # 
 # =============================================================================
+    def modCallback(name,old,new):        
+        y = individual_data_data_table.source.data["y"]
+        y_profil,s = profil(y)
+        dic_modtools["total"].value  = str(round(s,3))
+        if dic_modtools["mean"].active != [] and individual_data_data_table.source.data["y"] != []:
+            individual_data_data_table.source.data["y"] = np.mean(y)*np.ones(8760)
+            dic_modtools["total"].value = str(round(sum(individual_data_data_table.source.data["y"]),3))
+        else:
+            if dic_modtools["offset"].value =="":
+                dic_modtools["offset"].value = "0"
+            if dic_modtools["constant"].value =="":
+                dic_modtools["constant"].value = "-"
+            if dic_modtools["constant"].value == "-" :
+                y_new = y_profil * float(dic_modtools["total"].value) * \
+                dic_modtools["scale"].value + \
+                float(dic_modtools["offset"].value)
+                individual_data_data_table.source.data["y"] = np.round(y_new,3)
+                dic_modtools["total"].value = str(round(sum(individual_data_data_table.source.data["y"]),3))
+            else:
+                y_new = (float(dic_modtools["constant"].value) + \
+                         float(dic_modtools["offset"].value) )*\
+                         np.ones(8760) * dic_modtools["scale"].value 
+                individual_data_data_table.source.data["y"]= np.round(y_new,3)
+                dic_modtools["total"].value = str(round(sum(individual_data_data_table.source.data["y"]),3))
+                
+    def totalCallback(name,old,new):
+        y = individual_data_data_table.source.data["y"] 
+        y_profil,s = profil(y)
+        
+        try:
+            s2 = float(dic_modtools["total"].value)
+        except:
+            s2 = 0
+        if s2 == 0:
+            s2 = s
+            dic_modtools["total"].value = str(round(s2,3))
+        individual_data_data_table.source.data["y"] = np.round(y_profil*s2,3)
+        
     def setLayout(name,old,new):
-        r1.children[-1]=dummy_col[create_individual_data.value]
+        opt,function = create_options[create_individual_data.value]
+        setLabel(create_widgets,**opt)
+        plotDistribution(create_widgets[0].value, create_widgets[1].value,
+                         function)
+        dic_modtools["total"].value = str(round(sum(individual_data_data_table.source.data["y"]),3))
+        modCallback("","","")
+    
+    def createCallback(name,old,new):
+        opt,function = create_options[create_individual_data.value]
+        plotDistribution(create_widgets[0].value, create_widgets[1].value,
+                         function)
+        dic_modtools["total"].value = str(round(sum(individual_data_data_table.source.data["y"]),3))
+        modCallback("","","")
+    def loadCallback(name,old,new):
+        file_type = file_source.data['file_name'][0].split(".")[1]
+        raw_contents = file_source.data['file_contents'][0]
+        prefix, b64_contents = raw_contents.split(",", 1)
+        file_contents = base64.b64decode(b64_contents)
+        if  file_type in ["xlsx","xls"]:
+            print(file_type)
+            file_io = io.BytesIO(file_contents)
+            excel_object = pd.ExcelFile(file_io, engine='xlrd')
+            data2 = excel_object.parse(index_col = 0).fillna(method='ffill', limit=50).values[:8760,0]
+            
+            
+
 # =============================================================================
 #   Signal Emitting / Coupling for Loading External Data
 # =============================================================================
-
     create_individual_data.on_change('value', setLayout)
-
+    for widget in create_widgets:
+        widget.on_change('value', createCallback)
+    for i in [0,1,2]:
+        modtools[i].on_change('value', modCallback)    
+    dic_modtools["mean"].on_change('active', modCallback)
+    dic_modtools["total"].on_change('value', totalCallback)
 # =============================================================================
 #   Set Global Layout
 # =============================================================================
