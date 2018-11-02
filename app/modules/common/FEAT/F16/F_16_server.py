@@ -209,11 +209,7 @@ with open(path_download_js) as file:
     download_code=file.read()
 with open(path_upload_js) as file:
     upload_code=file.read()
-# Load External Data from .dat files
-price_name_map,price_name_map_inv,prices = load_extern_data("price")
-load_name_map,load_name_map_inv,load_profiles = load_extern_data("load")
-radiation_name_map, radiation_name_map_inv,radiation = load_extern_data("radiation")
-temperature_name_map, temperature_name_map_inv, temperature = load_extern_data("temperature")
+
 # Specify Sheet Names of the Excel Database (If Changed)
 sheets = ['Heat Generators','prices and emmision factors',
           'financal and other parameteres',"Heat Storage", "Techologies"]
@@ -253,33 +249,6 @@ model_keys = ["radiation","temp","electricity","sale_electricity",
 _hd = widgets_keys[-1]
 # string for "electricity prices"
 _elec = widgets_keys[2:4]
-# Database for the external data manipulation,
-widgets_data = [ dict(data=radiation,
-                      dic=radiation_name_map,
-                      dic_inv = invert_dict(radiation_name_map),
-                      labels=lab),
-                dict(data=temperature,
-                      dic=temperature_name_map,
-                      dic_inv = invert_dict(temperature_name_map),
-                      labels=lab),
-                dict(data=prices,
-                      dic=price_name_map,
-                      dic_inv = invert_dict(price_name_map),
-                      labels=dict()),
-                dict(data=prices,
-                      dic=price_name_map,
-                      dic_inv = invert_dict(price_name_map),
-                      labels=dict()),
-                dict(data=load_profiles,
-                      dic=load_name_map,
-                      dic_inv = invert_dict(load_name_map),
-                      labels=lab),
-                ]
-# Create Data structure for better code handling
-widget_to_model_keys_dict = dict(zip(widgets_keys,model_keys))
-data_kwargs = dict(zip(widgets_keys,widgets_data))
-#external_data = dict(zip(widgets_keys,[{}]*len(widgets_keys))) #XXX only copy
-external_data = dict(zip(widgets_keys,[{} for _ in range(len(widgets_keys))]))
 
 # =============================================================================
 #  Data for adding Technologies
@@ -312,6 +281,38 @@ energy_carrier_options = pd.read_excel(path_parameter,sheets[1],skiprows=[0])[in
 # Function Handler
 # =============================================================================
 def modify_doc(doc):
+    # Load External Data from .dat files
+    price_name_map,price_name_map_inv,prices = load_extern_data("price")
+    load_name_map,load_name_map_inv,load_profiles = load_extern_data("load")
+    radiation_name_map, radiation_name_map_inv,radiation = load_extern_data("radiation")
+    temperature_name_map, temperature_name_map_inv, temperature = load_extern_data("temperature")
+    # Database for the external data manipulation,
+    widgets_data = [ dict(data=radiation,
+                          dic=radiation_name_map,
+                          dic_inv = invert_dict(radiation_name_map),
+                          labels=lab),
+                    dict(data=temperature,
+                          dic=temperature_name_map,
+                          dic_inv = invert_dict(temperature_name_map),
+                          labels=lab),
+                    dict(data=prices,
+                          dic=price_name_map,
+                          dic_inv = invert_dict(price_name_map),
+                          labels=dict()),
+                    dict(data=prices,
+                          dic=price_name_map,
+                          dic_inv = invert_dict(price_name_map),
+                          labels=dict()),
+                    dict(data=load_profiles,
+                          dic=load_name_map,
+                          dic_inv = invert_dict(load_name_map),
+                          labels=lab),
+                    ]
+    # Create Data structure for better code handling
+    widget_to_model_keys_dict = dict(zip(widgets_keys,model_keys))
+    data_kwargs = dict(zip(widgets_keys,widgets_data))
+    #external_data = dict(zip(widgets_keys,[{}]*len(widgets_keys))) #XXX only copy
+    external_data = dict(zip(widgets_keys,[{} for _ in range(len(widgets_keys))]))
 # =============================================================================
 #   MAIN GUI Elements
 # =============================================================================
@@ -1041,19 +1042,17 @@ def modify_doc(doc):
             widgets[i].placeholder = kwargs["placeholder"][i]
             widgets[i].disabled = kwargs["disabled"][i]
 
-    dirichlet_options = dict(title=["sum Σ",""], value=["1",""], 
+    dirichlet_options = dict(title=["sum Σ",""], value=["100",""], 
                              placeholder=[">0","-"],disabled=[False,True])
-    normal_options = dict(title=["sigma σ","my µ"], value=["1","1"], 
+    normal_options = dict(title=["sigma σ","my µ"], value=["100","100"], 
                           placeholder=["-","-"], disabled=[False,False])
-    linear_options = dict(title=["start","stop"], value=["-1","1"], 
+    linear_options = dict(title=["start","stop"], value=["-10","100"], 
                           placeholder=["-","-"], disabled=[False,False])
     none_options = dict(title=["",""], value=["",""], 
                           placeholder=["-","-"], disabled=[True,True])
     def dirichlet(summe,_):
         x = np.random.dirichlet(np.ones(8760)/5)*summe
-        print(sum(x))
         x[-1] += summe - sum(x)
-        print(sum(x))
         return x
     def normal(my,sigma):
         return np.random.normal(my,sigma,8760)
@@ -1107,9 +1106,10 @@ def modify_doc(doc):
     individual_data_layout = column(children=[r1,r2])
     tabs.tabs += [Panel(child=individual_data_layout,title="Load Individual Data")]
 # =============================================================================
-# 
+#   CALLBACKS FOR Loading External Data
 # =============================================================================
-    def modCallback(name,old,new):        
+    def modCallback(name,old,new):
+        div_spinner.text = load_text       
         y = individual_data_data_table.source.data["y"]
         y_profil,s = profil(y)
         dic_modtools["total"].value  = str(round(s,3))
@@ -1133,8 +1133,10 @@ def modify_doc(doc):
                          np.ones(8760) * dic_modtools["scale"].value 
                 individual_data_data_table.source.data["y"]= np.round(y_new,3)
                 dic_modtools["total"].value = str(round(sum(individual_data_data_table.source.data["y"]),3))
+        div_spinner.text = ""
                 
     def totalCallback(name,old,new):
+        div_spinner.text = load_text
         y = individual_data_data_table.source.data["y"] 
         y_profil,s = profil(y)
         
@@ -1146,44 +1148,90 @@ def modify_doc(doc):
             s2 = s
             dic_modtools["total"].value = str(round(s2,3))
         individual_data_data_table.source.data["y"] = np.round(y_profil*s2,3)
+        div_spinner.text = ""
         
     def setLayout(name,old,new):
+        div_spinner.text = load_text
         opt,function = create_options[create_individual_data.value]
         setLabel(create_widgets,**opt)
         plotDistribution(create_widgets[0].value, create_widgets[1].value,
                          function)
         dic_modtools["total"].value = str(round(sum(individual_data_data_table.source.data["y"]),3))
         modCallback("","","")
+        div_spinner.text = ""
     
     def createCallback(name,old,new):
+        div_spinner.text = load_text
         opt,function = create_options[create_individual_data.value]
         plotDistribution(create_widgets[0].value, create_widgets[1].value,
                          function)
         dic_modtools["total"].value = str(round(sum(individual_data_data_table.source.data["y"]),3))
         modCallback("","","")
+        div_spinner.text = ""
+    
+    def saveCallback():
+        div_spinner.text = load_text
+        widget_data = data_kwargs[dic_modtools["add"].value]
+#        print(list(widget_data))
+        widget_data["data"][dic_modtools["name"].value,1] = individual_data_data_table.source.data["y"]
+        widget_data["dic"][dic_modtools["name"].value] = dic_modtools["name"].value
+        widget_data["dic_inv"] = invert_dict(widget_data["dic"])
+        widgets[dic_modtools["add"].value]["select"].options += [dic_modtools["name"].value+"_1"]
+        div_spinner.text = """<div align="center"> <strong style="color: green;">External Data """+dic_modtools["name"].value+" added to "+dic_modtools["add"].value + " as "+dic_modtools["name"].value+"_1"+"""</strong> </div>"""
     def loadCallback(name,old,new):
-        file_type = file_source.data['file_name'][0].split(".")[1]
-        raw_contents = file_source.data['file_contents'][0]
-        prefix, b64_contents = raw_contents.split(",", 1)
-        file_contents = base64.b64decode(b64_contents)
-        if  file_type in ["xlsx","xls"]:
-            print(file_type)
+        try:
+            div_spinner.text = load_text
+            create_individual_data.value = "None"
+            file_type = file_source2.data['file_name'][0].split(".")[1]
+            raw_contents = file_source2.data['file_contents'][0]
+            prefix, b64_contents = raw_contents.split(",", 1)
+            file_contents = base64.b64decode(b64_contents)
             file_io = io.BytesIO(file_contents)
-            excel_object = pd.ExcelFile(file_io, engine='xlrd')
-            data2 = excel_object.parse(index_col = 0).fillna(method='ffill', limit=50).values[:8760,0]
-            
-            
+            if  file_type.lower() in ["xlsx","xls"]:
+                excel_object = pd.ExcelFile(file_io, engine='xlrd')
+                y = excel_object.parse().fillna(method='ffill', limit=50).values[:8760,0]
+            elif file_type.lower() in ["csv"]:
+                y = pd.read_csv(file_io).fillna(method='ffill', limit=50).values[:8760,0]
+            else:
+#                print("Invalid Filetype to load")
+                div_spinner.text = """<div align="center"> <strong style="color: red;">Invalid Filetype to load @ Loading External Data </strong> </div>"""
+                return
+            if len(y) == 8760:
+                x = np.arange(8760)
+                individual_data_data_table.source.data = dict(x=x,y=np.round(y,3))
+                modCallback("","","")
+#                print("External Data Loaded")
+                div_spinner.text = """<div align="center"> <strong style="color: green;">External Data Loaded</strong> </div>"""
+                
+            else:
+#                print("There are not enought data <"+str(len(y))+"/8760>")
+                div_spinner.text = """<div align="center"> <strong style="color: red;">Your File has not enought values (please specify 8750 values) </strong> </div>"""
 
+        except Exception as e:
+            print(str(e))
+            div_spinner.text = """<div align="center"> <strong style="color: red;">Fatal Error @ Loading External Data </strong> </div>"""
+
+    
 # =============================================================================
 #   Signal Emitting / Coupling for Loading External Data
 # =============================================================================
     create_individual_data.on_change('value', setLayout)
+    
     for widget in create_widgets:
         widget.on_change('value', createCallback)
+        
     for i in [0,1,2]:
         modtools[i].on_change('value', modCallback)    
+        
     dic_modtools["mean"].on_change('active', modCallback)
     dic_modtools["total"].on_change('value', totalCallback)
+    dic_modtools["save"].on_click(saveCallback)
+    
+    file_source2 = ColumnDataSource({'file_contents':[], 'file_name':[]})
+    file_source2.on_change('data', loadCallback)
+    individual_data_upload_button.callback = CustomJS(args=dict(file_source=file_source2), code =upload_code)
+    
+    
 # =============================================================================
 #   Set Global Layout
 # =============================================================================
