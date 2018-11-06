@@ -52,7 +52,10 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Ramping Costs"] = c_ramp
         solution["Revenue From Electricity"] = rev_tot
         solution["Heat Demand"] = [instance.demand_th_t[t] for t in instance.t]
-        _x = list(instance.j_bp)[0] if list(instance.j_bp)[0] in list(instance.j) else list(instance.j)[0]
+        try:
+            _x = list(instance.j_bp)[0] 
+        except:
+            _x = list(instance.j)[0]
         solution["Electricity Price"] = [instance.electricity_price_jt[_x,t] for t in instance.t]
         solution["Mean Value Heat Price"] = np.mean(np.array(solution["Heat Price"]))
         solution["Mean Value Heat Price (with costs of existing power plants)"] =  c_tot_inv/sum([instance.demand_th_t[t] for t in instance.t])
