@@ -524,8 +524,10 @@ def modify_doc(doc):
                 div_spinner.text = """<div align="center"> <strong style="color: red;">Error: No Capacities are installed !!!</strong></div>"""
             elif solutions == "Error2":
                 div_spinner.text = """<div align="center"> <strong style="color: red;">Error: The installed capacities are not enough to cover the load !!!</strong></div>"""
-            elif solutions == "Error3":
+            elif solutions == "Error3#":
                 print("Error in Saving Solution to JSON !!!")
+                div_spinner.text = """<div align="center"><strong style="color: red;">Error @ Generating JSON!!!</strong></div>"""                
+            elif solutions == "Error3":
                 print("Cause: Infeasible or unbounded model !!!")
                 div_spinner.text = """<div align="center"><strong style="color: red;">Error: Infeasible or unbounded model !!!</strong></div>"""
             elif solutions == None:

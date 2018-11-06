@@ -20,11 +20,17 @@ def main(data,inv_flag,selection,demand_f):
     
     if instance == "Error1" or instance == "Error2":
         return instance,None,None
-    elif instance == None or results == None:
-        return None,None,None
+    
+    if instance == "Error3":
+        return "Error3",None,None
+    
+    if instance == None or results == None:
+        return None,None,None    
 
+    
     solutions = save_sol_to_json(instance,results,inv_flag)
-    if solutions == "Error3":
+    
+    if solutions == "Error3#":
         return solutions,instance,results 
         
     return solutions,instance,results 

@@ -32,7 +32,11 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
             c_ramp[j] = sum(instance.ramp_j_chp_t[j,t]() * instance.c_ramp_chp for t in instance.t)
         rev_tot = {j:sum(instance.x_el_jt[j,t]()*instance.sale_electricity_price_jt[j,t] for t in instance.t) for j in instance.j}
 
-        c_tot_inv = instance.cost() + sum ([c_inv_stock[j]  for j in instance.j])
+        #FIXME: for modeling reasons this cost are not real costs
+        c_hs_penalty_load = sum([instance.x_load_hs_t[hs,t]()*5e-2  for hs in instance.j_hs for t in instance.t])      # for modeling reasons
+        c_hs_penalty_unload = sum([instance.x_unload_hs_t[hs,t]()*5e-2  for hs in instance.j_hs for t in instance.t])  # for modeling reasons
+        c_hs = c_hs_penalty_load + c_hs_penalty_unload
+        c_tot_inv = instance.cost() + sum ([c_inv_stock[j]  for j in instance.j]) - c_hs
 
 
         solution={ "Thermal Power Energymix":{j:[instance.x_th_jt[(j,t)]() for t in instance.t] for j in instance.j},
@@ -64,7 +68,8 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Variable Cost CHP's"]= sum([instance.mc_jt[j,t] * instance.x_th_jt[j,t]() - instance.sale_electricity_price_jt[j,t] * instance.x_el_jt[j,t]() for j in instance.j_chp for t in instance.t])
         solution["Fuel Costs"] = {j:sum([instance.mc_jt[j,t] * instance.x_th_jt[j,t]() for t in instance.t]) for j in instance.j}
         solution["MC"] = {j:[instance.mc_jt[j,t] for t in instance.t] for j in instance.j}
-        solution["Anual Total Costs"] = instance.cost() #Operational + Fuel + Ramping + el. Peakload-el. Revenues without Investmentcosts of existing Powerplants
+        #FIXME
+        solution["Anual Total Costs"] = instance.cost() - c_hs #Operational + Fuel + Ramping + el. Peakload-el. Revenues without Investmentcosts of existing Powerplants
         solution["Anual Total Costs (with costs of existing power plants)"] = c_tot_inv
 
         solution["Anual Investment Cost"] =  {j:0 for j in instance.j}
@@ -143,8 +148,8 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Total CO2 Emission:"]= {**solution["Total CO2 Emission"],**solution["CO2 Emission Heat Storages"]}
         solution["Total CO2 Emissions"] = sum(solution["Total CO2 Emission:"].values())
         # Full Load Hours
-        solution["Full Load Hours"] = {j:solution["Thermal Generation Mix"][j]/solution["Installed Capacities"][j] for j in instance.j}
-        solution["Full Load Hours Heat Storage"] = {hs: solution["Unloading Heat Storage over year"][hs]/solution["Installed Capacities Heat Storages"][hs] for hs in instance.j_hs}
+        solution["Full Load Hours"] = {j:solution["Thermal Generation Mix"][j]/solution["Installed Capacities"][j] if solution["Installed Capacities"][j]!=0 else 0 for j in instance.j}
+        solution["Full Load Hours Heat Storage"] = {hs: solution["Unloading Heat Storage over year"][hs]/solution["Installed Capacities Heat Storages"][hs] if solution["Installed Capacities Heat Storages"][hs]!=0 else 0 for hs in instance.j_hs}
         solution["Full Load Hours:"] = {**solution["Full Load Hours"],**solution["Full Load Hours Heat Storage"]}
        
         # only sum effective energy -> producton of solar thermal over  heat
@@ -177,8 +182,9 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         print("Done !")
         return solution
     except Exception as e:
+        print("Error in creating JSON")
         print(e)
-        return "Error3"
+        return "Error3#"
 
 
 

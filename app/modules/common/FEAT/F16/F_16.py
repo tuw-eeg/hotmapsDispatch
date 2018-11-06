@@ -31,6 +31,8 @@ if __name__ == "__main__":
         print("The installed capacities are not enough to cover the load !!!" )
     elif solutions == "Error3":
         print("Error: Infeasible or Unbounded model !!!")
+    elif solutions == "Error3#":
+        print("Error: Could not save data to JSON!!!")
     elif solutions == None:
         print("Error: Something get Wrong")
     else:
