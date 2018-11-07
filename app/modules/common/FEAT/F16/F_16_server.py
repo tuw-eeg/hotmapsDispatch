@@ -230,11 +230,11 @@ input_list= ['name',
  'renewable factor',
  'must run [0-1]']
 
-input_price_list = ["energy carrier","prices(EUR/MWh)","emission factor"]
+input_price_list = ["energy carrier","prices(EUR/MWh)","emission factor [tCO2/MWh]"]
 
-parameter_list = ['CO2 Price',
+parameter_list = ['CO2 Price [EUR/tC02]',
  'Interest Rate [0-1]',
- 'Total Renewable Factor [0-1]',
+ 'Minimum Renewable Factor [0-1]',
  'Total Demand[ MWh]']
 # select default labels for the modification tools
 lab = dict(offset="Offset",constant="Set To Constant",
@@ -798,7 +798,7 @@ def modify_doc(doc):
     children = [tec_buttons,widgetbox(tabs_geneator),row(children = [ok_button,cancel_button])]
 
     cop_label = TextInput(placeholder="COP", title="COP",disabled= True)
-    flow_temp = Select(title="Flow Temperature")
+    flow_temp = Select(title="Inlet Temperature")
     return_temp = Select(title="Return Temperature")
 
     energy_carrier_select = Select(options = energy_carrier_options, title="Energy Carrier",value = energy_carrier_options[0])
