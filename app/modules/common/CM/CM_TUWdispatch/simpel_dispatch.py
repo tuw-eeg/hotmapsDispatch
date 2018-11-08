@@ -24,7 +24,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m = pe.AbstractModel()
     #%% Sets - TODO: depends on how the input data looks finally
     val = preprocessing(data,demand_f,inv_flag,selection)
-
+    
     if val == "Error1" or val == "Error2":
         return (val,None)
 
@@ -43,7 +43,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     #%% Parameter - TODO: depends on how the input data looks finally
     m.demand_th_t = pe.Param(m.t,initialize = val["demand_th_t"])
     max_demad = val["max_demad"]
-
+    
     m.radiation_t = pe.Param(m.t,initialize=val["radiation_t"])
     m.IK_j = pe.Param(m.j,initialize=val["IK_j"])
     m.OP_fix_j = pe.Param(m.j,initialize=val["OP_fix_j"])
@@ -54,7 +54,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.ratioPMaxFW = pe.Param(initialize=val["ratioPMaxFW"])
     m.ratioPMax = pe.Param(initialize=val["ratioPMax"])
     m.mc_jt = pe.Param(m.j,m.t,initialize= val["mc_jt"])
-    m.n_th_j = pe.Param(m.j,initialize=val["n_th_j"])
+    m.n_th_jt = pe.Param(m.j,m.t,initialize=val["n_th_jt"])
     m.x_th_cap_j = pe.Param(m.j,initialize=val["x_th_cap_j"])
 #    m.x_el_cap_j = pe.Param(m.j,initialize=val["x_el_cap_j"])
 #    m.pot_j = pe.Param(m.j,initialize=val["pot_j"])
@@ -103,8 +103,8 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
 
     #% electircal power generation
     def gen_el_jt_rule(m,j,t):
-        if j not in m.j_chp or m.n_th_j[j] != 0:
-            return m.x_el_jt[j,t] == m.x_th_jt[j,t] / m.n_th_j[j] * m.n_el_j[j]
+        if j not in m.j_chp or m.n_th_jt[j,t] != 0:
+            return m.x_el_jt[j,t] == m.x_th_jt[j,t] / m.n_th_jt[j,t] * m.n_el_j[j]
         else:
             return pe.Constraint.Skip
     m.gen_el_jt = pe.Constraint(m.j,m.t,rule=gen_el_jt_rule)
@@ -144,6 +144,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.must_run_jt = pe.Constraint(m.j,m.t,rule=must_run_jt_rule)
 
     #% The solar gains depend on the installed capacity and the solar radiation
+    #% 1000 represent the radiation at wich the solar plant has maximal power 
     def solar_restriction_jt_rule(m,j,t):
         rule = m.x_th_jt[j,t] <=  m.Cap_j[j]*m.radiation_t[t]/1000
         return rule
@@ -168,7 +169,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     #% the sum of the power consumption of the power to heat systems and the heat pumps.
     def max_p_el_t_rule(m,t):
         if t in range(1,24*60+1) or t in range(8760-24*30, 8760+1):
-            return m.P_el_max >= sum([m.x_th_jt[j,t] / m.n_th_j[j]  for j in m.j_hp]) + sum([m.x_th_jt[j,t] / m.n_th_j[j]  for j in m.j_pth])
+            return m.P_el_max >= sum([m.x_th_jt[j,t] / m.n_th_jt[j,t]  for j in m.j_hp]) + sum([m.x_th_jt[j,t] / m.n_th_jt[j,t]  for j in m.j_pth])
         else:
             return pe.Constraint.Skip
     m.max_p_el_t = pe.Constraint(m.t,rule=max_p_el_t_rule)
@@ -211,7 +212,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
         if j in val["j_chp_se"]:
             rule = m.x_el_jt[j,t] >= m.x_th_jt[j,t] / m.ratioPMaxFW    # should be adopted using binary variables
         else:
-            rule = m.x_el_jt[j,t] == m.x_th_jt[j,t] / m.n_th_j[j] * m.n_el_j[j]
+            rule = m.x_el_jt[j,t] == m.x_th_jt[j,t] / m.n_th_jt[j,t] * m.n_el_j[j]
         return rule
     m.chp_geneartion_restriction3_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction3_jt_rule)
 

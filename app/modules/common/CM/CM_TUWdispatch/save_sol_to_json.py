@@ -45,11 +45,11 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
                   "Electricity Production by CHP" : sum([instance.x_el_jt[(j,t)]() for j in instance.j_chp for t in instance.t]),
                   "Thermal Production by CHP" : sum([instance.x_th_jt[(j,t)]() for j in instance.j_chp for t in instance.t]),
                   "Electrical Consumption of Heatpumps and Power to Heat devices" : \
-                                       sum([instance.x_th_jt[(j,t)]() / instance.n_th_j[j] for j in instance.j_hp for t in instance.t])+\
-                                       sum([instance.x_th_jt[(j,t)]() / instance.n_th_j[j] for j in instance.j_pth for t in instance.t]),
+                                       sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for j in instance.j_hp for t in instance.t])+\
+                                       sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for j in instance.j_pth for t in instance.t]),
                   "Maximum Electrical Load of Heatpumps and Power to Heat devices" : \
-                                       max([max(np.array([instance.x_th_jt[(j,t)]() / instance.n_th_j[j] for j in instance.j_hp for t in instance.t]),default=0),
-                                          max(np.array([instance.x_th_jt[(j,t)]() / instance.n_th_j[j] for j in instance.j_pth for t in instance.t]),default=0)]),
+                                       max([max(np.array([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for j in instance.j_hp for t in instance.t]),default=0),
+                                          max(np.array([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for j in instance.j_pth for t in instance.t]),default=0)]),
                   "Thermal Generation Mix":{j:sum([instance.x_th_jt[(j,t)]() for t in instance.t]) for j in instance.j}
                   }
 
@@ -92,10 +92,10 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Electrical Peak Load Costs"] = instance.P_el_max()*10000
         solution["Specific Capital Costs of installed Capacities"] = {j:instance.IK_j[j] * instance.alpha_j[j] for j in solution["Installed Capacities"].keys() if solution["Installed Capacities"][j] !=0 }
         solution["Technologies"] = [j for j in instance.j]
-        solution["Marginal Costs"] = [np.mean([instance.mc_jt[j,t] for t in instance.t]) - instance.n_el_j[j]/instance.n_th_j[j] *np.mean([instance.sale_electricity_price_jt[j,t] for t in instance.t]) if j in instance.j_chp else np.mean([instance.mc_jt[j,t] for t in instance.t]) for j in instance.j]
+        solution["Marginal Costs"] = [np.mean([instance.mc_jt[j,t] for t in instance.t]) - instance.n_el_j[j]/np.mean([instance.n_th_jt[j,t] for t in instance.t]) *np.mean([instance.sale_electricity_price_jt[j,t] for t in instance.t]) if j in instance.j_chp else np.mean([instance.mc_jt[j,t] for t in instance.t]) for j in instance.j]
         for i,val in enumerate(instance.j):
             if val in instance.j_chp:
-                solution["Marginal Costs"][i] = solution["Marginal Costs"][i] - instance.n_el_j[val]/instance.n_th_j[val]*np.mean([instance.sale_electricity_price_jt[j,t] for t in instance.t])
+                solution["Marginal Costs"][i] = solution["Marginal Costs"][i] - instance.n_el_j[val]/np.mean([instance.n_th_jt[val,t] for t in instance.t])*np.mean([instance.sale_electricity_price_jt[j,t] for t in instance.t])
         solution["State of Charge"] = {hs:[instance.store_level_hs_t[hs,t]() for t in instance.t] for hs in instance.j_hs}
 
         solution["HS-Capacities"] = {hs:instance.Cap_hs[hs]()+instance.cap_hs[hs] if instance.Cap_hs[hs]() != None else instance.cap_hs[hs] for hs in instance.j_hs }
@@ -141,9 +141,9 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
                 **solution["Fuel Costs Heat Storages"]}
         solution["all_heat_geneartors"] = list(instance.all_heat_geneartors.value)
         # CO2 Emissions
-        solution["Total CO2 Emission"]= {j:1e3*solution["Thermal Generation Mix"][j]*instance.em_j[j]/instance.n_th_j[j] for j in instance.j} 
-        solution["CO2 Emission Heat"] = {j: solution["Total CO2 Emission"][j]*instance.n_th_j[j]/(instance.n_th_j[j]+instance.n_el_j[j]) for j in instance.j} 
-        solution["CO2 Emission Electricity"] = {j:solution["Total CO2 Emission"][j]*instance.n_el_j[j]/(instance.n_th_j[j]+instance.n_el_j[j]) for j in instance.j} 
+        solution["Total CO2 Emission"]= {j:1e3*solution["Thermal Generation Mix"][j]*instance.em_j[j]/np.mean([instance.n_th_jt[j,t] for t in instance.t]) for j in instance.j} 
+        solution["CO2 Emission Heat"] = {j: solution["Total CO2 Emission"][j]*np.mean([instance.n_th_jt[j,t] for t in instance.t])/(np.mean([instance.n_th_jt[j,t] for t in instance.t])+instance.n_el_j[j]) for j in instance.j} 
+        solution["CO2 Emission Electricity"] = {j:solution["Total CO2 Emission"][j]*instance.n_el_j[j]/(np.mean([instance.n_th_jt[j,t] for t in instance.t])+instance.n_el_j[j]) for j in instance.j} 
         solution["CO2 Emission Heat Storages"] = {hs:0 for hs in instance.j_hs}
         solution["Total CO2 Emission:"]= {**solution["Total CO2 Emission"],**solution["CO2 Emission Heat Storages"]}
         solution["Total CO2 Emissions"] = sum(solution["Total CO2 Emission:"].values())

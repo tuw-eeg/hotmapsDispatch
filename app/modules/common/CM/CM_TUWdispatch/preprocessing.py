@@ -77,26 +77,24 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
 
     mc = {}
     for j in data["tec"]:
-        if data["n_th"][j]  == 0:
-            for t in range(1,8760+1):
-                mc[j,t]= 1e100
-        else:
-            if type(data["energy_carrier_prices"][data["energy_carrier"][j]]) == dict:
-                for t in range(1,8760+1):
-                    mc[j,t]= data["energy_carrier_prices"][data["energy_carrier"][j]][j,t] /  \
-                                  data["n_th"][j] + \
-                                 data["em"][data["energy_carrier"][j]]*data["P_co2"] / \
-                                  data["n_th"][j]
+        for t in range(1,8760+1):
+            if data["n_th"][j,t]  == 0:
+                    mc[j,t]= 1e100
             else:
-                for t in range(1,8760+1):
+                if type(data["energy_carrier_prices"][data["energy_carrier"][j]]) == dict:
+                        mc[j,t]= data["energy_carrier_prices"][data["energy_carrier"][j]][j,t] /  \
+                                      data["n_th"][j,t] + \
+                                     data["em"][data["energy_carrier"][j]]*data["P_co2"] / \
+                                      data["n_th"][j,t]
+                else:
                     mc[j,t]= data["energy_carrier_prices"][data["energy_carrier"][j]] /  \
-                                data["n_th"][j] + \
-                                 data["em"][data["energy_carrier"][j]]*data["P_co2"] / \
-                                  data["n_th"][j]
+                                    data["n_th"][j,t] + \
+                                     data["em"][data["energy_carrier"][j]]*data["P_co2"] / \
+                                      data["n_th"][j,t]
 
 
     mc_jt =                 {(key,t):mc[key,t] for t in range(1,8760+1) for key in tec}
-    n_th_j =                {key:data["n_th"][key] for key in tec}
+    n_th_jt =                {(key,t):data["n_th"][key,t] for t in range(1,8760+1) for key in tec}
     x_th_cap_j =            {key:data["P_th_cap"][key] for key in tec}
 #    x_el_cap_j =            {key:data["P_el_cap"][key] for key in tec}
     x_el_cap_j = None #XXX: Not used
@@ -152,7 +150,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     args = [tec, j_hp, j_pth, j_st, j_waste, j_chp, j_bp, j_wh,
             j_gt, j_hs, demand_th_t, max_demad, radiation_t, IK_j,
             OP_fix_j, n_el_j, electricity_price_t, P_min_el_chp,
-            Q_min_th_chp, ratioPMaxFW, ratioPMax, mc_jt, n_th_j,
+            Q_min_th_chp, ratioPMaxFW, ratioPMax, mc_jt, n_th_jt,
             x_th_cap_j, x_el_cap_j, pot_j, lt_j, el_surcharge, ir,
             alpha_j, load_cap_hs, unload_cap_hs, n_hs, loss_hs,
             IK_hs, cap_hs, c_ramp_chp, c_ramp_waste, alpha_hs,
@@ -163,7 +161,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     keys = ['j', 'j_hp', 'j_pth', 'j_st', 'j_waste', 'j_chp', 'j_bp', 'j_wh',
             'j_gt', 'j_hs', 'demand_th_t', 'max_demad', 'radiation_t', 'IK_j',
             'OP_fix_j', 'n_el_j', 'electricity_price_t', 'P_min_el_chp',
-            'Q_min_th_chp', 'ratioPMaxFW', 'ratioPMax', 'mc_jt', 'n_th_j',
+            'Q_min_th_chp', 'ratioPMaxFW', 'ratioPMax', 'mc_jt', 'n_th_jt',
             'x_th_cap_j', 'x_el_cap_j', 'pot_j', 'lt_j', 'el_surcharge', 'ir',
             'alpha_j', 'load_cap_hs', 'unload_cap_hs', 'n_hs', 'loss_hs',
             'IK_hs', 'cap_hs', 'c_ramp_chp', 'c_ramp_waste', 'alpha_hs',

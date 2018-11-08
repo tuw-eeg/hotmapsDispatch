@@ -57,8 +57,9 @@ path_spinner_html = os.path.join(root_dir, "spinner2.html")
 path_spinner_load_html = os.path.join(root_dir, "spinner.html")
 #%%
 
-global data_table,data_table_prices,data_table_data,f,carrier_dict
+global data_table,data_table_prices,data_table_data,f,carrier_dict,_nth
 carrier_dict ={}
+_nth = dict()
 #%%
 # =============================================================================
 # RUN MODEL
@@ -313,6 +314,9 @@ def modify_doc(doc):
     data_kwargs = dict(zip(widgets_keys,widgets_data))
     #external_data = dict(zip(widgets_keys,[{}]*len(widgets_keys))) #XXX only copy
     external_data = dict(zip(widgets_keys,[{} for _ in range(len(widgets_keys))]))
+#    _nth = dict()
+    add_to_tec = Select(title="Add To Heatgenerator", value="", 
+                            options=[],disabled=True)
 # =============================================================================
 #   MAIN GUI Elements
 # =============================================================================
@@ -409,7 +413,7 @@ def modify_doc(doc):
 # =============================================================================
     def run_callback():
         try:
-            global carrier_dict
+            global carrier_dict,_nth
 
             df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
             if df.shape[0] == 0:
@@ -497,13 +501,23 @@ def modify_doc(doc):
                     data["energy_carrier_prices"][mk] = ext
                 else:
                     data[mk] = ext
-            ##
+            ## Categorize
             data["categorize"] = {}
             _dataframe= pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore')
             select_tec_options = [x.replace("CHP Steam Extraction","CHP-SE").replace("CHP Back Pressure","CHP-BP") for x in select_tec_options_model]
             for j in select_tec_options:
                 data["categorize"][j] = _dataframe["name"][_dataframe["type"] == j].values.tolist()
-
+            ## thermal efficiencc
+            _n_th = {}
+            data["n_th"] = {**data["n_th"],**_nth}
+            for k,v in data["n_th"].items():
+                if type(v)==list:
+                    _n_th = {**_n_th,**dict(zip(zip([k]*8760,range(1,8760+1)),v))}
+                else:
+                    _n_th = {**_n_th,**dict(zip(zip([k]*8760,range(1,8760+1)),[v]*8760))}
+            data["n_th"] = _n_th
+            _nth = {}
+            ## 
             solutions = None
             selection = [[],[]]
             inv_flag = False
@@ -660,9 +674,11 @@ def modify_doc(doc):
         if new_key and old_key:
             carrier_dict[new_key] = carrier_dict.pop(old_key)
         #
-
+        add_to_tec.options = ["None"]+_opt
+        add_to_tec.value = "None"
+        
         _options = ["Default"] + _opt
-
+        
         for i in data_kwargs:
             widgets[i]["tec"].options = _options
             c,year = widgets[i]["select"].value.split("_")
@@ -1029,12 +1045,13 @@ def modify_doc(doc):
                                  tools=["pan,wheel_zoom,box_zoom,reset,save"],)
     individual_data_fig.line('x', 'y', source=individual_data_data_table.source, line_alpha=0.6)
     individual_data_fig.toolbar.logo = None
+
 # =============================================================================
 # 
 # =============================================================================
-    modtools += [individual_data_name]
+    modtools += [individual_data_name,add_to_tec]
     dic_modtools = dict(zip(["offset","constant","scale","mean","total","add",
-                            "save","name"],
+                            "save","name","tec"],
                             modtools))
     
     def setLabel(widgets,**kwargs):
@@ -1089,7 +1106,7 @@ def modify_doc(doc):
                                   [dirichlet,normal,linear,noneFunc])))
     
     dic_modtools["add"].value = widgets_keys[0]
-    dic_modtools["add"].options = widgets_keys
+    dic_modtools["add"].options = widgets_keys + ["n_th/COP"]
     dic_modtools["save"].label = '✓ Save'
     dic_modtools["total"].disabled=False
     for i in ["total","offset"]:
@@ -1103,7 +1120,7 @@ def modify_doc(doc):
                         column(create_widgets)])
     
     r2 = row(children=[widgetbox(individual_data_data_table),individual_data_fig,
-     column([modtools[i] for i in [4,0,1,2,3,5,7,6]])])
+     column([modtools[i] for i in [4,0,1,2,3,5,8,7,6]])])
     
     individual_data_layout = column(children=[r1,r2])
     tabs.tabs += [Panel(child=individual_data_layout,title="Load Individual Data")]
@@ -1172,14 +1189,26 @@ def modify_doc(doc):
         div_spinner.text = ""
     
     def saveCallback():
-        div_spinner.text = load_text
-        widget_data = data_kwargs[dic_modtools["add"].value]
-#        print(list(widget_data))
-        widget_data["data"][dic_modtools["name"].value,1] = individual_data_data_table.source.data["y"]
-        widget_data["dic"][dic_modtools["name"].value] = dic_modtools["name"].value
-        widget_data["dic_inv"] = invert_dict(widget_data["dic"])
-        widgets[dic_modtools["add"].value]["select"].options += [dic_modtools["name"].value+"_1"]
-        div_spinner.text = """<div align="center"> <strong style="color: green;">External Data """+dic_modtools["name"].value+" added to "+dic_modtools["add"].value + " as "+dic_modtools["name"].value+"_1"+"""</strong> </div>"""
+        if len(individual_data_data_table.source.data["y"]) == 8760:
+            div_spinner.text = load_text
+            if dic_modtools["add"].value != "n_th/COP":
+                widget_data = data_kwargs[dic_modtools["add"].value]
+        #        print(list(widget_data))
+                widget_data["data"][dic_modtools["name"].value,1] = individual_data_data_table.source.data["y"]
+                widget_data["dic"][dic_modtools["name"].value] = dic_modtools["name"].value
+                widget_data["dic_inv"] = invert_dict(widget_data["dic"])
+                widgets[dic_modtools["add"].value]["select"].options += [dic_modtools["name"].value+"_1"]
+                div_spinner.text = """<div align="center"> <strong style="color: green;">External Data """+dic_modtools["name"].value+" added to "+dic_modtools["add"].value + " as "+dic_modtools["name"].value+"_1"+"""</strong> </div>"""
+            else:
+                if dic_modtools["tec"].value != "None":
+                    _nth[dic_modtools["tec"].value] = list(individual_data_data_table.source.data["y"])
+                    print("COP/ n_th added to"+dic_modtools["tec"].value)
+                    div_spinner.text = """<div align="center"> <strong style="color: green;">n_th/COP - External Data added to """+dic_modtools["tec"].value+"""</strong> </div>"""
+                else:
+                    div_spinner.text = """<div align="center"> <strong style="color: red;">Nothing to Save</strong> </div>"""
+        else:
+            div_spinner.text = """<div align="center"> <strong style="color: red;">Nothing to Save</strong> </div>"""
+
     def loadCallback(name,old,new):
         try:
             div_spinner.text = load_text
@@ -1213,7 +1242,22 @@ def modify_doc(doc):
             print(str(e))
             div_spinner.text = """<div align="center"> <strong style="color: red;">Fatal Error @ Loading External Data </strong> </div>"""
 
-    
+    def setCOP(name,old,new):
+        _heat_generators= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
+        _heat_generators = _heat_generators.fillna(0)
+        _opt = list(_heat_generators["name"].values)
+        _opt = ["None"]+_opt
+        
+        if dic_modtools["add"].value == "n_th/COP":
+            dic_modtools["name"].disabled=True
+            dic_modtools["tec"].options = _opt
+            
+        else:
+            dic_modtools["name"].disabled=False
+            dic_modtools["tec"].options = ["None"]
+            dic_modtools["tec"].value = "None"
+        
+        
 # =============================================================================
 #   Signal Emitting / Coupling for Loading External Data
 # =============================================================================
@@ -1232,8 +1276,8 @@ def modify_doc(doc):
     file_source2 = ColumnDataSource({'file_contents':[], 'file_name':[]})
     file_source2.on_change('data', loadCallback)
     individual_data_upload_button.callback = CustomJS(args=dict(file_source=file_source2), code =upload_code)
-    
-    
+    dic_modtools["add"].on_change('value', setCOP)
+    dic_modtools["tec"].on_change('value', setCOP)
 # =============================================================================
 #   Set Global Layout
 # =============================================================================
