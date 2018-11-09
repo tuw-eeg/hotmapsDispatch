@@ -24,8 +24,8 @@ def main(data,inv_flag,selection,demand_f):
     if instance == "Error3":
         return "Error3",None,None
     
-    if instance == None or results == None:
-        return None,None,None    
+    if instance == None and type(results) == str:
+        return None,results,None    
 
     
     solutions = save_sol_to_json(instance,results,inv_flag)

@@ -530,7 +530,7 @@ def modify_doc(doc):
                     div_spinner.text = """<div align="center"> <strong style="color: red;"><p>Error: Please specify the technologies for the invesment model !!!<p>
                     <p>Mark Heat Generators by pressing "CTRL" + "left mouse"<p><p>Selection is marked yellow<p></strong></div>"""
                     return
-            solutions,_,_ = execute(data,inv_flag,selection)
+            solutions,_message,_ = execute(data,inv_flag,selection)
 
             print('calculation done')
             print ("Ploting started..")
@@ -546,7 +546,8 @@ def modify_doc(doc):
                 div_spinner.text = """<div align="center"><strong style="color: red;">Error: Infeasible or unbounded model !!!</strong></div>"""
             elif solutions == None:
                 print("Error: Something get Wrong")
-                div_spinner.text = """<div align="center"> <strong style="color: red;">Error: Something get Wrong</strong></div>"""
+                print(_message)
+                div_spinner.text = """<div align="center"> <strong style="color: red;">Error: """+_message+"""</strong></div>"""
             else:
                 output_tabs = plot_solutions(solution=solutions)
 

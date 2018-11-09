@@ -35,6 +35,7 @@ if __name__ == "__main__":
         print("Error: Could not save data to JSON!!!")
     elif solutions == None:
         print("Error: Something get Wrong")
+        print(instance)
     else:
         print('calculation done')
         tabs = plot_solutions(show_plot=True,solution=solutions)   

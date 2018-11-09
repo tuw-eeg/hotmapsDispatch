@@ -7,7 +7,7 @@ Created on Tue Sep 26 11:52:51 2017
 #%% Import needed modules
 import pyomo.environ as pe
 from datetime import datetime
-
+from pyomo.opt import SolverStatus, TerminationCondition
 import os
 import sys
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
@@ -332,7 +332,19 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     instance.solutions.load_from(results)
     instance.solutions.store_to(results)
     print("*****************\ntime for solving: " + str(datetime.now()-solv_start)+"\n*****************")
-    return(instance,results)
+    
+    if (results.solver.status == SolverStatus.ok) and (results.solver.termination_condition == TerminationCondition.optimal):
+        print ("this is feasible and optimal")
+        return(instance,results)
+    elif results.solver.termination_condition == TerminationCondition.infeasible:
+         print ("infeasible")
+         return("Error3","Error3")
+    else:
+        print ("something else is wrong")
+        return (None,results.solver.message)
+     
+     
+    
 
 
 
