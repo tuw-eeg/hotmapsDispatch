@@ -419,7 +419,7 @@ def modify_doc(doc):
             if df.shape[0] == 0:
                 del df
                 carrier_dict ={}
-                div_spinner.text = """<div align="center"> <strong style="color: red;">No Heat Generators aviable </strong> </div>"""
+                div_spinner.text = """<div align="center"> <strong style="color: red;">No Heat Generators available </strong> </div>"""
                 return
 
             if float(to_install.value) > 0 and not invest_button.active:
@@ -651,7 +651,7 @@ def modify_doc(doc):
                 div_spinner.text = """<div align="center"><strong style="color: green;">Upload done</strong></div>"""
             else:
                 print("Not a valid file to upload")
-                div_spinner.text = """<div align="center"><strong style="color: red;">Not a valid file to uploade</strong></div>"""
+                div_spinner.text = """<div align="center"><strong style="color: red;">Not a valid file to upload</strong></div>"""
             print('Upload done')
 
         except Exception as e:
@@ -1237,7 +1237,7 @@ def modify_doc(doc):
                 
             else:
 #                print("There are not enought data <"+str(len(y))+"/8760>")
-                div_spinner.text = """<div align="center"> <strong style="color: red;">Your File has not enought values (please specify 8750 values) </strong> </div>"""
+                div_spinner.text = """<div align="center"> <strong style="color: red;">Your File has not enought values (please specify 8760 values) </strong> </div>"""
 
         except Exception as e:
             print(str(e))
