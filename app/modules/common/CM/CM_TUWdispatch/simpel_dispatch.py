@@ -39,6 +39,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.j_wh = pe.Set(initialize = val["j_wh"])
     m.j_gt = pe.Set(initialize = val["j_gt"])
     m.j_hs = pe.Set(initialize = val["j_hs"])
+    m.all_heat_geneartors = pe.Set(initialize = val["all_heat_geneartors"])
     #%% Parameter - TODO: depends on how the input data looks finally
     m.demand_th_t = pe.Param(m.t,initialize = val["demand_th_t"])
     max_demad = val["max_demad"]
@@ -84,7 +85,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.mr_j = pe.Param(m.j, initialize = val["mr_j"])
     m.em_j = pe.Param(m.j, initialize = val["em_j"])
     
-    m.cap_losse_hs = pe.Param(initialize=val["cap_losse_hs"])
+    m.cap_losse_hs = pe.Param(m.j_hs,initialize=val["cap_losse_hs"])
     #%% Variablen
     m.x_th_jt = pe.Var(m.j,m.t,within=pe.NonNegativeReals)
     m.Cap_j = pe.Var(m.j,within=pe.NonNegativeReals)
