@@ -39,7 +39,6 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.j_wh = pe.Set(initialize = val["j_wh"])
     m.j_gt = pe.Set(initialize = val["j_gt"])
     m.j_hs = pe.Set(initialize = val["j_hs"])
-    m.all_heat_geneartors = pe.Set(initialize = val["all_heat_geneartors"])
     #%% Parameter - TODO: depends on how the input data looks finally
     m.demand_th_t = pe.Param(m.t,initialize = val["demand_th_t"])
     max_demad = val["max_demad"]
@@ -84,7 +83,8 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
 
     m.mr_j = pe.Param(m.j, initialize = val["mr_j"])
     m.em_j = pe.Param(m.j, initialize = val["em_j"])
-
+    
+    m.cap_losse_hs = pe.Param(initialize=val["cap_losse_hs"])
     #%% Variablen
     m.x_th_jt = pe.Var(m.j,m.t,within=pe.NonNegativeReals)
     m.Cap_j = pe.Var(m.j,within=pe.NonNegativeReals)
@@ -229,7 +229,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
         elif t == 8760:
             return m.store_level_hs_t[hs,t] == 0
         else:
-            return m.store_level_hs_t[hs,t] == m.store_level_hs_t[hs,t-1] - m.x_unload_hs_t[hs,t]/m.loss_hs[hs] + m.x_load_hs_t[hs,t-1]*m.n_hs[hs]
+            return m.store_level_hs_t[hs,t] == m.store_level_hs_t[hs,t-1]*(1-m.cap_losse_hs[hs]) - m.x_unload_hs_t[hs,t]/m.loss_hs[hs] + m.x_load_hs_t[hs,t-1]*m.n_hs[hs]
     m.storage_state_hs_t = pe.Constraint(m.j_hs,m.t,rule=storage_state_hs_t_rule)
 
     # The storage_level is restricted by the installed capcities

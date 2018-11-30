@@ -123,7 +123,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     IK_hs =                 {hs: data["IK_cap_hs"][hs] for hs in j_hs}
     cap_hs =                {hs: data["cap_hs"][hs] for hs in j_hs}
     OP_fix_hs =             {hs: data["OP_fix_hs"][hs] for hs in j_hs}
-
+    cap_losse_hs =          {hs: data["cap_losse_hs"][hs]/100 for hs in j_hs}
     ir =    	              data["interest_rate"]
     q =                     1+ir
     alpha_hs =              {hs: ( q**data["LT_hs"][hs] * ir) / \
@@ -156,7 +156,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
             IK_hs, cap_hs, c_ramp_chp, c_ramp_waste, alpha_hs,
             rf_j, rf_tot, OP_var_j, temperature, thresh,
             sale_electricity_price_t, OP_fix_hs, all_heat_geneartors,
-            mr_j,j_chp_se,j_chp_bp,em_j]
+            mr_j,j_chp_se,j_chp_bp,em_j,cap_losse_hs]
 
     keys = ['j', 'j_hp', 'j_pth', 'j_st', 'j_waste', 'j_chp', 'j_bp', 'j_wh',
             'j_gt', 'j_hs', 'demand_th_t', 'max_demad', 'radiation_t', 'IK_j',
@@ -167,6 +167,6 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
             'IK_hs', 'cap_hs', 'c_ramp_chp', 'c_ramp_waste', 'alpha_hs',
             'rf_j', 'rf_tot', 'OP_var_j', 'temperature_t', 'thresh',
             'sale_electricity_price_jt', 'OP_fix_hs', 'all_heat_geneartors',
-            'mr_j' , 'j_chp_se' , 'j_chp_bp','em_j' ]
+            'mr_j' , 'j_chp_se' , 'j_chp_bp','em_j','cap_losse_hs' ]
 
     return dict(zip(keys,args))
