@@ -644,11 +644,13 @@ def tab_panes(path2output,**kwargs):
 #%%
 def co2_barplot(decision_vars,dic,cmap):
     tec = list(dic[decision_vars[0]].keys())
+    total = [str(EngNumber(round(sum([dic[key][j] for key in decision_vars]),2))) for j in tec]
     #FIXME: Use Numberformater
-    columns = [TableColumn(field="tec", title="Heat Producers")] + [TableColumn(field=key, title=key) for key in decision_vars] 
-    data = {**{key:[str(EngNumber(round(dic[key][j],2))) for j in tec] for key in decision_vars},**dict(tec=tec),}
+    columns = [TableColumn(field="tec", title="Heat Producers")] + [TableColumn(field=key, title=key) for key in decision_vars]
+    columns += [TableColumn(field="total", title="Total")] 
+    data = {**{key:[str(EngNumber(round(dic[key][j],2))) for j in tec] for key in decision_vars},**dict(tec=tec),**dict(total=total),}
     source = ColumnDataSource(data)
-    data_table = DataTable(source=source, columns=columns, width=500, height=400)
+    data_table = DataTable(source=source, columns=columns, width=600, height=400)
     
     hover = HoverTool(tooltips=[
     ("heat producer", "@hp"),
