@@ -26,18 +26,15 @@ if path not in sys.path:
     sys.path.append(path)
 #%%
 #TODO: Upgrade to new bokeh version
-import bokeh
-if bokeh.__version__ != '0.12.10':
-    print("Your current bokeh version ist not compatible (Your Version:" +bokeh.__version__+")")
-    print("Please install bokeh==0.12.10")
-    sys.exit()
-
-import tornado 
-# früher (4.4.2) 
-if tornado.version != '4.5.3':  
-    print("Your current tornado version ist not compatible (Your Version:" +tornado.version +")")
-    print("Please install tornado==4.5.3")
-    sys.exit()
+#import bokeh
+#assert bokeh.__version__ == '0.12.10', f"Your current bokeh version ist not compatible (Your Version:{bokeh.__version__})\nPlease install bokeh==0.12.10"
+#import tornado 
+## früher (4.4.2) 
+#assert tornado.version == '4.5.3',f"Your current tornado version ist not compatible (Your Version:{tornado.version})\nPlease install tornado==4.5.3"
+try:
+    import openpyxl
+except Exception as e:
+    assert False, str(e)+ "\nPlease install e.g.: <conda install -c anaconda openpyxl>"
 #%%
 #from AD.F16_input.main import load_data
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
@@ -122,7 +119,8 @@ def genearte_selection(dic,dict_key_map):
     source = cds(select,dic,invert_dict(dict_key_map))
     hover = HoverTool(tooltips=[("(x,y)", "($x, $y)")])
     TOOLS = [PanTool(),WheelZoomTool(),BoxZoomTool(),ResetTool(),SaveTool(),hover]
-    fig = figure(tools=TOOLS)
+    fig = figure(tools=TOOLS,min_border_left = 55 , min_border_bottom = 55,
+                 x_axis_label='Time in hours',)
     fig.line('x', 'y', source=source, line_alpha=0.6)
     fig.toolbar.logo = None
 
@@ -130,17 +128,19 @@ def genearte_selection(dic,dict_key_map):
 # ===========================================================================
 def generate_tables(columns,name="",):
     if name == "":
-#        data = pd.read_excel(path_parameter,skiprows=[0])[columns]
-        data = pd.DataFrame({x:[] for x in columns+["type"]})
+        data = pd.read_excel(path_parameter,skiprows=[0])[columns]
+        data["type"] = data.index
     else:
         data = pd.read_excel(path_parameter,name,skiprows=[0])[columns]
+    if name in ["","Heat Storage"]:
+        data = data.drop(data.index)
 
 
     col = [TableColumn(field=name, title=name) for name in columns]
     source = ColumnDataSource(data)
     #,width=1550,height=700
     table = DataTable(source=source,columns=col,width=1550,
-                           editable=True,row_headers =True,height=250)
+                           editable=True,height=250)
     return table
 # ===========================================================================
 def modification_tools(**kwargs):
@@ -171,6 +171,7 @@ def modification_tools(**kwargs):
 # ===========================================================================
 def generate_widgets(data):
     select,source,figure = genearte_selection(data["data"],data["dic"])
+    figure.yaxis.axis_label = data["unit"]
     offset,constant,scale,mean,total,tec,ok = modification_tools(**data["labels"])
     return dict(select=select,source=source,figure=figure,offset=offset,
                 constant=constant,scale=scale,mean= mean,total=total,tec=tec,
@@ -276,12 +277,14 @@ select_tec2_options= {"heat pump": list(tec_mapper.values()),
                       "CHP Steam Extraction": data_tec[data_tec["output"] == "CHP-SE"]["name"].values.tolist(),
                       "boiler":data_tec[data_tec["type"] == "boiler"]["name"].values.tolist()}
 energy_carrier_options = pd.read_excel(path_parameter,sheets[1],skiprows=[0])[input_price_list[0]].values.tolist()
+select_hs_options = pd.read_excel(path_parameter,sheets[3],skiprows=[0])["name"].values.tolist()
 #%%
 #%%
 # =============================================================================
 # Function Handler
 # =============================================================================
 def modify_doc(doc):
+#%%
     # Load External Data from .dat files
     price_name_map,price_name_map_inv,prices = load_extern_data("price")
     load_name_map,load_name_map_inv,load_profiles = load_extern_data("load")
@@ -291,23 +294,28 @@ def modify_doc(doc):
     widgets_data = [ dict(data=radiation,
                           dic=radiation_name_map,
                           dic_inv = invert_dict(radiation_name_map),
-                          labels=lab),
+                          labels=lab,
+                          unit="W/m²"),
                     dict(data=temperature,
                           dic=temperature_name_map,
                           dic_inv = invert_dict(temperature_name_map),
-                          labels=lab),
+                          labels=lab,
+                          unit="°C"),
                     dict(data=prices,
                           dic=price_name_map,
                           dic_inv = invert_dict(price_name_map),
-                          labels=dict()),
+                          labels=dict(),
+                          unit="€/MWh"),
                     dict(data=prices,
                           dic=price_name_map,
                           dic_inv = invert_dict(price_name_map),
-                          labels=dict()),
+                          labels=dict(),
+                          unit="€/MWh"),
                     dict(data=load_profiles,
                           dic=load_name_map,
                           dic_inv = invert_dict(load_name_map),
-                          labels=lab),
+                          labels=lab,
+                          unit="MW"),
                     ]
     # Create Data structure for better code handling
     widget_to_model_keys_dict = dict(zip(widgets_keys,model_keys))
@@ -336,13 +344,15 @@ def modify_doc(doc):
     to_install = TextInput(title="Missing Capacities [MW]",disabled=True)
     invest_button = Toggle(label="Invest", button_type="default")
     label1 = Div(text="""<h1 style=" font-size: 20px; text-align: center; text-transform: uppercase; ">Heat Generators </h1>  """, width=210, height=10)
-    button1= Button(label='🞧', width=30)
+    button1= Button(label='🞧',  button_type="success", width=50)
+    button1_1= Button(label="x",button_type="danger",width=30)
     label2 = Div(text="""<h1 style=" font-size: 20px; text-align: center; text-transform: uppercase; ">Heat Storages </h1>  """, width=180, height=10)
-    button2= Button(label='🞧', width=30)
+    button2= Button(label='🞧',  button_type="success", width=50)
+    button2_1= Button(label="x",button_type="danger",width=30)
 # =============================================================================
 #   Layout for Main GUI
 # =============================================================================
-    col_hp_hs = column([row(label1,button1),data_table,row(label2,button2),data_table_heat_storage])
+    col_hp_hs = column([row(label1,button1,button1_1),data_table,row(label2,button2,button2_1),data_table_heat_storage])
     lay = { i : generate_layout(widgets[i]) for i in data_kwargs}
     dic = {"Heat Producers and Heat Storage":col_hp_hs,
            "Parameters":data_table_data,
@@ -359,7 +369,7 @@ def modify_doc(doc):
     tabs = Tabs(tabs=tabs_liste)
 # =============================================================================
 #   Callbacks for Main GUI
-# =============================================================================
+# ============================================================================= 
     def download_callback():
         try:
             global carrier_dict
@@ -756,7 +766,18 @@ def modify_doc(doc):
                 else:
                     div_spinner.text = """<div align="center"><strong style="color: green;"> """+i+""" Data For """+widgets[i]["tec"].value+""" is added </strong></div>"""
                 widgets[i]["ok"].clicks = 0 # this calls again this function
-
+# =============================================================================
+    def delete_hg():
+        df = pd.DataFrame(data_table.source.data)
+        df = df.loc[~df.index.isin(data_table.source.selected["1d"]["indices"])].reset_index(drop=True)
+        data_table.source.data = {key:list(dic.values()) for key,dic in df.to_dict().items()}
+        
+    def delete_hs():
+        df = pd.DataFrame(data_table_heat_storage.source.data)
+        df = df.loc[~df.index.isin(data_table_heat_storage.source.selected["1d"]["indices"])].reset_index(drop=True)
+        data_table_heat_storage.source.data = {key:list(dic.values()) for key,dic in df.to_dict().items()}       
+           
+# =============================================================================
 # =============================================================================
 #   Signal Emitting / Coupling of Main GUI
 # =============================================================================
@@ -792,6 +813,9 @@ def modify_doc(doc):
     run_button.on_click(run_callback)
 
     reset_button.on_click(reset_callback)
+    button1_1.on_click(delete_hg)
+    button2_1.on_click(delete_hs)
+
 # =============================================================================
 #   Initilizing GUI with Default Values
 # =============================================================================
@@ -842,7 +866,7 @@ def modify_doc(doc):
             ]
 
     widgets_dict = dict(zip(input_list,widgets_list))
-
+    
 # =============================================================================
 #  Widget Layout for adding Technologies
 # =============================================================================
@@ -1013,6 +1037,100 @@ def modify_doc(doc):
     flow_temp.on_change('value', cop_callback)
     return_temp.on_change('value', cop_callback)
     energy_carrier_select.on_change('value', change_name_if_carrier_changes)
+#%%
+# =============================================================================
+#   Gui Elements for adding heat storages   
+# =============================================================================
+    ok_button_hs = Button(label='✓ ADD', button_type='success',width=60)
+    cancel_button_s = Button(label='	🞮 CANCEL', button_type='danger',width=60)
+    select_hs = Select(title="Select a Heat Storage:", options = select_hs_options, 
+                       value=select_hs_options[0])
+    tabs_geneator_hs = Tabs(tabs=[] ,width = 800)
+    name_hs = TextInput(placeholder="-", title="name")
+    capacity_hs = TextInput(placeholder="-", title="Storage Capacity [MWh]")
+    losses_hs =  Slider(start=0, end=100, value=1, step=1, title="Hourly Stoarge Losses [%]")
+    unloding_power = TextInput(placeholder="-", title="maximum unloading power  [MW]")
+    uloading_efficiency = Slider(start=0, end=1, value=.980, step=.001, title="unloading efficiency")
+    loading_power = TextInput(placeholder="-", title="maximum loading power  [MW]")
+    loading_efficiency = Slider(start=0, end=1, value=.980, step=.001, title="loading efficiency")
+    inv_cost_hs = TextInput(placeholder="-", title="Invesment costs for additional storage capacity  [€/MWh]")
+    opex_fix_hs = TextInput(placeholder="-", title="OPEX fix [€/MWh]")
+    lt_hs = TextInput(placeholder="-", title="Life Time [a]")
+    
+    widget_hs = [name_hs, capacity_hs, losses_hs, unloding_power,
+                 loading_power, loading_efficiency, uloading_efficiency, 
+                 inv_cost_hs, opex_fix_hs, lt_hs]
+    widgets_dict_hs = dict(zip((list(heat_storage_list_mapper)),widget_hs))
+         
+# =============================================================================
+#   Layout for adding heat storages
+# =============================================================================
+    tec_param_layout_hs = column(children=[row(children=[name_hs,capacity_hs]),
+                                            row(children=[loading_power,
+                                                          unloding_power]),
+                                           row(children=[loading_efficiency,
+                                                          uloading_efficiency])])
+    finance_param_layout_hs = column(children=[inv_cost_hs,opex_fix_hs,lt_hs])
+    model_param_layout_hs = widgetbox(losses_hs)
+    
+    tec_param_panel_hs = Panel(child=tec_param_layout_hs, title="Technical Parameters")
+    finance_param_panel = Panel(child=finance_param_layout_hs, title="Finance Parameters")
+    model_param_panel = Panel(child=model_param_layout_hs, title="Model Parameters")
+
+    layout_hs = [tec_param_panel_hs, finance_param_panel , model_param_panel]
+    tabs_geneator_hs.tabs = layout_hs
+    
+    children_hs = [widgetbox(select_hs),widgetbox(tabs_geneator_hs),row(children = [ok_button_hs,cancel_button_s])]
+    
+# =============================================================================
+#     Callback for adding heat storages
+# =============================================================================
+    def add_heat_storage():
+        output.tabs = []
+        div_spinner.text = load_text
+        grid.children = children_hs  
+        div_spinner.text = ""
+# =============================================================================
+    def add_data_table():
+        div_spinner.text = load_text
+        df2 = pd.DataFrame(data_table_heat_storage.source.data)
+        df2.set_index(df2["index"])
+        del df2["index"]
+        new_data={}
+        for x in heat_storage_list_mapper:
+            if x == "name":
+                try:
+                    new_data[x] = new_name(str(name_hs.value),data_table_heat_storage.source.data["name"].tolist())
+                except:
+                    new_data[x] = new_name(str(name_hs.value),data_table_heat_storage.source.data["name"])
+            else:
+                new_data[x] = str(widgets_dict_hs[x].value)
+        df2 = df2.append(new_data,ignore_index=True)
+        df2 = df2.apply(pd.to_numeric, errors='ignore')
+        df2["index"] = df2.index
+        data_table_heat_storage.source.data.update(df2)
+        del df2
+        div_spinner.text = """<div align="center"> <strong style="color: green;">Heat Storage added</strong> </div>"""
+# =============================================================================
+    def autoload_hs(name,old,new):
+        df = pd.read_excel(path_parameter,sheets[3],skiprows=[0])
+        df.index = df.name
+        for key,element in widgets_dict_hs.items():
+            try:
+                element.value = float(df.loc[select_hs.value][key])
+            except:
+                element.value = str(df.loc[select_hs.value][key])   
+# =============================================================================
+#   Signal Emitting / Coupling for adding heat_storages
+# =============================================================================
+    button2.on_click(add_heat_storage)
+    cancel_button_s.on_click(cancel)
+    ok_button_hs.on_click(add_data_table)
+    select_hs.on_change('value', autoload_hs) 
+# =============================================================================
+#     Initializing with default values
+# =============================================================================
+    autoload_hs("","","")
 #%%
 # =============================================================================
 #  GUI Elements for Loading External Data
