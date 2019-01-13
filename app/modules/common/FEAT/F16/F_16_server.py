@@ -25,9 +25,9 @@ root_dir = os.path.dirname(os.path.abspath(__file__))
 if path not in sys.path:
     sys.path.append(path)
 #%%
-#TODO: Upgrade to new bokeh version
-#import bokeh
-#assert bokeh.__version__ == '0.12.10', f"Your current bokeh version ist not compatible (Your Version:{bokeh.__version__})\nPlease install bokeh==0.12.10"
+#Done: Upgrade to new bokeh version (früher: "0.12.10")
+import bokeh 
+assert bokeh.__version__ == '1.0.4', f"Your current bokeh version ist not compatible (Your Version:{bokeh.__version__})\nPlease install bokeh==1.0.4"
 #import tornado 
 ## früher (4.4.2) 
 #assert tornado.version == '4.5.3',f"Your current tornado version ist not compatible (Your Version:{tornado.version})\nPlease install tornado==4.5.3"
@@ -199,6 +199,13 @@ def profil(value_list):
         y = np.zeros(8760)
     return y,s
 # =============================================================================
+def disable_widgets(widget_list,flag):
+    for w in widget_list:
+        try: 
+            w.disabled = flag
+        except:
+            continue
+# =============================================================================
 #  Global Data
 # =======================================================================
 
@@ -354,7 +361,9 @@ def modify_doc(doc):
 # =============================================================================
     col_hp_hs = column([row(label1,button1,button1_1),data_table,row(label2,button2,button2_1),data_table_heat_storage])
     lay = { i : generate_layout(widgets[i]) for i in data_kwargs}
+    grid = Tabs(tabs=[])
     dic = {"Heat Producers and Heat Storage":col_hp_hs,
+           "Adding": grid,
            "Parameters":data_table_data,
            "Prices & Emission factors":data_table_prices}
     # Change layout of Heat Demand Tab -> Add Total Demand
@@ -438,8 +447,8 @@ def modify_doc(doc):
 
             div_spinner.text = load_text
             output.tabs = []
-            if type(grid.children[0]) != type(Div()):
-                grid.children = [Div()]
+#            if type(grid.children[0]) != type(Div()):
+#                grid.children = [Div()]
             div_spinner.text = ""
 
 
@@ -533,8 +542,10 @@ def modify_doc(doc):
             inv_flag = False
             if invest_button.active:
                 inv_flag = True
-                selection0 = data_table.source.selected["1d"]["indices"]
-                selection1 = data_table_heat_storage.source.selected["1d"]["indices"]
+#                selection0 = data_table.source.selected["1d"]["indices"] #XXX: 0.12.10
+#                selection1 = data_table_heat_storage.source.selected["1d"]["indices"] #XXX: 0.12.10
+                selection0 = data_table.source.selected.indices
+                selection1 = data_table_heat_storage.source.selected.indices
                 selection = [selection0,selection1]
                 if selection[0] == []:
                     div_spinner.text = """<div align="center"> <strong style="color: red;"><p>Error: Please specify the technologies for the invesment model !!!<p>
@@ -685,9 +696,7 @@ def modify_doc(doc):
         if new_key and old_key:
             carrier_dict[new_key] = carrier_dict.pop(old_key)
         #
-        add_to_tec.options = ["None"]+_opt
-        add_to_tec.value = "None"
-        
+        add_to_tec.options = _opt
         _options = ["Default"] + _opt
         
         for i in data_kwargs:
@@ -736,7 +745,7 @@ def modify_doc(doc):
         div_spinner.text = load_text
         output.tabs = []
         div_spinner.text = ""
-        grid.children = [Div()]
+#        grid.children = [Div()] # XXX
 # =============================================================================
     def update_pmax(attrname, old, new):
         pmax.value = str(round(max(widgets[_hd]["source"].data["y"]),2))
@@ -769,12 +778,14 @@ def modify_doc(doc):
 # =============================================================================
     def delete_hg():
         df = pd.DataFrame(data_table.source.data)
-        df = df.loc[~df.index.isin(data_table.source.selected["1d"]["indices"])].reset_index(drop=True)
+        df = df.drop(data_table.source.selected.indices).reset_index(drop=True)
+#        df = df.loc[~df.index.isin(data_table.source.selected["1d"]["indices"])].reset_index(drop=True) #XXX: 0.12.10
         data_table.source.data = {key:list(dic.values()) for key,dic in df.to_dict().items()}
         
     def delete_hs():
         df = pd.DataFrame(data_table_heat_storage.source.data)
-        df = df.loc[~df.index.isin(data_table_heat_storage.source.selected["1d"]["indices"])].reset_index(drop=True)
+        df = df.drop(data_table_heat_storage.source.selected.indices).reset_index(drop=True)
+#        df = df.loc[~df.index.isin(data_table_heat_storage.source.selected["1d"]["indices"])].reset_index(drop=True) #XXX: 0.12.10
         data_table_heat_storage.source.data = {key:list(dic.values()) for key,dic in df.to_dict().items()}       
            
 # =============================================================================
@@ -827,22 +838,17 @@ def modify_doc(doc):
 # =============================================================================
 #  GUI Elements for adding Technologies
 # =============================================================================
-    grid = column(children=[Div()],height=300)
     ok_button = Button(label='✓ ADD', button_type='success',width=60)
     cancel_button = Button(label='	🞮 CANCEL', button_type='danger',width=60)
     select_tec = Select(title="Add Heat Generator:", options = select_tec_options )
-    select_tec2 = Select()
+    select_tec2 = Select(value="",disabled=True)
 
-    tabs_geneator = Tabs(tabs=[] ,width = 800)
-    tec_buttons = widgetbox(children = [select_tec])
-
-    children = [tec_buttons,widgetbox(tabs_geneator),row(children = [ok_button,cancel_button])]
-
-    cop_label = TextInput(placeholder="COP", title="COP",disabled= True)
+    cop_label = TextInput(placeholder="-", title="COP",disabled= True)
     flow_temp = Select(title="Inlet Temperature")
     return_temp = Select(title="Return Temperature")
 
-    energy_carrier_select = Select(options = energy_carrier_options, title="Energy Carrier",value = energy_carrier_options[0])
+    energy_carrier_select = Select(options = energy_carrier_options, 
+                                   title="Energy Carrier",value = energy_carrier_options[0])
 
     n_th_label = TextInput(placeholder="-", title="Thermal Efficiency")
     n_el_label = TextInput(placeholder="-", title="Electrical Efficiency")
@@ -866,7 +872,12 @@ def modify_doc(doc):
             ]
 
     widgets_dict = dict(zip(input_list,widgets_list))
-    
+    cop_widget_list = [return_temp, flow_temp, cop_label]
+    hg_widget_list = [select_tec,select_tec2, installed_cap, n_th_label, n_el_label,
+            ik_label, opex_fix_label, opex_var_label,lt_label,
+            renewable_factor, must_run_box,energy_carrier_select,name_label,
+            ok_button,cancel_button
+            ]
 # =============================================================================
 #  Widget Layout for adding Technologies
 # =============================================================================
@@ -883,22 +894,30 @@ def modify_doc(doc):
     tec_param_panel = Panel(child=tec_param_layout, title="Technical Parameters")
     finance_param_panel = Panel(child=finance_param_layout, title="Finance Parameters")
     model_param_panel = Panel(child=model_param_layout, title="Model Parameters")
-    layout1 = [ cop_panel , tec_param_panel, finance_param_panel , model_param_panel]
-    layout2 = [tec_param_panel, finance_param_panel , model_param_panel]
+    layout1 = [tec_param_panel, cop_panel, finance_param_panel , model_param_panel]
+#    layout2 = [tec_param_panel, finance_param_panel , model_param_panel]
+    tabs_geneator = Tabs(tabs=layout1 ,width = 800)
+    tec_buttons = widgetbox(children = [select_tec,select_tec2])
+    hg_layout = column(children = [tec_buttons,widgetbox(tabs_geneator),
+                                   row(children = [ok_button,cancel_button])])
+    disable_widgets(hg_widget_list+cop_widget_list,True)
 # =============================================================================
 #  Callbacks for adding Technologies
 # =============================================================================
     def add_heat_generator():
-        output.tabs = []
         div_spinner.text = load_text
-        grid.children = children
+        tabs.active = 1
+        grid.active = 0
+        disable_widgets(hg_widget_list,False)
+        output.tabs = []
         select_tec.value = select_tec.options[0]
-        div_spinner.text = ""
         installed_cap.end=int(float(pmax.value))+1
+        div_spinner.text = ""
 # =============================================================================
     def cancel():
         div_spinner.text = load_text
-        grid.children = [Div()]
+        tabs.active = 0
+        disable_widgets(hg_widget_list+cop_widget_list,True)
         div_spinner.text = ""
 # =============================================================================
     def add_to_cds():
@@ -934,7 +953,8 @@ def modify_doc(doc):
         div_spinner.text = """<div align="center"> <strong style="color: green;">Heat Generator ADDED</strong> </div>"""
 # =============================================================================
     def add_heat_pump():
-
+        disable_widgets(cop_widget_list,False)
+        cop_label.disabled = True
         flow_temp.options = flow_temp_dic[tec_mapper_inv[select_tec2.value]]
         flow_temp.value = flow_temp_dic[tec_mapper_inv[select_tec2.value]][0] # Caution: this calls the cop_callback, thus need of try block
         return_temp.options = return_temp_dic[tec_mapper_inv[select_tec2.value]]
@@ -942,11 +962,12 @@ def modify_doc(doc):
         cop_label.value = str(heat_pumps[tec_mapper_inv[select_tec2.value]].loc[return_temp.value,flow_temp.value])
         n_th_label.value = cop_label.value
         n_th_label.disabled = True
-        tabs_geneator.tabs = layout1
+#        tabs_geneator.tabs = layout1
 # =============================================================================
     def add_tec(name,old,new):
         div_spinner.text = load_text
         n_th_label.disabled = False
+        disable_widgets(cop_widget_list,True)
         ###
         energy_carier_search = data_tec["input"][data_tec["type"].str.contains(select_tec.value)]
         if energy_carier_search.empty:
@@ -983,9 +1004,12 @@ def modify_doc(doc):
             select_tec2.options = select_tec2_options[select_tec.value]
             tec_buttons.children = [select_tec,select_tec2]
             select_tec2.value = select_tec2.options[0]
+            if select_tec.value == "heat pump": 
+                disable_widgets(cop_widget_list,False)   
+                cop_label.disabled = True
+            select_tec2.disabled = False
         else:
-            tec_buttons.children = [select_tec]
-            tabs_geneator.tabs = layout2
+            select_tec2.disabled = True
 
         div_spinner.text = ""
 # =============================================================================
@@ -1007,7 +1031,8 @@ def modify_doc(doc):
 
             lt_label.value = str(data_tec[data_tec["name"] == select_tec2.value]["life time"].values[0])
             ik_label.value = str(data_tec[data_tec["name"] == select_tec2.value]["investment costs (EUR/MW_th)"].values[0])
-            tabs_geneator.tabs = layout2
+            disable_widgets(cop_widget_list,True)
+            select_tec2.disabled = True
 # =============================================================================
     def update_slider(name,old,new):
         try:
@@ -1061,7 +1086,8 @@ def modify_doc(doc):
                  loading_power, loading_efficiency, uloading_efficiency, 
                  inv_cost_hs, opex_fix_hs, lt_hs]
     widgets_dict_hs = dict(zip((list(heat_storage_list_mapper)),widget_hs))
-         
+    
+    widget_list_hs = [ok_button_hs, cancel_button_s, select_hs, ] + widget_hs
 # =============================================================================
 #   Layout for adding heat storages
 # =============================================================================
@@ -1081,14 +1107,26 @@ def modify_doc(doc):
     tabs_geneator_hs.tabs = layout_hs
     
     children_hs = [widgetbox(select_hs),widgetbox(tabs_geneator_hs),row(children = [ok_button_hs,cancel_button_s])]
-    
+    hs_layout = column(children_hs)
 # =============================================================================
 #     Callback for adding heat storages
 # =============================================================================
+    def autoload_hs(name,old,new):
+        df = pd.read_excel(path_parameter,sheets[3],skiprows=[0])
+        df.index = df.name
+        for key,element in widgets_dict_hs.items():
+            try:
+                element.value = float(df.loc[select_hs.value][key])
+            except:
+                element.value = str(df.loc[select_hs.value][key])   
+# =============================================================================
     def add_heat_storage():
+        tabs.active = 1
         output.tabs = []
-        div_spinner.text = load_text
-        grid.children = children_hs  
+        div_spinner.text = load_text   
+        grid.active = 1  
+        disable_widgets(widget_list_hs,False)
+        autoload_hs("","","") 
         div_spinner.text = ""
 # =============================================================================
     def add_data_table():
@@ -1112,25 +1150,21 @@ def modify_doc(doc):
         del df2
         div_spinner.text = """<div align="center"> <strong style="color: green;">Heat Storage added</strong> </div>"""
 # =============================================================================
-    def autoload_hs(name,old,new):
-        df = pd.read_excel(path_parameter,sheets[3],skiprows=[0])
-        df.index = df.name
-        for key,element in widgets_dict_hs.items():
-            try:
-                element.value = float(df.loc[select_hs.value][key])
-            except:
-                element.value = str(df.loc[select_hs.value][key])   
+    def cancel_hs():
+        disable_widgets(widget_list_hs,True) 
+        tabs.active = 0
 # =============================================================================
 #   Signal Emitting / Coupling for adding heat_storages
 # =============================================================================
     button2.on_click(add_heat_storage)
-    cancel_button_s.on_click(cancel)
+    cancel_button_s.on_click(cancel_hs)
     ok_button_hs.on_click(add_data_table)
     select_hs.on_change('value', autoload_hs) 
 # =============================================================================
-#     Initializing with default values
+#  Initializing with default values
 # =============================================================================
-    autoload_hs("","","")
+    disable_widgets(widget_list_hs,True) 
+
 #%%
 # =============================================================================
 #  GUI Elements for Loading External Data
@@ -1365,16 +1399,22 @@ def modify_doc(doc):
         _heat_generators= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
         _heat_generators = _heat_generators.fillna(0)
         _opt = list(_heat_generators["name"].values)
-        _opt = ["None"]+_opt
+        _opt = _opt
         
         if dic_modtools["add"].value == "n_th/COP":
             dic_modtools["name"].disabled=True
             dic_modtools["tec"].options = _opt
+            if _opt != []:
+                dic_modtools["tec"].disabled = False
+                dic_modtools["save"].disabled = False
+            else:
+                dic_modtools["save"].disabled = True
             
         else:
             dic_modtools["name"].disabled=False
             dic_modtools["tec"].options = ["None"]
-            dic_modtools["tec"].value = "None"
+            dic_modtools["tec"].disabled = True
+            dic_modtools["save"].disabled = False
         
         
 # =============================================================================
@@ -1402,7 +1442,8 @@ def modify_doc(doc):
 # =============================================================================
     from imageHTML import header_html
     header = widgetbox(Div(text= header_html))
-    
+    grid.tabs = [Panel(child=hg_layout, title="Add Heat Generators"),
+                 Panel(child=hs_layout, title="Add Heat Storages")]
 #    l = column([header,
 #                row([
 #                        widgetbox(download_button,upload_button,run_button,
@@ -1422,7 +1463,6 @@ def modify_doc(doc):
                     [row([column([download_button,upload_button,run_button,
                                reset_button,invest_button]),
                      widgetbox(div_spinner,width=500),column([pmax,to_install])])],
-                   [grid],
                    [widgetbox(dummy)],
                    [widgetbox(output,width=1500)],
                    [widgetbox(tabs,width=1500)],
