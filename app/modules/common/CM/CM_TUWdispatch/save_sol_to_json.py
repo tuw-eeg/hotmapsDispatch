@@ -12,7 +12,7 @@ import pandas as pd
 import copy
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
-
+#%%
 path2solution = os.path.join(path, "AD", "F16_input", "Solution")
 
 def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
@@ -185,6 +185,50 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         print("Error in creating JSON")
         print(e)
         return "Error3#"
-
+#%%
+def json2xlsx(json_data,output_path):
+    try:
+        df5 = pd.DataFrame(json_data.pop("Loading Heat Storage"))
+        y = [pd.DataFrame([val],columns=list(val),index=[key]).T for key,val in json_data.items() if type(val)==dict]
+        anual_per_tec_values= dict()
+        for k,i in enumerate(y):
+            if i[i.columns[0]].dtypes == object:
+                anual_per_tec_values[i.columns[0]] = i[i.columns[0]].apply(pd.Series).T
+                y.pop(k)
+        # Worksheet technology data        
+        df = y[0][:]
+        for i in y[1:]:
+            df = pd.concat([df,i],axis=1, sort = True)
+        # Worksheet: anual data
+        df2 = pd.DataFrame({key:val for key,val in json_data.items() if type(val)==list and len(val)==8760})
+        # More Data
+        df3 = pd.DataFrame([{key:val for key,val in json_data.items() if type(val)!=list and type(val)!=dict}],index=["value"]).T
+        
+        dfs = {"Generator Data (single values)":df,
+              "Anual Data":df2,
+              "More Data":df3,
+              **anual_per_tec_values,
+              "Loading Heat Storage":df5,}
+        # alichaudry from stackoverflow
+        # https://stackoverflow.com/questions/17326973/is-there-a-way-to-auto-adjust-excel-column-widths-with-pandas-excelwriter/32679806#32679806
+        writer = pd.ExcelWriter(output_path,engine='xlsxwriter')
+        for sheetname, df in dfs.items():  # loop through `dict` of dataframes
+            sheetname=sheetname.replace(":","")
+            df.to_excel(writer, sheet_name=sheetname)  # send df to writer
+            worksheet = writer.sheets[sheetname]  # pull worksheet object
+            for idx, col in enumerate(df):  # loop through all columns
+                series = df[col]
+                max_len = max((
+                    series.astype(str).map(len).max(),  # len of largest item
+                    len(str(series.name))  # len of column name/header
+                    )) + 1  # adding a little extra space
+                worksheet.set_column(idx, idx, max_len)  # set column width
+        writer.save()
+        print("JSON to EXCEL Done")
+#        print("Saved to"+output_path)
+        
+    except Exception as e:
+        print(e)
+        print("Error @ json2xlsx")
 
 

@@ -39,6 +39,7 @@ except Exception as e:
 #from AD.F16_input.main import load_data
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
 import CM.CM_TUWdispatch.run_cm as dispatch
+from CM.CM_TUWdispatch.save_sol_to_json import json2xlsx
 
 #%% Setting Global default paramters and default paths
 path_parameter = os.path.join(path, "AD", "F16_input", "DH_technology_cost.xlsx")
@@ -597,6 +598,11 @@ def modify_doc(doc):
                         json.dump(solutions, f)
                     path_download_json = os.path.join("download","static",time_id,filename)
 #                    trigger_download(time_id,filename)
+                    time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+                    filename = "output_data.xlsx"
+                    path_download = os.path.join(create_folder(time_id),filename)
+                    json2xlsx(solutions,path_download)
+                    path_download_xlsx = os.path.join("download","static",time_id,filename)
                     print("Download output data done")
                     print("Render in Browser...")
                     # --
@@ -621,6 +627,7 @@ def modify_doc(doc):
                     <p>Calculation done<p>
                     <p><a href="""+"'"+path_download_html+"'"""" download="output.html">Download HTML File </a> <p>
                     <p><a href="""+"'"+path_download_json+"'"""" download="output.json">Download JSON File </a>  <p>
+                    <p><a href="""+"'"+path_download_xlsx+"'"""" download="output.xlsx">Download XLSX File </a>  <p>                   
                     </strong>
                     </div>
                     """
@@ -660,8 +667,10 @@ def modify_doc(doc):
                 data2 = data2.fillna(0)
                 data_table_data.source.data.update(data2)
 
-                data2 = excel_object.parse(sheet_name = sheets[3], index_col = 0).apply(pd.to_numeric, errors='ignore')
-                data2 = data2.fillna(0)
+                data2 = excel_object.parse(sheet_name = sheets[3]).apply(pd.to_numeric, errors='ignore')
+                data2 = data2.fillna(0).reset_index()
+#                print(f"Shape is {data2.shape}")
+#                print(data2)
                 data_table_heat_storage.source.data.update(data2)
 
                 data2 = excel_object.parse(sheet_name = 'Energy Carrier', index_col = 0)

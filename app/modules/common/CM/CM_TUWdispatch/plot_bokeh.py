@@ -658,7 +658,7 @@ def co2_barplot(decision_vars,dic,cmap):
     ("CO2 Emission from Heat", "@co2_heat kg"),
     ("CO2 Emission from Electricity", "@co2_electricity kg")
     ], mode='mouse')
-        
+    hover.renderers = [] # for bokeh=1.0.4  
     p = figure(title = "CO2 Emissions of Technologies by Heat and Electricity",
            plot_width=700   ,
            plot_height=400,
