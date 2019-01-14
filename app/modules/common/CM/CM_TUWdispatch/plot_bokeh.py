@@ -246,41 +246,45 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     items = [("Heat Demand",   [line] )]
     for label,glyph in zip(legend,areas):
         items.append((label,[glyph]))
-
-
+        
+    p4 = figure(x_range=p.x_range,title="Heat Storages",
+    x_axis_label = "Time in Hours",
+    y_axis_label = "MWh_th")
+    p4.toolbar.logo = None
+    p4.grid.minor_grid_line_color = '#eeeeee'
+    items4 = []
     flag = False
+    
     try:
         for hs in dic["Heat Storage Technologies"]:
             if sum(np.array(dic["Loading Heat Storage"][hs])[t]) != 0:
                 flag = True
+                
                 loading = p.patch( [t[0]] + list(t) + [t[-1]],
                               [0] + (np.array(dic["Loading Heat Storage"][hs])*-1)[t].tolist() + [0]
                               ,color="#EF7B7B",line_color=None,muted_alpha=0.2)
                 items.append(("Loading-"+hs,[loading]))
-
-                p4 = figure(x_range=p.x_range,title="Heat Storages",
-                x_axis_label = "Time in Hours",
-                y_axis_label = "MWh_th")
-                p4.toolbar.logo = None
-                p4.grid.minor_grid_line_color = '#eeeeee'
-                items4 = []
-
-                level = p4.line( list(t),np.array(dic["State of Charge"][hs])[t].tolist(),color=cmap[hs],muted_alpha=0.2)
+                
+                level = p4.line( list(t),np.array(dic["State of Charge"][hs])[t].tolist(),
+                                color=cmap[hs],muted_alpha=0.2)
                 items4.append(("Level-"+hs,[level]))
 
-                load = p4.line( list(t),np.array(dic["Loading Heat Storage"][hs])[t].tolist(),color="green",muted_alpha=0.2)
+                load = p4.line( list(t),np.array(dic["Loading Heat Storage"][hs])[t].tolist(),
+                               color=cmap[hs],muted_alpha=0.2,
+                               line_dash="dashed",line_width=2)
                 items4.append(("Load-"+hs,[load]))
 
-                unload = p4.line( list(t),np.array(dic["Unloading Heat Storage"][hs])[t].tolist(),color="blue",muted_alpha=0.2)
+                unload = p4.line( list(t),np.array(dic["Unloading Heat Storage"][hs])[t].tolist(),
+                                 color=cmap[hs],muted_alpha=0.2,
+                                 line_dash="dotted",line_width=2.5)
                 items4.append(("Unload-"+hs,[unload]))
 
                 level.visible  = True
                 load.visible = False
                 unload.visible = False
-                legend4 = Legend(items=items4,location=(10, 10))
-
-                p4.add_layout(legend4, 'right')
-                p4.legend.click_policy = "hide" # "mute"
+        legend4 = Legend(items=items4,location=(10, 10))
+        p4.add_layout(legend4, 'right')
+        p4.legend.click_policy = "hide" # "mute, "hide"
     except:
         pass
 
