@@ -36,7 +36,7 @@ try:
 except Exception as e:
     assert False, str(e)+ "\nPlease install e.g.: <conda install -c anaconda openpyxl>"
 #%%
-#from AD.F16_input.main import load_data
+from AD.F16_input.main import extract,find_FiT
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
 import CM.CM_TUWdispatch.run_cm as dispatch
 from CM.CM_TUWdispatch.save_sol_to_json import json2xlsx
@@ -330,6 +330,7 @@ def modify_doc(doc):
     data_kwargs = dict(zip(widgets_keys,widgets_data))
     #external_data = dict(zip(widgets_keys,[{}]*len(widgets_keys))) #XXX only copy
     external_data = dict(zip(widgets_keys,[{} for _ in range(len(widgets_keys))]))
+    external_data_map = dict(zip(widgets_keys,[{} for _ in range(len(widgets_keys))]))
 #    _nth = dict()
     add_to_tec = Select(title="Add To Heatgenerator", value="", 
                             options=[],disabled=True)
@@ -396,8 +397,12 @@ def modify_doc(doc):
             time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
             filename = "download_input.xlsx"
             path_download = os.path.join(create_folder(time_id),filename)
-
             writer = pd.ExcelWriter(path_download)
+            
+            df = df.set_index(df.name)
+            data = pd.DataFrame(external_data_map).drop("Default")[_elec]
+            df = df.join(data)
+            df = df.reset_index(drop=True)
             df.to_excel(writer,sheets[0])
 
             data_prices_df = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore')
@@ -419,7 +424,10 @@ def modify_doc(doc):
             del df_carrier[0]
             df_carrier.index = range(df_carrier.shape[0])
             df_carrier.to_excel(writer,'Energy Carrier')
-
+            
+            df_default_external_data = pd.DataFrame(external_data_map).loc["Default"].to_frame().T.reset_index(drop= True)
+            df_default_external_data.to_excel(writer,"Default - External Data")
+            
             writer.save()
             trigger_download(time_id,filename)
             print("Download done.\nSaved to <"+path_download+">")
@@ -651,20 +659,24 @@ def modify_doc(doc):
                 print(file_type)
                 file_io = io.BytesIO(file_contents)
                 excel_object = pd.ExcelFile(file_io, engine='xlrd')
-                data2 = excel_object.parse(sheet_name = sheets[0], index_col = 0,skiprows = range(22,50)).apply(pd.to_numeric, errors='ignore')
+#                data2 = excel_object.parse(sheet_name = sheets[0], index_col = 0,skiprows = range(22,50)).apply(pd.to_numeric, errors='ignore')
+                data = excel_object.parse(sheet_name = sheets[0], index_col = 0)
+                data2 = data[input_list+["type"]].apply(pd.to_numeric, errors='ignore')
                 data2 = data2.fillna(0)
                 data2["index"] = data2.index
                 data_table.source.data.update(data2)
 
-                data2 = excel_object.parse(sheet_name = sheets[1], index_col = 0,skiprows = range(14,50)).apply(pd.to_numeric, errors='ignore')
+#                data2 = excel_object.parse(sheet_name = sheets[1], index_col = 0,skiprows = range(14,50)).apply(pd.to_numeric, errors='ignore')
+                data2 = excel_object.parse(sheet_name = sheets[1], index_col = 0).apply(pd.to_numeric, errors='ignore')
+
                 data2 = data2.fillna(0)
                 data_table_prices.source.data.update(data2)
 
                 data2 = excel_object.parse(sheet_name = 'Data', index_col = 0).apply(pd.to_numeric, errors='ignore')
                 data2 = data2.fillna(0)
-                r = data2.shape[0]
-                data2 = excel_object.parse(sheet_name = 'Data', index_col = 0,skiprows = range(2,r+1)).apply(pd.to_numeric, errors='ignore')
-                data2 = data2.fillna(0)
+#                r = data2.shape[0]
+#                data2 = excel_object.parse(sheet_name = 'Data', index_col = 0,skiprows = range(2,r+1)).apply(pd.to_numeric, errors='ignore')
+#                data2 = data2.fillna(0)
                 data_table_data.source.data.update(data2)
 
                 data2 = excel_object.parse(sheet_name = sheets[3]).apply(pd.to_numeric, errors='ignore')
@@ -678,6 +690,26 @@ def modify_doc(doc):
                 data2 = data2.set_index(data2["name"])
                 del data2["name"]
                 carrier_dict = data2.to_dict()["carrier"]
+                
+                data3 = data[_elec].set_index(data.name)
+                for i in _elec:
+                    external_data_map[i]= data3[i][~data3[i].isna()].to_dict()
+                    
+                data2 = excel_object.parse(sheet_name = 'Default - External Data',index_col=0)
+                for i in external_data_map:
+                    external_data_map[i]["Default"] = data2[i][0]
+                    ## callbacks take very long
+                    (c,y),fit_string = extract(data2[i][0])
+                    offset,constant = find_FiT(fit_string)
+                    constant = "" if type(constant) == str else constant
+                    widgets[i]["select"].value = data_kwargs[i]["dic"][c]+"_"+str(y)
+                    widgets[i]["offset"].value = str(offset)
+                    widgets[i]["constant"].value = str(constant)
+                    
+                    
+                    
+                
+                
                 div_spinner.text = """<div align="center"><strong style="color: green;">Upload done</strong></div>"""
             else:
                 print("Not a valid file to upload")
@@ -777,8 +809,34 @@ def modify_doc(doc):
 # =============================================================================
     def add_external_data_to_heat_producers():
         for i in data_kwargs:
+            ###
+            _name,_jahr = widgets[i]["select"].value.split("_")
+            _name = data_kwargs[i]["dic_inv"][_name]
+            try:
+                _off = float(widgets[i]["offset"].value)
+                _off = f"{_off}f" if _off != 0 else ""
+            except:
+                _off = ""
+            try:
+                _const = float(widgets[i]["constant"].value)
+                _const = f"{_const}h"
+            except:
+                _const = ""
+                
+            if _const != "" and _off != "":
+                _str = f", {_const} + {_off}" 
+            elif _const != "" and _off == "":
+                _str = f", {_const}"
+            elif _const == "" and _off != "":
+                _str = f", {_off}"
+            else:
+                _str = ""
+        
+            external_data_map[i][widgets[i]["tec"].value] = f" {_name} # {_jahr} {_str}"
+            ###
             if widgets[i]["ok"].clicks > 0 :
                 external_data[i][widgets[i]["tec"].value]= widgets[i]["source"].data["y"]
+
                 if widgets[i]["tec"].value == "Default":
                     div_spinner.text = """<div align="center"><strong style="color: green;"> """+i+""" Data is set as """+widgets[i]["tec"].value+"""</strong></div>"""
                 else:
