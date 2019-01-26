@@ -24,10 +24,95 @@ root_dir = os.path.dirname(os.path.abspath(__file__))
 
 if path not in sys.path:
     sys.path.append(path)
+
 #%%
-#Done: Upgrade to new bokeh version (früher: "0.12.10")
+#XXX: Downgrade back bokeh version "0.12.10"
 import bokeh 
-assert bokeh.__version__ == '1.0.4', f"Your current bokeh version ist not compatible (Your Version:{bokeh.__version__})\nPlease install bokeh==1.0.4"
+assert bokeh.__version__ == '0.12.10', f"Your current bokeh version ist not compatible (Your Version:{bokeh.__version__})\nPlease install: pip install bokeh==0.12.10"
+#%%  
+#XXX: for bokeh 0.12.10
+# =============================================================================
+# extent functionality for setting the active tab  and  Implement disabled
+# because Zooming performance regression with higher versions of bokeh
+# see CHANGELOG (https://github.com/bokeh/bokeh/blob/master/CHANGELOG): #1376 , #6502, #7255  
+# Implement #1376 , #6502
+# use idea of Zyell : https://github.com/bokeh/bokeh/issues/6502
+# =============================================================================
+JS_CODE = """
+import * as p from "core/properties"
+import {Tabs, TabsView} from "models/widgets/tabs"
+export class CustomTabsView extends TabsView
+    connect_signals: () ->
+        super()
+        @connect(@model.properties.active.change, () => @render())
+export class CustomTabs extends Tabs
+  type: "Tabs"
+  default_view: CustomTabsView
+
+"""
+# =============================================================================
+class CustomTabs(Tabs):
+    __implementation__ = JS_CODE
+# =============================================================================
+JS_CODE = """
+import {empty, label, select, option, optgroup} from "core/dom"
+import {isString, isArray} from "core/util/types"
+import {logger} from "core/logging"
+import * as p from "core/properties"
+import {InputWidget, InputWidgetView} from "models/widgets/input_widget"
+import {Select, SelectView} from "models/widgets/selectbox"
+export class CustomSelectView extends SelectView
+  initialize: (options) ->
+    super(options)
+    @render()
+  connect_signals: () ->
+    super()
+    @connect(@model.change, () -> @render())
+  build_options: (values) ->
+     return values.map (el) =>
+      if isString(el)
+        value = _label  = el
+      else
+        [value, _label] = el
+      selected = @model.value == value
+      return option({selected: selected, value: value}, _label)
+  render: () ->
+    super()
+    empty(@el)
+    labelEl = label({for: @model.id}, @model.title)
+    @el.appendChild(labelEl)
+    if isArray(@model.options)
+     contents = @build_options( @model.options )
+    else
+     contents = []
+     for key,value of @model.options
+      contents.push optgroup({label: key}, @build_options( value ))
+    @selectEl = select({
+      class: "bk-widget-form-input",
+      id: @model.id,
+      name: @model.name
+      disabled: @model.disabled}, contents)
+    @selectEl.addEventListener("change", () => @change_input())
+    @el.appendChild(@selectEl)
+    return @
+  change_input: () ->
+    value = @selectEl.value
+    logger.debug("selectbox: value = #{value}")
+    @model.value = value
+    super()
+export class CustomSelect extends Select
+  type: "Select"
+  default_view: CustomSelectView
+
+"""
+# =============================================================================
+class CustomSelect(Select):
+    __implementation__ = JS_CODE
+# =============================================================================
+Tabs = CustomTabs
+Select = CustomSelect
+# =============================================================================
+#%%
 #import tornado 
 ## früher (4.4.2) 
 #assert tornado.version == '4.5.3',f"Your current tornado version ist not compatible (Your Version:{tornado.version})\nPlease install tornado==4.5.3"
@@ -551,10 +636,10 @@ def modify_doc(doc):
             inv_flag = False
             if invest_button.active:
                 inv_flag = True
-#                selection0 = data_table.source.selected["1d"]["indices"] #XXX: 0.12.10
-#                selection1 = data_table_heat_storage.source.selected["1d"]["indices"] #XXX: 0.12.10
-                selection0 = data_table.source.selected.indices
-                selection1 = data_table_heat_storage.source.selected.indices
+                selection0 = data_table.source.selected["1d"]["indices"] #XXX: 0.12.10
+                selection1 = data_table_heat_storage.source.selected["1d"]["indices"] #XXX: 0.12.10
+#                selection0 = data_table.source.selected.indices #XXX:  > 0.12.10
+#                selection1 = data_table_heat_storage.source.selected.indices #XXX:  > 0.12.10
                 selection = [selection0,selection1]
                 if selection[0] == []:
                     div_spinner.text = """<div align="center"> <strong style="color: red;"><p>Error: Please specify the technologies for the invesment model !!!<p>
@@ -845,14 +930,16 @@ def modify_doc(doc):
 # =============================================================================
     def delete_hg():
         df = pd.DataFrame(data_table.source.data)
-        df = df.drop(data_table.source.selected.indices).reset_index(drop=True)
-#        df = df.loc[~df.index.isin(data_table.source.selected["1d"]["indices"])].reset_index(drop=True) #XXX: 0.12.10
+#        df = df.drop(data_table.source.selected.indices).reset_index(drop=True)  #XXX: >0.12.10
+        df = df.drop(data_table.source.selected["1d"]["indices"]).reset_index(drop=True)  #XXX: 0.12.10
+
         data_table.source.data = {key:list(dic.values()) for key,dic in df.to_dict().items()}
         
     def delete_hs():
         df = pd.DataFrame(data_table_heat_storage.source.data)
-        df = df.drop(data_table_heat_storage.source.selected.indices).reset_index(drop=True)
-#        df = df.loc[~df.index.isin(data_table_heat_storage.source.selected["1d"]["indices"])].reset_index(drop=True) #XXX: 0.12.10
+#        df = df.drop(data_table_heat_storage.source.selected.indices).reset_index(drop=True) #XXX: >0.12.10
+        df = df.drop(data_table_heat_storage.source.selected["1d"]["indices"]).reset_index(drop=True)  #XXX: 0.12.10
+
         data_table_heat_storage.source.data = {key:list(dic.values()) for key,dic in df.to_dict().items()}       
            
 # =============================================================================
