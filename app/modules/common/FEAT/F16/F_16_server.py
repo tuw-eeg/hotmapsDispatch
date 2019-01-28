@@ -9,6 +9,7 @@ matplotlib.use('agg',warn=False)
 from tornado.ioloop import IOLoop
 import pandas as pd
 import numpy as np
+from zipfile import ZipFile
 from bokeh.application.handlers import FunctionHandler,DirectoryHandler
 from bokeh.application import Application
 from bokeh.layouts import widgetbox,row,column,layout
@@ -670,35 +671,46 @@ def modify_doc(doc):
                     print("Error @ Ploting  !!!")
                     div_spinner.text = """<div align="center"> <strong style="color: red;">Error: @ Ploting !!!</strong></div>"""
                 else:
-                    output.tabs = output_tabs
+                    output.tabs = output_tabs #TODO: render only when a toggle button is active
                     print("Ploting done")
                     print("Download output_graphics started...")
                     time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
-                    filename = "output_graphs.html"
-                    
-                    path_download = os.path.join(create_folder(time_id),filename)
-                    output_file(path_download,title="Dispatch output")
+                    filename = "output_graphs.html"                    
+                    path_download_html = os.path.join(create_folder(time_id),filename)
+                    output_file(path_download_html,title="Dispatch output")
                     save(output)
-                    path_download_html = os.path.join("download","static",time_id,filename)
+#                    save(Tabs(tabs=output_tabs))
+                    path_download_html_ = os.path.join("download","static",time_id,filename)
 #                    trigger_download(time_id,filename)
                     print("Graphics Download done")
                     print("Download output data started...")
                     # -- Download JSON
                     time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
                     filename = "output_data.json"
-                    path_download = os.path.join(create_folder(time_id),filename)
-                    with open(path_download, "w") as f:
+                    path_download_json = os.path.join(create_folder(time_id),filename)
+                    with open(path_download_json, "w") as f:
                         json.dump(solutions, f)
-                    path_download_json = os.path.join("download","static",time_id,filename)
+                    path_download_json_ = os.path.join("download","static",time_id,filename)
 #                    trigger_download(time_id,filename)
+                    # -- Download XLSX
                     time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
                     filename = "output_data.xlsx"
-                    path_download = os.path.join(create_folder(time_id),filename)
-                    json2xlsx(solutions,path_download)
-                    path_download_xlsx = os.path.join("download","static",time_id,filename)
+                    path_download_xlsx = os.path.join(create_folder(time_id),filename)
+                    json2xlsx(solutions,path_download_xlsx)
+                    path_download_xlsx_ = os.path.join("download","static",time_id,filename)
                     print("Download output data done")
-                    print("Render in Browser...")
-                    # --
+                     # -- Download ZIP
+                    print("Create Zip File...")
+                    time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+                    filename = "output_data.zip"
+                    path_download_zip = os.path.join(create_folder(time_id),filename)
+                    with ZipFile(path_download_zip,"w") as zip_file:
+                        for file in [path_download_html,path_download_json,
+                                     path_download_xlsx]:
+                            zip_file.write(file,os.path.basename(file))
+                    path_download_zip_ = os.path.join("download","static",time_id,filename)
+                    print("Create Zip File done")
+                    # --                  
                     div_spinner.text = """<div align="center"> 
                     <style>
                     a:link, a:visited {
@@ -718,13 +730,14 @@ def modify_doc(doc):
                     </style>
                     <strong style="color: green">
                     <p>Calculation done<p>
-                    <p><a href="""+"'"+path_download_html+"'"""" download="output.html">Download HTML File </a> <p>
-                    <p><a href="""+"'"+path_download_json+"'"""" download="output.json">Download JSON File </a>  <p>
-                    <p><a href="""+"'"+path_download_xlsx+"'"""" download="output.xlsx">Download XLSX File </a>  <p>                   
+                    <p><a href="""+"'"+path_download_html_+"'"""" download="output.html">Download HTML File </a> <p>
+                    <p><a href="""+"'"+path_download_xlsx_+"'"""" download="output.xlsx">Download XLSX File </a>  <p>
+                    <p><a href="""+"'"+path_download_zip_+"'"""" download="output.zip">Download ZIP File </a>  <p>                   
                     </strong>
                     </div>
                     """
                     print("Calculation is Done !")
+                    print("Render in Browser...")
         except Exception as e:
             print(str(e))
             print(e)
@@ -783,7 +796,7 @@ def modify_doc(doc):
                 data2 = excel_object.parse(sheet_name = 'Default - External Data',index_col=0)
                 for i in external_data_map:
                     external_data_map[i]["Default"] = data2[i][0]
-                    ## callbacks take very long
+                    ## XXX: callbacks take very long
                     (c,y),fit_string = extract(data2[i][0])
                     offset,constant = find_FiT(fit_string)
                     constant = "" if type(constant) == str else constant
@@ -1000,7 +1013,6 @@ def modify_doc(doc):
     cop_label = TextInput(placeholder="-", title="COP",disabled= True)
     flow_temp = Select(title="Inlet Temperature")
     return_temp = Select(title="Return Temperature")
-
     energy_carrier_select = Select(options = energy_carrier_options, 
                                    title="Energy Carrier",value = energy_carrier_options[0])
 
@@ -1066,6 +1078,7 @@ def modify_doc(doc):
         output.tabs = []
         select_tec.value = select_tec.options[0]
         installed_cap.end=int(float(pmax.value))+1
+        energy_carrier_select.options =  data_table_prices.source.data["energy carrier"]
         div_spinner.text = ""
 # =============================================================================
     def cancel():
@@ -1186,7 +1199,7 @@ def modify_doc(doc):
             lt_label.value = str(data_tec[data_tec["name"] == select_tec2.value]["life time"].values[0])
             ik_label.value = str(data_tec[data_tec["name"] == select_tec2.value]["investment costs (EUR/MW_th)"].values[0])
             disable_widgets(cop_widget_list,True)
-            select_tec2.disabled = True
+            
 # =============================================================================
     def update_slider(name,old,new):
         try:
