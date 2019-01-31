@@ -4,7 +4,16 @@ Created on Fri Mar  9 15:30:16 2018
 
 @author: root
 """
-import matplotlib
+#%%
+# Check if modules are installed
+import bokeh,tornado,xlsxwriter, openpyxl, pyomo, matplotlib, xlrd, numpy, pandas, sys
+#XXX: Downgrade back bokeh version "0.12.10"
+assert bokeh.__version__ == '0.12.10', f"Your current bokeh version ist not compatible (Your Version:{bokeh.__version__})\nPlease install version 0.12.10 (type < pip install bokeh==0.12.10 >)"
+#XXX: Downgrade to torndado 4.5.3
+assert tornado.version == '4.5.3',f"Your current tornado version ist not compatible (Your Version:{tornado.version})\nPlease install tornado==4.5.3"
+
+
+#%%
 matplotlib.use('agg',warn=False)
 from tornado.ioloop import IOLoop
 import pandas as pd
@@ -16,7 +25,7 @@ from bokeh.layouts import widgetbox,row,column,layout
 from bokeh.models import ColumnDataSource,TableColumn,DataTable,CustomJS,TextInput, Slider,NumberFormatter
 from bokeh.server.server import Server
 from bokeh.models.widgets import Panel, Tabs, Button,Div,Toggle,Select,CheckboxGroup
-import os,sys,io,base64,pickle,datetime,json#,shutil
+import os,io,base64,pickle,datetime,json#,shutil
 from bokeh.plotting import figure,output_file,save
 from bokeh.models import PanTool,WheelZoomTool,BoxZoomTool,ResetTool,SaveTool,HoverTool
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
@@ -25,11 +34,6 @@ root_dir = os.path.dirname(os.path.abspath(__file__))
 
 if path not in sys.path:
     sys.path.append(path)
-
-#%%
-#XXX: Downgrade back bokeh version "0.12.10"
-import bokeh 
-assert bokeh.__version__ == '0.12.10', f"Your current bokeh version ist not compatible (Your Version:{bokeh.__version__})\nPlease install: pip install bokeh==0.12.10"
 #%%  
 #XXX: for bokeh 0.12.10
 # =============================================================================
@@ -113,14 +117,7 @@ class CustomSelect(Select):
 Tabs = CustomTabs
 Select = CustomSelect
 # =============================================================================
-#%%
-#import tornado 
-## früher (4.4.2) 
-#assert tornado.version == '4.5.3',f"Your current tornado version ist not compatible (Your Version:{tornado.version})\nPlease install tornado==4.5.3"
-try:
-    import openpyxl
-except Exception as e:
-    assert False, str(e)+ "\nPlease install e.g.: <conda install -c anaconda openpyxl>"
+
 #%%
 from AD.F16_input.main import extract,find_FiT
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
@@ -450,10 +447,12 @@ def modify_doc(doc):
     col_hp_hs = column([row(label1,button1,button1_1),data_table,row(label2,button2,button2_1),data_table_heat_storage])
     lay = { i : generate_layout(widgets[i]) for i in data_kwargs}
     grid = Tabs(tabs=[])
+    profiles_tabs = Tabs(tabs=[Panel(child=p, title=name) for name, p in lay.items()])
     dic = {"Heat Producers and Heat Storage":col_hp_hs,
            "Adding": grid,
            "Parameters":data_table_data,
-           "Prices & Emission factors":data_table_prices}
+           "Prices & Emission factors":data_table_prices,
+           "Profiles": profiles_tabs,}
     # Change layout of Heat Demand Tab -> Add Total Demand
     widgets[_hd]["total"].title = "Set Total Demand (MWh)"
     widgets[_hd]["total"].disabled=False
@@ -461,7 +460,7 @@ def modify_doc(doc):
     # Change layout of Electricity Tabs -> Select technologies to add external data
     for i in _elec:
         lay[i].children.append(column(widgetbox(widgets[i]["tec"]), widgetbox(widgets[i]["ok"])))
-    dic =  {**dic, **lay}
+
     tabs_liste = [Panel(child=p, title=name) for name, p in dic.items()]
     tabs = Tabs(tabs=tabs_liste)
 # =============================================================================

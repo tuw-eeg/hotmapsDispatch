@@ -1,0 +1,1276 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>1. Getting Started &mdash; Hotmaps Dispatch Module 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to Hotmaps Dispatch Module’s documentation!" href="index.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Hotmaps Dispatch Module
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">1. Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#workflow">1.1. Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#things-to-consider">1.2. Things to consider</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#user-guide">2. User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-web-user-interface">2.1. The Web User Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#button-section">2.2. Button Section</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#short-description">2.2.1. Short Description:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#long-description">2.2.2. Long Description:</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#download">2.2.2.1. Download </a></li>
+<li class="toctree-l4"><a class="reference internal" href="#upload">2.2.2.2. Upload </a></li>
+<li class="toctree-l4"><a class="reference internal" href="#run">2.2.2.3. Run </a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reset">2.2.2.4. Reset </a></li>
+<li class="toctree-l4"><a class="reference internal" href="#invest">2.2.2.5. Invest </a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#notification-section-with-peak-load-and-missing-capacities-information">2.3. Notification Section with Peak Load and Missing Capacities – Information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">2.3.1. Short Description:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">2.3.2. Long Description:</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#after-pressing-the-run-dispatch-model-button">2.3.2.1. After pressing the Run Dispatch Model Button</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#after-pressing-the-download-button">2.3.2.2. After Pressing the Download Button</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#after-pressing-the-upload-button">2.3.2.3. After Pressing the Upload Button</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#after-pressing-the-invest-button">2.3.2.4. After Pressing the Invest Button</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#after-pressing-the-button-in-the-heat-producers-and-heat-storage-tab">2.3.2.5. After Pressing the + Button in the Heat Producers and Heat Storage Tab</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#after-pressing-the-add-button-in-the-heat-generator-adding-section">2.3.2.6. After Pressing the ✓ ADD Button in the Heat Generator Adding Section</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#after-pressing-the-button-in-the-sale-electricity-price-tab">2.3.2.7. After Pressing the ✓ - Button in the Sale-/Electricity Price Tab</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#after-uploading-a-file-in-the-load-individual-data-tab">2.3.2.8. After Uploading a file in the Load Individual Data Tab</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#after-pressing-the-save-button-in-the-load-individual-data-tab">2.3.2.9. After Pressing the ✓ Save Button in the Load Individual Data –Tab</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#output-section">2.4. Output Section</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id3">2.4.1. Short Description:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">2.4.2. Long Description:</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data-section">2.5. Data Section</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#heat-producers-and-heat-storage-tab">2.5.1. Heat Producers and Heat Storage – Tab</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id5">2.5.1.1. Short Description:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id6">2.5.1.2. Long Description:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#parameters-tab">2.5.2. Parameters – Tab</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id7">2.5.2.1. Short Description:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#prices-emission-factors-tab">2.5.3. Prices &amp; Emission factors – Tab</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id8">2.5.3.1. Short Description:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#radiation-tab">2.5.4. Radiation – Tab</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id9">2.5.4.1. Short Description:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#temperature-tab">2.5.5. Temperature – Tab</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id10">2.5.5.1. Short Description:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#electricity-price-sale-electricity-price-tab">2.5.6. Electricity price / Sale Electricity price – Tab</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id11">2.5.6.1. Short Description:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#heat-demand-tab">2.5.7. Heat Demand – Tab</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id12">2.5.7.1. Short Description:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#load-individual-data-tab">2.5.8. Load Individual Data – Tab</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id13">2.5.8.1. Short Description:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id14">2.5.8.2. Long Description:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Hotmaps Dispatch Module</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>1. Getting Started</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/Getting Started.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="getting-started">
+<h1>1. Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>This Getting Started guide aims to get you using the
+Hotmaps-Dispatch-Application as quickly as possible</p>
+<div class="section" id="workflow">
+<h2>1.1. Workflow<a class="headerlink" href="#workflow" title="Permalink to this headline">¶</a></h2>
+<ol class="simple">
+<li>Visit the Website (<a class="reference external" href="http://dispatch.invert.at">www.dispatch.invert.at</a>) and
+log in with your user data</li>
+<li><a class="reference external" href="#the-web-user-interface">Web User Interface</a> loads</li>
+<li>Select a heat demand profile in the <a class="reference external" href="#heat-demand-tab">Heat Demand – Tab</a> or
+upload your own profile via the <a class="reference external" href="#load-individual-data-tab">Load Individual Data
+-Tab</a></li>
+<li>Set the yearly heat consumption of your region in the <a class="reference external" href="#heat-demand-tab">Heat Demand –
+Tab</a> or in the <a class="reference external" href="#parameters-tab">Paramters- Tab</a>, by
+editing the Total Demand [MWh] input widget</li>
+<li>Add predefined <a class="reference external" href="#hg_add">heat generators</a> or <a class="reference external" href="#hs_add">heat storages</a> in the <a class="reference external" href="#heat-producers-and-heat-storage-tab">Heat Producers and
+Heat Storage - Tab</a> by pressing the
+<strong>+</strong> Button or <a class="reference external" href="#upload">upload</a> custom generators via the Upload Power Plant
+Parameters – Button</li>
+<li>Set various prices, parameters, profiles, etc. or upload your own data and
+click on the Run Dispatch Model - Button</li>
+<li>After 60 to 120 seconds the results are shown in the output section</li>
+</ol>
+</div>
+<div class="section" id="things-to-consider">
+<h2>1.2. Things to consider<a class="headerlink" href="#things-to-consider" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Refreshing the page deletes all your progress</li>
+<li>Always save your progress by <a class="reference external" href="#download">downloading</a> the created structure</li>
+<li>After calculation is done <a class="reference external" href="#calc_done">download</a> the result files</li>
+<li><a class="reference external" href="#calc_done">Copy the link of the results</a> if something occurs you can
+access your results within 2 hours (this saves you time)</li>
+<li>If you upload your own data, pay attention to the needed structure as
+described <a class="reference external" href="#format">here</a> and <a class="reference external" href="#upload_extern">here</a></li>
+<li>Look up the heat <a class="reference external" href="#types">generator types</a> that are available when
+generating your custom structure outside the Application</li>
+<li>Don’t forget to press the ✓ - Button in the <a class="reference external" href="#electricity-price-sale-electricity-price-tab">Sale-/Electricity Price
+Tab</a>, because only so changes
+take effect</li>
+<li>If the page doesn’t respond for a long time or something else happened
+refresh the page and try again, if the issue is still present look up the
+<a class="reference external" href="#user-guide">User Guide</a>, if you have still the issue please document all
+setting you set (which browser, parameters, data, etc. did you use)</li>
+<li>At last but not least, be patient…</li>
+</ul>
+</div>
+</div>
+<div class="section" id="user-guide">
+<h1>2. User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
+<p>The User Guide is the primary resource for documenting key concepts that will
+help you use the Hotmaps-Dispatch-Application in your work</p>
+<div class="section" id="the-web-user-interface">
+<h2>2.1. The Web User Interface<a class="headerlink" href="#the-web-user-interface" title="Permalink to this headline">¶</a></h2>
+<p>The figure below shows the User Interface. At first glance, you can see that the
+Application is divided into four sections:</p>
+<ol class="simple">
+<li>Button Section</li>
+<li>Notification Section with Peak Load and Missing Capacities – Information</li>
+<li>Output Section</li>
+<li>Data Section
+<img alt="_images/050c08fbf53cedb8872c4c5f5d7eacda.png" src="_images/050c08fbf53cedb8872c4c5f5d7eacda.png" /></li>
+</ol>
+<p>In the following chapters, each section is described in detail.</p>
+</div>
+<div class="section" id="button-section">
+<h2>2.2. Button Section<a class="headerlink" href="#button-section" title="Permalink to this headline">¶</a></h2>
+<p><img alt="_images/b1b13e0d0fb94ce2e4f143d83ea15957.png" src="_images/b1b13e0d0fb94ce2e4f143d83ea15957.png" /></p>
+<div class="section" id="short-description">
+<h3>2.2.1. Short Description:<a class="headerlink" href="#short-description" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>In this Section, you can download the created structure to save your
+progress,</li>
+<li>You can upload your saved progress, or a custom structure into the
+Application,</li>
+<li>You can run the model you created,</li>
+<li>You can reset the view for better workflow or</li>
+<li>You can start an investment model</li>
+</ul>
+</div>
+<div class="section" id="long-description">
+<h3>2.2.2. Long Description:<a class="headerlink" href="#long-description" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="download">
+<h4>2.2.2.1. Download <img alt="_images/d28666e58cf858840eefd397de89536e.png" src="_images/d28666e58cf858840eefd397de89536e.png" /><a class="headerlink" href="#download" title="Permalink to this headline">¶</a></h4>
+<p>By pressing this button, the browser will try to download a file with the name
+<em>download_input.xlsx</em> that contains all the Information regarding heat producers
+and heat storages.
+<strong><a name="format"></a>The downloaded file has the following format (for uploading the same format
+must be specified):</strong>
+It has five worksheets:</p>
+<div class="section" id="worksheets">
+<h5>2.2.2.1.1. Worksheets<a class="headerlink" href="#worksheets" title="Permalink to this headline">¶</a></h5>
+<p><img alt="_images/a90bbdf02f6d9027389d53ff4ce9c1c2.png" src="_images/a90bbdf02f6d9027389d53ff4ce9c1c2.png" /></p>
+<p><strong><a name="HeatGenerators"></a>The worksheets have following structure (columns):</strong></p>
+<ul class="simple">
+<li><strong>Heat Generators:</strong></li>
+</ul>
+<p><img alt="_images/ce5b0b144debcfd9e10635331fa2ebf2.png" src="_images/ce5b0b144debcfd9e10635331fa2ebf2.png" />
+<a name="ec_emf_worksheet"></a></p>
+<ul class="simple">
+<li><strong>prices and emission factors:</strong></li>
+</ul>
+<p><img alt="_images/cb5b58cbfe9b48423f3c512f9fce9515.png" src="_images/cb5b58cbfe9b48423f3c512f9fce9515.png" />
+<a name="data_worksheet"></a></p>
+<ul class="simple">
+<li><strong>Data:</strong></li>
+</ul>
+<p><a name="heat_storage_worksheet"></a>
+<img alt="_images/d043a39b480930492632b3e465364562.png" src="_images/d043a39b480930492632b3e465364562.png" /></p>
+<ul class="simple">
+<li><strong>Heat Storage:</strong></li>
+</ul>
+<p><img alt="_images/a6eeeddcfb2391bd9b6a2d7e5f646044.png" src="_images/a6eeeddcfb2391bd9b6a2d7e5f646044.png" />
+<a name = "energy_carrier"></a></p>
+<ul class="simple">
+<li><strong>Energy Carrier:</strong></li>
+</ul>
+<p><img alt="_images/5c2331521ea5460c940bc2293409811e.png" src="_images/5c2331521ea5460c940bc2293409811e.png" /></p>
+</div>
+</div>
+<div class="section" id="upload">
+<h4>2.2.2.2. Upload <img alt="_images/024da518d8b23eb9da0eccdc662e805d.png" src="_images/024da518d8b23eb9da0eccdc662e805d.png" /><a class="headerlink" href="#upload" title="Permalink to this headline">¶</a></h4>
+<p>By clicking this button, a pop up window will open and you will be able to
+upload a xlsx file. That overwrites the content of the web user interface.
+The file you upload <strong>must</strong> have the structure as described <a class="reference external" href="#format">before</a>
+in the long description of the download powerplant parameters -Button.</p>
+<p><em><strong>Consider following:</strong></em></p>
+<ul class="simple">
+<li>You have to create a file that has the same names for the <a class="reference external" href="#worksheets">worksheets</a> and columns</li>
+<li>The worksheet names are case sensitive</li>
+<li>The column names are case sensitive</li>
+<li>You must specify an index column starting with 0</li>
+<li>You can create maximum 13 energy carriers</li>
+</ul>
+<p><em><strong><a name = "types"></a>Following heat generator types are available (type column in the <a class="reference external" href="#HeatGenerators">Heat Generators</a> worksheet)</strong></em></p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th><em>name available (case sensitive)</em></th>
+<th><em>Description</em></th>
+<th><em>Implementation Note</em></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>CHP-BP</em></td>
+<td>Back Pressure CHP</td>
+<td></td>
+</tr>
+<tr>
+<td><em>CHP-SE</em></td>
+<td>Steam Extraction CHP</td>
+<td></td>
+</tr>
+<tr>
+<td><em>boiler</em></td>
+<td>heat boiler</td>
+<td></td>
+</tr>
+<tr>
+<td><em>heat pump</em></td>
+<td>heat pump</td>
+<td>For temperatures &lt; 0°C the heat pump doesn’t work</td>
+</tr>
+<tr>
+<td><em>Solar Thermal</em></td>
+<td>Solar thermal plant</td>
+<td>At 1000 W/m² the solar power plant gives the maximum output</td>
+</tr>
+<tr>
+<td><em>Waste treatment</em></td>
+<td>waste incineration plants</td>
+<td></td>
+</tr>
+<tr>
+<td><em>Waste Heat*</em></td>
+<td>Power plants that work with the unused heat from other power plants</td>
+<td></td>
+</tr>
+<tr>
+<td><em>Geo Thermal*</em></td>
+<td>Geo thermal power plant</td>
+<td></td>
+</tr>
+<tr>
+<td><em>Power To Heat*</em></td>
+<td>Power to heat devices</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<div class="section" id="run">
+<h4>2.2.2.3. Run <img alt="_images/3174e917468a17f4f6f70d8b6e9a3d59.png" src="_images/3174e917468a17f4f6f70d8b6e9a3d59.png" /><a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h4>
+<p>By Pressing this button, the optimization will start. You will get a progress
+shown in the notification section.
+Depending on the structure you create the optimization will run for about 60 to
+120 seconds.
+Please be aware that your browser might freeze at that time.
+After the solution is found the results are shown in the output section. You can
+download then the results via the <a class="reference external" href="#calc_done">buttons</a> in the <a class="reference external" href="#info_after_run">notification
+section.</a> Also, if something gets wrong you will get
+information in the notification section.
+If unexpected errors occur please document and send detailed instruction to
+reproduce the error and send these instruction with a short problem description.</p>
+</div>
+<div class="section" id="reset">
+<h4>2.2.2.4. Reset <img alt="_images/12f6b8f234660e6af21f46bbbaf9c166.png" src="_images/12f6b8f234660e6af21f46bbbaf9c166.png" /><a class="headerlink" href="#reset" title="Permalink to this headline">¶</a></h4>
+<p>By pressing this button, the notification section and the output section will be
+cleared, and you will get a “fresh” view.</p>
+</div>
+<div class="section" id="invest">
+<h4>2.2.2.5. Invest <img alt="_images/56881a1e6d88a2616f0bef07c38b4ed9.png" src="_images/56881a1e6d88a2616f0bef07c38b4ed9.png" /><a class="headerlink" href="#invest" title="Permalink to this headline">¶</a></h4>
+<p>The Application is implemented as a linear program and can be used on the one
+hand as a pure dispatch model and on the other hand for investment planning (how
+much capacities to install) to cover a load profile with the minimum costs.
+If you enable this toggle button, it is important to specify the heat producers
+and heat storages by marking them (hold CTRL and left mouse click to select the
+desired generators and storages) for which an investment model should run.</p>
+</div>
+</div>
+</div>
+<div class="section" id="notification-section-with-peak-load-and-missing-capacities-information">
+<h2>2.3. Notification Section with Peak Load and Missing Capacities – Information<a class="headerlink" href="#notification-section-with-peak-load-and-missing-capacities-information" title="Permalink to this headline">¶</a></h2>
+<p><a name="info_after_run"></a><img alt="_images/e9314d346544f03058e2a7ea8552bc2d.png" src="_images/e9314d346544f03058e2a7ea8552bc2d.png" /></p>
+<div class="section" id="id1">
+<h3>2.3.1. Short Description:<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>In this section, you will get information regarding the progress, the peak load,
+missing capacities and errors that occur.</p>
+</div>
+<div class="section" id="id2">
+<h3>2.3.2. Long Description:<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>In the following you will see some frequent messages (progress and error
+information) that might appear in the notification section.</p>
+<div class="section" id="after-pressing-the-run-dispatch-model-button">
+<h4>2.3.2.1. After pressing the <a class="reference external" href="#run">Run Dispatch Model Button</a><a class="headerlink" href="#after-pressing-the-run-dispatch-model-button" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>Dispatch in progress, please be patient…</strong>
+This can take some time. Typically, also to browser can freeze when the
+calculation is done and the results are rendered in the browser
+<img alt="_images/f93f99ccce7127601c7b1281f893af8f.png" src="_images/f93f99ccce7127601c7b1281f893af8f.png" /></li>
+<li><strong><a name="calc_done"></a>Calculation is Done</strong>
+With these buttons, you can download your results. It might happen that the
+page freezes after downloading, please be patient. We recommend also to save the
+link of these file right click on the buttons Copy Link (after 2 hours this
+links will not work but you can download the files directly if the page freeze
+and so save so your time)
+<img alt="_images/1c7301fcfc1b127a4d783f49818df1fc.png" src="_images/1c7301fcfc1b127a4d783f49818df1fc.png" /></li>
+<li><strong>No Heat Generators available</strong>
+This will happen if you haven’t specified any heat generators and wanted to
+start the model from the initial page.
+<img alt="_images/92af72c601a53719e7b128b2da87d499.png" src="_images/92af72c601a53719e7b128b2da87d499.png" /></li>
+<li><strong>The installed capacities are not enough to cover the load</strong>
+This will be shown when you haven’t specified enough MW to cover the peak load
+(see missing Capacities in the right sight of the notification section)
+<img alt="_images/aaa4258dbacccdcbf364e575ae8460db.png" src="_images/aaa4258dbacccdcbf364e575ae8460db.png" /></li>
+<li><strong>Error: Problem proven to be infeasible or unbounded</strong>
+This happens typically when constraints cannot be met and can have a lot of
+reasons, its upon you to think about what could happen.
+<img alt="_images/9a67d333b2ddb8813c13ae0544ca04b4.png" src="_images/9a67d333b2ddb8813c13ae0544ca04b4.png" /></li>
+<li><strong>Error: Please specify the technologies for the investment model</strong>
+This is shown when you enable investment planning but you forgot to select the
+heat generators and heat storages to mark, with whom it should do an investment
+optimization
+<img alt="_images/8047b9d6aad2622d644131fe55951205.png" src="_images/8047b9d6aad2622d644131fe55951205.png" /></li>
+</ul>
+</div>
+<div class="section" id="after-pressing-the-download-button">
+<h4>2.3.2.2. After Pressing the <a class="reference external" href="#download">Download Button</a><a class="headerlink" href="#after-pressing-the-download-button" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>Nothing to download</strong>
+Typically, this occurs when you want to download the initial page, to download
+you need to <a class="reference external" href="#add-new-heat-generator-section">add</a> first a heat generator
+<img alt="_images/50aaacb2247c9e7602b710de74a2e1ff.png" src="_images/50aaacb2247c9e7602b710de74a2e1ff.png" /></li>
+<li><strong>Download done</strong>
+<img alt="_images/c398859e99ccfd24e001bc15f8b86862.png" src="_images/c398859e99ccfd24e001bc15f8b86862.png" /></li>
+</ul>
+</div>
+<div class="section" id="after-pressing-the-upload-button">
+<h4>2.3.2.3. After Pressing the <a class="reference external" href="#upload">Upload Button</a><a class="headerlink" href="#after-pressing-the-upload-button" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>Not a valid file to upload</strong>
+This is shown when you try to upload an filetype other then .xlsx
+<img alt="_images/e11de03f743b7cfd854c0fc29d603eac.png" src="_images/e11de03f743b7cfd854c0fc29d603eac.png" /></li>
+<li><strong>Fatal Error &#64; Update</strong>
+This is shown when your file you want to upload has not the needed
+<a class="reference external" href="#format">structure</a>.
+<img alt="_images/5ab41f9a168ff2cabed0d109f3118aa6.png" src="_images/5ab41f9a168ff2cabed0d109f3118aa6.png" /></li>
+<li><strong>Upload Done</strong>
+<img alt="_images/cf1962e9543ba80b03e9f3cfb502f7bc.png" src="_images/cf1962e9543ba80b03e9f3cfb502f7bc.png" /></li>
+</ul>
+</div>
+<div class="section" id="after-pressing-the-invest-button">
+<h4>2.3.2.4. After Pressing the <a class="reference external" href="#invest">Invest Button</a><a class="headerlink" href="#after-pressing-the-invest-button" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>Mark Technologies by pressing “CTRL” + “left mouse” Rows are marked yellow</strong>
+As soon as you press the Invest Button you will see this Information in the
+notification section, it tells you that you need to specify for which generators
+and storages to do the investment planning. If you don’t mark technologies you
+will get the message as described <a class="reference external" href="#specify">here</a>
+<img alt="_images/24e8963ff8e796a4496dc3007b244e81.png" src="_images/24e8963ff8e796a4496dc3007b244e81.png" /></li>
+</ul>
+</div>
+<div class="section" id="after-pressing-the-button-in-the-heat-producers-and-heat-storage-tab">
+<h4>2.3.2.5. After Pressing the + Button in the <a class="reference external" href="#heat-producers-and-heat-storage-tab">Heat Producers and Heat Storage Tab</a><a class="headerlink" href="#after-pressing-the-button-in-the-heat-producers-and-heat-storage-tab" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>This waiting spinner is especially visible after pressing the + Button, typically
+the browser freezes, so be patient, the <a class="reference external" href="#add-new-heat-generator-section">add</a> section is loading
+<img alt="_images/c93709c29ec2ee0ae9412bf423d254cc.png" src="_images/c93709c29ec2ee0ae9412bf423d254cc.png" /></li>
+</ul>
+</div>
+<div class="section" id="after-pressing-the-add-button-in-the-heat-generator-adding-section">
+<h4>2.3.2.6. After Pressing the ✓ ADD Button in the <a class="reference external" href="#add-new-heat-generator-section">Heat Generator Adding Section</a><a class="headerlink" href="#after-pressing-the-add-button-in-the-heat-generator-adding-section" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>Heat Generator ADDED</strong>
+<img alt="_images/08a588a38a5ec0d6091a98d594259dd6.png" src="_images/08a588a38a5ec0d6091a98d594259dd6.png" /></li>
+</ul>
+</div>
+<div class="section" id="after-pressing-the-button-in-the-sale-electricity-price-tab">
+<h4>2.3.2.7. After Pressing the ✓ - Button in the <a class="reference external" href="#electricity-price-sale-electricity-price-tab">Sale-/Electricity Price Tab</a><a class="headerlink" href="#after-pressing-the-button-in-the-sale-electricity-price-tab" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>Sale-/Electricity price Data is set as Default</strong>
+<img alt="_images/df67539a118da7384926cd562ef09b06.png" src="_images/df67539a118da7384926cd562ef09b06.png" /></li>
+<li><strong>Sale-/Electricity price Data for Heat Generator <em>name</em> is added</strong>
+<img alt="_images/a85d3e69afe7deb9c6e49368dbed4305.png" src="_images/a85d3e69afe7deb9c6e49368dbed4305.png" /></li>
+</ul>
+</div>
+<div class="section" id="after-uploading-a-file-in-the-load-individual-data-tab">
+<h4>2.3.2.8. After Uploading a file in the <a class="reference external" href="#load-individual-data-tab">Load Individual Data Tab</a><a class="headerlink" href="#after-uploading-a-file-in-the-load-individual-data-tab" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>Invalid Filetyp to load &#64; Loading External Data</strong>
+This is shown when you try to upload a filetype that is not .xlsx or .csv
+<img alt="_images/6b307b6c70ea76744282a19c31fbcb87.png" src="_images/6b307b6c70ea76744282a19c31fbcb87.png" /></li>
+<li><strong>Your file has not enough values (please specify 8760 values)</strong>
+Your file that you upload has to have the structure as described
+<a class="reference external" href="#upload_extern">here</a>
+<img alt="_images/079430d491a1d10e2284ac6b596cb9f9.png" src="_images/079430d491a1d10e2284ac6b596cb9f9.png" /></li>
+<li><strong>External Data Loaded</strong>
+This is shown when the external Data has been <a class="reference external" href="#succes_extern">uploaded</a>.
+<img alt="_images/327c70ba0804bc78898a233c6edc02b8.png" src="_images/327c70ba0804bc78898a233c6edc02b8.png" /></li>
+</ul>
+</div>
+<div class="section" id="after-pressing-the-save-button-in-the-load-individual-data-tab">
+<h4>2.3.2.9. After Pressing the ✓ Save Button in the <a class="reference external" href="#load-individual-data-tab">Load Individual Data –Tab</a><a class="headerlink" href="#after-pressing-the-save-button-in-the-load-individual-data-tab" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>External Data <em>name</em> added to Profile as <em>name_1</em></strong>
+This is shown after adding a custom data to the profiles as described
+<a class="reference external" href="#saving_tools">here</a>
+<img alt="_images/e769cbf4d16e533757ecd42c18bec6e0.png" src="_images/e769cbf4d16e533757ecd42c18bec6e0.png" /></li>
+<li><strong>n_th/COP - External Data added to Heat Generator name</strong>
+This is shown after adding a custom data for the thermal efficiency to a heat
+generator as described <a class="reference external" href="#saving_tools2">here</a>
+<img alt="_images/af69a0a9e3782c204e5846aa34a2f365.png" src="_images/af69a0a9e3782c204e5846aa34a2f365.png" /></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="output-section">
+<h2>2.4. Output Section<a class="headerlink" href="#output-section" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h3>2.4.1. Short Description:<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p><img alt="_images/28e1793a53bd76c1085276cf7e360827.png" src="_images/28e1793a53bd76c1085276cf7e360827.png" /></p>
+</div>
+<div class="section" id="id4">
+<h3>2.4.2. Long Description:<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="data-section">
+<h2>2.5. Data Section<a class="headerlink" href="#data-section" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="heat-producers-and-heat-storage-tab">
+<h3>2.5.1. Heat Producers and Heat Storage – Tab<a class="headerlink" href="#heat-producers-and-heat-storage-tab" title="Permalink to this headline">¶</a></h3>
+<p><img alt="_images/1429a6c52efacc6e8e6d02351957f66c.png" src="_images/1429a6c52efacc6e8e6d02351957f66c.png" /></p>
+<div class="section" id="id5">
+<h4>2.5.1.1. Short Description:<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>In this Tab, the <a class="reference external" href="#add-new-heat-generator-section">created</a> or <a class="reference external" href="#upload">uploaded</a> heat generator
+and heat storage data is shown in two tables (heat storage table and heat
+generator table). The above picture shows the initial page (no heat generators and no heat storages are defined).</p>
+<p>Please notice that it is possible to edit the values in the tables.</p>
+<p>By pressing the <em>+</em> Button you will be navigated to the <a class="reference external" href="#add-new-heat-generator-section">Adding Tab</a>, for adding new heat
+generators or <a class="reference external" href="#add-new-heat-generator-section2">heat storages</a>, pops up between the button section and the output section (see
+picture below) <em>*</em>.</p>
+<ul class="simple">
+<li><a name="hg_add"></a><strong>Section After Pressing <em>+</em> Button in the <a class="reference external" href="#heat-generator-table">Heat Generator Table</a></strong></li>
+</ul>
+<p><img alt="_images/9db9b55c71124bc80ff4d69040c08e8a.png" src="_images/9db9b55c71124bc80ff4d69040c08e8a.png" /></p>
+<ul class="simple">
+<li><a name="hs_add"></a><strong>Section After Pressing <em>+</em> Button in the <a class="reference external" href="#heat-storage-table">Heat Storage Table</a></strong></li>
+</ul>
+<p><img alt="_images/9db9b55c71124bc80ff4d69040c08e8a_2.png" src="_images/9db9b55c71124bc80ff4d69040c08e8a_2.png" /></p>
+</div>
+<div class="section" id="id6">
+<h4>2.5.1.2. Long Description:<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="heat-generator-table">
+<h5>2.5.1.2.1. Heat Generator Table<a class="headerlink" href="#heat-generator-table" title="Permalink to this headline">¶</a></h5>
+<p><img alt="_images/a1245e357176d3c0a07f532a4b255f4e.png" src="_images/a1245e357176d3c0a07f532a4b255f4e.png" /></p>
+<p>Your <a class="reference external" href="#add-new-heat-generator-section">added</a> (by pressing the <strong>+</strong> Button) or <a class="reference external" href="#upload">uploaded
+data</a> of heat generators is shown here. You have the opportunity to
+change the values of the table *.</p>
+<p>These parameters can also be changed via <a class="reference external" href="#upload">uploading</a>. Therefor you have
+to create an excel sheet with the structure as described <a class="reference external" href="#format">here</a>. Then
+the parameters must be specified in the <a class="reference external" href="#HeatGenerators">Heat Generators worksheet</a>.</p>
+<p><strong>Format, unit and description of the Heat Generators Table</strong></p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th><strong>Column name</strong></th>
+<th><strong>Format</strong></th>
+<th><strong>Unit</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td>String</td>
+<td>-</td>
+<td>Name of your power plant, you can give any name you want (don’t use to same names for different generators)</td>
+</tr>
+<tr>
+<td>installed capacity (MW_th)</td>
+<td>Number</td>
+<td>MW</td>
+<td>Here you can specify the power you want to install</td>
+</tr>
+<tr>
+<td>efficiency th</td>
+<td>Number</td>
+<td>-</td>
+<td>Here you can specify the thermal efficiency of the heat generator</td>
+</tr>
+<tr>
+<td>efficiency el</td>
+<td>Number $$\mathbb{R}$$ $$\vee$$[0,1]</td>
+<td>-</td>
+<td>Here you can specify the electrical efficiency of the heat generator</td>
+</tr>
+<tr>
+<td>investment costs (EUR/MW_th)</td>
+<td>Number</td>
+<td>\frac{}{\text{MW}}</td>
+<td>Here you can set the specific investment cost (especially if you try to do <a href="#invest">investment planning</a>, this parameter can be crucial)</td>
+</tr>
+<tr>
+<td>OPEX fix (EUR/MWa)</td>
+<td>Number</td>
+<td>\frac{}{\text{MW}}</td>
+<td>Here you can specify fixed operational expenditures</td>
+</tr>
+<tr>
+<td>OPEX var (EUR/MWh)</td>
+<td>Number</td>
+<td>\frac{}{\text{MWh}}</td>
+<td>Here you can specify variable operational expenditures</td>
+</tr>
+<tr>
+<td>life time</td>
+<td>Number</td>
+<td>a</td>
+<td>Here you can set the life time of your generator (in the model this is used for the annuity factor)</td>
+</tr>
+<tr>
+<td><a name="renewFac"></a>renewable factor</td>
+<td>Number $$\mathbb{R}$$ $$\vee$$[0,1]</td>
+<td>-</td>
+<td>Here you can set the renewable share of your generator, e.g. if your generator is 0% renewable ten you set 0, if your generator is 50% renewable then you have to set this value to 0.5. The Application tries then to meet the minimum renewable share (specified in the <a href="#parameters-tab">Parameter Tab</a>) for the generation mix. Caution: the problem might become infeasible, e.g. if you defined a minimum share of 50% but you haven’t defined enough generators with a renewable factor higher than 0.5 the constraint for a minimum share of 50% cannot be met</td>
+</tr>
+<tr>
+<td><a name="mustRun"></a>must run [0-1]</td>
+<td>Number $$\mathbb{R}$$ $$\vee$$[0,1]</td>
+<td>-</td>
+<td>Here you can force a heat generator to run all the time with x% of its installed capacity, if you want to realize a base load you can use this as a parameter, e.g. if you want that your het generator run with 50% of its capacity all the time you have to set this value to 0.5. Caution: Due to other constraints, the problem might become infeasible, e.g. the heat pump doesn’t run at temperatures lower than 0°C, that means if you force a heat pump to run all the time with x% of its capacity the other constraint cannot be met and therefore the problem become infeasible</td>
+</tr>
+</tbody>
+</table><p>*Caution: In this table, it is not possible to change the heat generators
+<a class="reference external" href="#types">type</a> or <a class="reference external" href="#energy_carrier">energy carrier</a>. The type is either defined
+by the <a class="reference external" href="#HeatGenerators">type column</a> in the <a class="reference external" href="#worksheets">Heat Generator</a>s
+worksheet when uploading power plant parameters or internally by adding from the
+user interface in the <a class="reference external" href="#types_2">Add new Heat Generator Section</a>. The same
+applies for the energy carriers, they can only be adapted via uploading an excel
+file (<a class="reference external" href="#energy_carrier">energy carrier</a> worksheet) or via the internal <a class="reference external" href="#tec_param">adding
+section</a>.</p>
+</div>
+<div class="section" id="heat-storage-table">
+<h5>2.5.1.2.2. Heat Storage Table<a class="headerlink" href="#heat-storage-table" title="Permalink to this headline">¶</a></h5>
+<p><img alt="_images/eddbc0662544a60994a0dd4638aa4299.png" src="_images/eddbc0662544a60994a0dd4638aa4299.png" /></p>
+<p>You have the opportunity to change the values of the table *. These parameters
+can also be changed via <a class="reference external" href="#upload">uploading</a>. Therefor you have to create an
+excel sheet with the structure as described <a class="reference external" href="#format">here</a>. Then the parameters
+must be specified in the <a class="reference external" href="#heat_storage_worksheet">Heat Storage worksheet</a>.</p>
+<p><strong>Format, unit and description of the Heat Storages Table</strong></p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th><strong>Column name</strong></th>
+<th><strong>Format</strong></th>
+<th><strong>Unit</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td>String</td>
+<td>-</td>
+<td>Name of your heat storage, you can give any name you want (don’t use to same names for different storages)</td>
+</tr>
+<tr>
+<td>Storage Capacity [MWh]</td>
+<td>Number</td>
+<td>MWh</td>
+<td>Here you can specify the capacity you want to install (if you use only dispatch mode, you can see in the notification section, how much MW you need to cover the peak load)</td>
+</tr>
+<tr>
+<td>maximum unloading power [MW]</td>
+<td>Number</td>
+<td>MW</td>
+<td>Here you can specify the unloading power</td>
+</tr>
+<tr>
+<td>maximum loading power [MW]</td>
+<td>Number</td>
+<td>MW</td>
+<td>Here you can specify the loading power</td>
+</tr>
+<tr>
+<td>loading efficiency</td>
+<td>Number $$\mathbb{R}$$ $$\vee$$[0,1]</td>
+<td>-</td>
+<td>Loading efficiency</td>
+</tr>
+<tr>
+<td>unloading efficiency</td>
+<td>Number $$\mathbb{R}$$ $$\vee$$[0,1]</td>
+<td>-</td>
+<td>Unloading efficiency</td>
+</tr>
+<tr>
+<td>Invesment costs for additional storage capacity [€/MWh]</td>
+<td>Number</td>
+<td>\frac{}{\text{MWh}}</td>
+<td>Here you can set the specific investment cost (especially if you try to do <a href="#invest">investment planning</a>, this parameter can be crucial)</td>
+</tr>
+<tr>
+<td>OPEX fix [€/MWha]</td>
+<td>Number</td>
+<td>\frac{}{\text{MWh}}</td>
+<td>Here you can specify fixed operational expenditures</td>
+</tr>
+<tr>
+<td>Life Time [a]</td>
+<td>Number</td>
+<td>a</td>
+<td>Here you can set the life time of your generator (in the model this is used for the annuity factor)</td>
+</tr>
+</tbody>
+</table><p>*Caution: Please be aware that only one heat storage is available, e.g. if you
+don’t upload others only this storage will be editable. The <strong>+</strong> Button for heat
+storages does nothing, the implementation is in progress and in future this
+feature will become available.</p>
+</div>
+<div class="section" id="add-new-heat-generator-section">
+<h5>2.5.1.2.3. Add new Heat Generator Section<a class="headerlink" href="#add-new-heat-generator-section" title="Permalink to this headline">¶</a></h5>
+<p><img alt="_images/0354e95d1f308ba607c236dc7bd45303.png" src="_images/0354e95d1f308ba607c236dc7bd45303.png" /></p>
+<p>By pressing the + Button in the <a class="reference external" href="#heat-generator-table">Heat Generators Table</a> the
+above section pops up (please be patient this will take some time). All heat
+generators have the three red marked tabs in common, only for heat pumps an
+extra tab is shown (Coefficient of Performance, COP)</p>
+<p>The picture below shows you all predefined heat generator types, that means by
+selection one of these, predefined values are loaded. You can see and edit the
+values in the <a class="reference external" href="#tec_param">Technical Parameters Tab</a> and in the <a class="reference external" href="#fin_param">Finance
+Parameters Tab</a>, but you can also change them in later in the <a class="reference external" href="#heat-generator-table">Heat
+Generator Table</a>. (after pressing ✓ ADD )</p>
+<div class="section" id="a-name-types-2-a-available-heat-genrators">
+<h6>2.5.1.2.3.1. <a name="types_2"></a>Available Heat Genrators<a class="headerlink" href="#a-name-types-2-a-available-heat-genrators" title="Permalink to this headline">¶</a></h6>
+<p><img alt="_images/image42.png" src="_images/image42.png" /></p>
+</div>
+<div class="section" id="available-types-of-boilers">
+<h6>2.5.1.2.3.2. Available types of boilers<a class="headerlink" href="#available-types-of-boilers" title="Permalink to this headline">¶</a></h6>
+<p><img alt="_images/image43.png" src="_images/image43.png" /></p>
+</div>
+<div class="section" id="available-types-of-heat-pumps">
+<h6>2.5.1.2.3.3. Available types of heat pumps<a class="headerlink" href="#available-types-of-heat-pumps" title="Permalink to this headline">¶</a></h6>
+<p><img alt="_images/image44.png" src="_images/image44.png" /></p>
+</div>
+<div class="section" id="available-types-of-chp-steam-extraction-types">
+<h6>2.5.1.2.3.4. Available types of CHP-Steam Extraction types<a class="headerlink" href="#available-types-of-chp-steam-extraction-types" title="Permalink to this headline">¶</a></h6>
+<p><img alt="_images/image45.png" src="_images/image45.png" /></p>
+</div>
+<div class="section" id="available-types-of-chp-back-pressure-types">
+<h6>2.5.1.2.3.5. Available types of CHP-Back Pressure types<a class="headerlink" href="#available-types-of-chp-back-pressure-types" title="Permalink to this headline">¶</a></h6>
+<p><img alt="_images/image46.png" src="_images/image46.png" /></p>
+</div>
+<div class="section" id="a-name-tec-param-a-technical-parameters-tab">
+<h6>2.5.1.2.3.6. <a name="tec_param"></a>Technical Parameters – Tab<a class="headerlink" href="#a-name-tec-param-a-technical-parameters-tab" title="Permalink to this headline">¶</a></h6>
+<ul class="simple">
+<li><img alt="_images/73861b3d5c5450390509131ec84431a6.png" src="_images/73861b3d5c5450390509131ec84431a6.png" /><ul>
+<li>Here you can select the energy carrier with witch the heat generator is fired.
+You can define a name and set the thermal and electrical efficiency. For heat
+pumps the input for Thermal Efficiency is disabled, because it is defined via
+the <a class="reference external" href="#cop_param">Coefficient of Performance, COP – Tab</a>. Each <a class="reference external" href="#types_2">heat
+generator</a> has predefined values that are shown here. You can and
+should change them.</li>
+</ul>
+</li>
+<li><img alt="_images/73861b3d5c5450390509131ec84431a6_2.png" src="_images/73861b3d5c5450390509131ec84431a6_2.png" /><ul>
+<li>Here you can define the technical parameters for your heat storage</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="a-name-fin-param-a-finance-parameters-tab">
+<h6>2.5.1.2.3.7. <a name="fin_param"></a>Finance Parameters – Tab<a class="headerlink" href="#a-name-fin-param-a-finance-parameters-tab" title="Permalink to this headline">¶</a></h6>
+<ul class="simple">
+<li><img alt="_images/fa30401ab1908826007200588c2b555c.png" src="_images/fa30401ab1908826007200588c2b555c.png" /><ul>
+<li>Here you can see and change predefined values of financial parameters for
+selected heat generator.</li>
+</ul>
+</li>
+<li><img alt="_images/fa30401ab1908826007200588c2b555c_2.png" src="_images/fa30401ab1908826007200588c2b555c_2.png" /><ul>
+<li>Here you can set the financel Paramters for your heat storage.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="model-parameters-tab">
+<h6>2.5.1.2.3.8. Model Parameters -Tab<a class="headerlink" href="#model-parameters-tab" title="Permalink to this headline">¶</a></h6>
+<ul class="simple">
+<li><img alt="_images/50f2918549630a2e5626eebf9a345029.png" src="_images/50f2918549630a2e5626eebf9a345029.png" /><ul>
+<li>In this Tab, you can set the orange toggle Button Must Run, that mean that this
+heat generator must run all the time with 100% of its capacity (for more details
+see <a class="reference external" href="#mustRun">here</a>)
+With one slider, you can set a renewable factor (values from 0 to 1, more
+details see <a class="reference external" href="#renewFac">here</a>) and with the other you can set the installed
+capacity of your heat generator (values from 0 to
+<a class="reference external" href="#notification-section-with-peak-load-and-missing-capacities-information">Pmax,</a>-Peak
+Load of the selected Heat Profile)</li>
+</ul>
+</li>
+<li><img alt="_images/50f2918549630a2e5626eebf9a345029_2.png" src="_images/50f2918549630a2e5626eebf9a345029_2.png" /><ul>
+<li>In this Tab, you can set heat storage losses, please specify losses because if losses are zero it can happen that the storage is loading and unloading at the same time</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="a-name-cop-param-a-coefficient-of-performance-cop-tab">
+<h6>2.5.1.2.3.9. <a name="cop_param"></a>Coefficient of Performance, COP – Tab<a class="headerlink" href="#a-name-cop-param-a-coefficient-of-performance-cop-tab" title="Permalink to this headline">¶</a></h6>
+<p><img alt="_images/a1909178325fb7b632e6c8c24dfa786f.png" src="_images/a1909178325fb7b632e6c8c24dfa786f.png" /></p>
+<p>Only heat pumps have this additional tab. Here you can select an
+Inlet-and-Return-Temperature and based on that selection a COP is defined. In
+the <a class="reference external" href="#tec_param">Technical Parameters Tab</a> the COP value is inserted into the
+thermal efficiency input widget (the widget itself is disabled, meaning you
+cannot edit the value here, but you can change it later in the <a class="reference external" href="#heat-generator-table">heat generators
+table</a> )</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="parameters-tab">
+<h3>2.5.2. Parameters – Tab<a class="headerlink" href="#parameters-tab" title="Permalink to this headline">¶</a></h3>
+<p><img alt="_images/78159f99ef93df6be5746f869cf718db.png" src="_images/78159f99ef93df6be5746f869cf718db.png" /></p>
+<div class="section" id="id7">
+<h4>2.5.2.1. Short Description:<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<p>In this tab, you can change following parameters</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th><strong>Column name</strong></th>
+<th><strong>Format</strong></th>
+<th><strong>Unit</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CO2 Price [EUR/tC02]</td>
+<td>Number</td>
+<td>\frac{}{\text{t\ CO}_{2}}</td>
+<td>CO2 Certificate Price (used for the short run marginal costs)</td>
+</tr>
+<tr>
+<td>Interest Rate [0-1]</td>
+<td>Number $$\mathbb{R}$$ $$\vee$$[0,1]</td>
+<td>-</td>
+<td>interest rate (for investment planning)</td>
+</tr>
+<tr>
+<td>Minimum Renewable Factor [0-1]]</td>
+<td>Number $$\mathbb{R}$$ $$\vee$$[0,1]</td>
+<td>-</td>
+<td>Minimum renewable share that the thermal generation should have</td>
+</tr>
+<tr>
+<td>Total Demand[ MWh]</td>
+<td>Number</td>
+<td>MWh</td>
+<td>Heat Consumption of one year Changing this will change the peak load (can be seen in the notification section), This cell and the Set Total Demamd (MWh) input widget in the <a href="#heat-demand-tab">Heat Demand Tab</a> are coupled, this means changing one value of them changes also the other</td>
+</tr>
+</tbody>
+</table><p>These parameters can also be changed via <a class="reference external" href="#upload">uploading</a>. Therefor you have
+to create an excel sheet with the structure as described <a class="reference external" href="#format">here</a>. Then
+the parameters must be specified in the <a class="reference external" href="#data_worksheet">data worksheet</a>.</p>
+</div>
+</div>
+<div class="section" id="prices-emission-factors-tab">
+<h3>2.5.3. Prices &amp; Emission factors – Tab<a class="headerlink" href="#prices-emission-factors-tab" title="Permalink to this headline">¶</a></h3>
+<p><img alt="_images/1a9491a095fba20c330ff2140ac8852c.png" src="_images/1a9491a095fba20c330ff2140ac8852c.png" /></p>
+<div class="section" id="id8">
+<h4>2.5.3.1. Short Description:<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+<p>In this Tab, you can set prices and emission factors for different energy
+carriers. These prices are used to calculate the short run marginal costs.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th><strong>Column name</strong></th>
+<th><strong>Format</strong></th>
+<th><strong>Unit</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>energy carrier</td>
+<td>String</td>
+<td>-</td>
+<td>Name of the energy carrier</td>
+</tr>
+<tr>
+<td>prices(EUR/MWh)</td>
+<td>Number</td>
+<td>\frac{}{\text{MWh}}</td>
+<td>Energy carrier price</td>
+</tr>
+<tr>
+<td>emission factor [tCO2/MWh]</td>
+<td>Number</td>
+<td>\frac{\text{t\ CO}_{2}}{\text{MWh}}</td>
+<td>CO2 emission factor of the energy carrier</td>
+</tr>
+</tbody>
+</table><p>These parameters can also be changed via <a class="reference external" href="#upload">uploading</a>. Therefor you have
+to create an excel sheet with the structure as described <a class="reference external" href="#format">here</a>. Then
+the parameters must be specified in the <a class="reference external" href="#ec_emf_worksheet">prices and emmision factors
+worksheet</a>. With the uploading method, you can create your
+own energy carriers (max. 13). If you create new ones don’t forget to specify
+the new names to your heat generators in the <a class="reference external" href="#energy_carrier">Energy Carrier
+worksheet.</a></p>
+</div>
+</div>
+<div class="section" id="radiation-tab">
+<h3>2.5.4. Radiation – Tab<a class="headerlink" href="#radiation-tab" title="Permalink to this headline">¶</a></h3>
+<p><img alt="_images/ee39253da5ba46a9458a05c96ed77a6b.png" src="_images/ee39253da5ba46a9458a05c96ed77a6b.png" /></p>
+<div class="section" id="id9">
+<h4>2.5.4.1. Short Description:<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>In this Tab, you can select (<em>Country-Year</em> drop-down-box) a predefined or a
+custom radiation profile with which you want to run the Application.</li>
+<li>If you have created your own profile with the <a class="reference external" href="#load-individual-data-tab">Load Individual Data -
+Tab</a> the profile will show up in <em>Country-Year</em>
+drop-down-box (<a class="reference external" href="#caution">Caution please</a>).</li>
+<li>The Unit of the profile is <strong>W/m²</strong> and the model use this profile
+for the solar thermal power plants. For hours where the radiation is larger than
+1000 W/m² the plant works with it peak capacities installed .</li>
+</ul>
+<p>You have the opportunity to make <em>*reversible</em> modifications on the profile:</p>
+<ul class="simple">
+<li>you can set an offset (every value of the profile will be added by the offset
+value),</li>
+<li>you can set the whole profile to a constant value</li>
+<li>you can scale the profile (multiplication by a factor)</li>
+<li>or you can use the mean value as constant profile.</li>
+</ul>
+<p><a name = "modTools_explain"></a>*By reversible we mean e.g. if you check the use mean value checkbox and uncheck
+again you will get your profile back (see picture below), the same applies if
+you set a constant value and then delete this value you will get the profile
+back, see in contrast the irreversible <a class="reference external" href="#modTool_individual">modification tool</a>
+in the <a class="reference external" href="#load-individual-data-tab">Load Individual Data - Tab</a>).</p>
+<p><img alt="_images/c36e4732c9129088e781c00b340d4033.png" src="_images/c36e4732c9129088e781c00b340d4033.png" /></p>
+</div>
+</div>
+<div class="section" id="temperature-tab">
+<h3>2.5.5. Temperature – Tab<a class="headerlink" href="#temperature-tab" title="Permalink to this headline">¶</a></h3>
+<p><img alt="_images/d6bbdbe60b830493283ff92d9dc2d9c0.png" src="_images/d6bbdbe60b830493283ff92d9dc2d9c0.png" /></p>
+<div class="section" id="id10">
+<h4>2.5.5.1. Short Description:<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>In this Tab, you can select (<em>Country-Year</em> drop-down-box) a predefined or a
+custom temperature profile with which you want to run the Application.</li>
+<li>If you have created your own profile with the <a class="reference external" href="#load-individual-data-tab">Load Individual Data -
+Tab</a> the profile will show up in <em>Country-Year</em>
+drop-down-box (<a class="reference external" href="#caution">Caution please</a>).</li>
+<li>The Unit of the profile is <strong>°C</strong> and the model use this profile for the heat
+pumps. For hours where the temperature is smaller than 0°C the heat pumps
+don’t work.</li>
+<li>You have the opportunity to make reversible modifications on the profile
+(details see <a class="reference external" href="#modTools_explain">here</a>).</li>
+</ul>
+</div>
+</div>
+<div class="section" id="electricity-price-sale-electricity-price-tab">
+<h3>2.5.6. Electricity price / Sale Electricity price – Tab<a class="headerlink" href="#electricity-price-sale-electricity-price-tab" title="Permalink to this headline">¶</a></h3>
+<p><em>Process to assigning a sale-/or electricity price profile</em></p>
+<p><img alt="_images/8d92b228a2145d0595235325facb41d4.png" src="_images/8d92b228a2145d0595235325facb41d4.png" /></p>
+<div class="section" id="id11">
+<h4>2.5.6.1. Short Description:<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>In this Tabs, you can select (<em>Country-Year</em> drop-down-box) a predefined or a
+custom sale-/electricity price profile and then assign it to a generator (<em>Add to</em>
+drop-down-box) by pressing the <em>✓</em> - Button <strong>*</strong>.</li>
+<li>If you have created your own profile with the <a class="reference external" href="#load-individual-data-tab">Load Individual Data -
+Tab</a> the profile will show up in <em>Country-Year</em>
+drop-down-box (<a class="reference external" href="#caution">Caution please</a>).</li>
+<li>The Unit of the profile is <strong>€/MWh</strong> and the model uses this for
+multiple purposes, e.g:<ul>
+<li>If the energy carrier is electricity this influences the short run marginal
+costs</li>
+<li>If your generator produces electricity this affects the revenues</li>
+</ul>
+</li>
+<li>Also, here you have the opportunity to make reversible modifications on the
+profile (details see <a class="reference external" href="#modTools_explain">here</a>).</li>
+</ul>
+<p><strong>*Caution</strong>: It is important to press the ✓ - Button, because only so changes
+take effect:
+e.g. Let’s say we want to change the <strong>default</strong> electricity price (see picture
+above):</p>
+<ol class="simple">
+<li>you select a new profile with the <em>Country-Year</em> drop-down-box</li>
+<li>select Default in the <em>Add to</em> drop-down-box then</li>
+<li>press the <em>✓</em> - Button,</li>
+<li>then you will get an information in the notification section,</li>
+</ol>
+<p><strong>this is the only way to assign a price profile, otherwise the initial profile or
+the last set profile is used.</strong></p>
+</div>
+</div>
+<div class="section" id="heat-demand-tab">
+<h3>2.5.7. Heat Demand – Tab<a class="headerlink" href="#heat-demand-tab" title="Permalink to this headline">¶</a></h3>
+<p><img alt="_images/6d84ca45dd92a8fdca6f1fb241dcf735.png" src="_images/6d84ca45dd92a8fdca6f1fb241dcf735.png" /></p>
+<div class="section" id="id12">
+<h4>2.5.7.1. Short Description:<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>In this Tab, you can select (<em>Country-Year</em> drop-down-box) a predefined or a
+custom load profile with which you want to run the Application.</li>
+<li>If you have created your own profile with the <a class="reference external" href="#load-individual-data-tab">Load Individual Data -
+Tab</a> the profile will show up in <em>Country-Year</em>
+drop-down-box (<a class="reference external" href="#caution">Caution please</a>).</li>
+<li>The Unit of the profile is <strong>MW</strong> and the model use this profile as the
+hourly heat demand curve.</li>
+</ul>
+<p>You have the opportunity to set the total heat consumption of one year. By this
+you set technically the sum of all values of the profile selected.</p>
+<p>This means if the Set Total Demand (MWh) value changes the plot will adapt so
+that the sum you specified is met, also the Total Demand [MWh] value in the
+<a class="reference external" href="#parameters-tab">Parameters Tab</a> will change to the value specified (and vice
+versa). Additionally, in the notification section you can see how the peak load
+changes when you change the total heat consumption (see picture above).</p>
+</div>
+</div>
+<div class="section" id="load-individual-data-tab">
+<h3>2.5.8. Load Individual Data – Tab<a class="headerlink" href="#load-individual-data-tab" title="Permalink to this headline">¶</a></h3>
+<p><img alt="_images/c84c7a4d1d85e81e4e93bd638d17b495.png" src="_images/c84c7a4d1d85e81e4e93bd638d17b495.png" /></p>
+<div class="section" id="id13">
+<h4>2.5.8.1. Short Description:<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="upload-external-data-button">
+<h5>2.5.8.1.1. Upload External Data – Button<a class="headerlink" href="#upload-external-data-button" title="Permalink to this headline">¶</a></h5>
+<p>Pressing this button will enable you to upload your own data</p>
+</div>
+<div class="section" id="create-data-tools">
+<h5>2.5.8.1.2. Create Data – Tools<a class="headerlink" href="#create-data-tools" title="Permalink to this headline">¶</a></h5>
+<p>Here you can create random data. You can choose between three distributions</p>
+<ol class="simple">
+<li>Dirichlet Distribution</li>
+<li>Normal Distribution</li>
+<li>Linear Distribution</li>
+</ol>
+</div>
+<div class="section" id="table">
+<h5>2.5.8.1.3. Table<a class="headerlink" href="#table" title="Permalink to this headline">¶</a></h5>
+<p>The values of the uploaded data or the created distribution are shown here. You
+can also change specific values inside the table.</p>
+</div>
+<div class="section" id="plot-area">
+<h5>2.5.8.1.4. Plot Area<a class="headerlink" href="#plot-area" title="Permalink to this headline">¶</a></h5>
+<p>Here a line plot of the values from the table is shown. With the toolbar at the
+right sight of the plot area you can inspect the data in more detail.</p>
+</div>
+<div class="section" id="modification-tools">
+<h5>2.5.8.1.5. Modification Tools<a class="headerlink" href="#modification-tools" title="Permalink to this headline">¶</a></h5>
+<p>You have the opportunity to modify the data with these tools, e.g. set the sum
+of all values, set an offset, scale, etc.</p>
+</div>
+<div class="section" id="saving-tools">
+<h5>2.5.8.1.6. Saving Tools<a class="headerlink" href="#saving-tools" title="Permalink to this headline">¶</a></h5>
+<p>After loading your custom data, or creating a distribution you can choose for
+which profile you want this dataset to be added. By Pressing the save button
+your data can be found at the selected profiles and can be used by selecting it
+with the name you specified.</p>
+<p>It is also possible to add your own thermal efficiency series to heat
+generators.</p>
+</div>
+</div>
+<div class="section" id="id14">
+<h4>2.5.8.2. Long Description:<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="a-name-upload-extern-a-upload-external-data">
+<h5>2.5.8.2.1. <a name="upload_extern"></a>Upload External Data <img alt="_images/fc3f8a501705380eb51b073089098152.png" src="_images/fc3f8a501705380eb51b073089098152.png" /><a class="headerlink" href="#a-name-upload-extern-a-upload-external-data" title="Permalink to this headline">¶</a></h5>
+<p>When you click on this button you will get a pop up window open, where you can
+select your file with the desired values. Information regarding the progress are
+shown in the notification section.
+<strong>The file you upload must have following structure:</strong></p>
+<ol class="simple">
+<li>It has to be either a <strong>.xlsx</strong> or a <strong>.csv</strong> data</li>
+<li>the files <strong>must</strong> have the <strong>structure</strong> as below (left: <em>.xlsx</em>, right:<em>csv</em>)<ul>
+<li><img alt="_images/2ea1ffce78d3d858331f9a7845128df8.png" src="_images/2ea1ffce78d3d858331f9a7845128df8.png" /> <img alt="_images/0a92d3ab21ca2a1c60c1ae89246bf0bb.png" src="_images/0a92d3ab21ca2a1c60c1ae89246bf0bb.png" /></li>
+</ul>
+</li>
+<li>you have to specify <strong>8760 values</strong> and a <strong>header name</strong></li>
+<li>for <em>.xlsx</em> only the values of the <strong>first worksheet</strong> will be <strong>uploaded</strong></li>
+</ol>
+<p><a name="succes_extern"></a>An example of a successful upload can be seen in the picture below.</p>
+<p><img alt="_images/9a0daa08cbfbfce4122a317f543bfc79.png" src="_images/9a0daa08cbfbfce4122a317f543bfc79.png" /></p>
+</div>
+<div class="section" id="create-data-tool">
+<h5>2.5.8.2.2. Create Data Tool<a class="headerlink" href="#create-data-tool" title="Permalink to this headline">¶</a></h5>
+<p>This part of the user interface enables you to create random data. For this
+purpose, following distributions are available</p>
+<p><img alt="_images/74d3af1e8680390afe8edd56b97c6534.png" src="_images/74d3af1e8680390afe8edd56b97c6534.png" /></p>
+<div class="section" id="dirichlet-distribution">
+<h6>2.5.8.2.2.1. Dirichlet Distribution:<a class="headerlink" href="#dirichlet-distribution" title="Permalink to this headline">¶</a></h6>
+<p>To use this distribution, you have to specify the sum$\text{\:Σ}$ - input
+widget. It gives you random numbers so the sum you specify is met. An example
+with sum$\text{\:Σ}$=10 is shown below.</p>
+<p><img alt="_images/f783d65c9e37fcb5cbb2a57c34f32763.png" src="_images/f783d65c9e37fcb5cbb2a57c34f32763.png" /></p>
+</div>
+<div class="section" id="normal-distribution">
+<h6>2.5.8.2.2.2. Normal Distribution<a class="headerlink" href="#normal-distribution" title="Permalink to this headline">¶</a></h6>
+<p>Another option to create random number is the gaussian-normal-distribution. To
+use this, you have to specify a mean value (sigma $$\sigma$$) and standard
+deviation from that value my $$\mu$$. Below is a normal distribution with
+$$\sigma = 100$$ and $$\mu = 100$$ shown.</p>
+<p><img alt="_images/377362dcf21cd7b8f08d8188dfc2e1d7.png" src="_images/377362dcf21cd7b8f08d8188dfc2e1d7.png" /></p>
+</div>
+<div class="section" id="linear-distribution">
+<h6>2.5.8.2.2.3. Linear Distribution<a class="headerlink" href="#linear-distribution" title="Permalink to this headline">¶</a></h6>
+<p>We this option you can create 8760 number that are linear distributed beginning
+from start and ending with stop. An example with start=-10 and stop=100 is shown
+below.</p>
+<p><img alt="_images/1a5c3a5372d44b395b28e632048470c9.png" src="_images/1a5c3a5372d44b395b28e632048470c9.png" /></p>
+</div>
+</div>
+<div class="section" id="table-and-plot-area">
+<h5>2.5.8.2.3. Table and Plot Area<a class="headerlink" href="#table-and-plot-area" title="Permalink to this headline">¶</a></h5>
+<p><img alt="_images/bc3e4f5616329ff80388c60fb50ff017.png" src="_images/bc3e4f5616329ff80388c60fb50ff017.png" /></p>
+<p>The values of the uploaded data or the created distribution are shown here in
+tabular and graphical form. You can also change specific values inside the
+table, in that case the cell you are editing become yellow and the graph is
+blurred. After editing press, the reset button on the toolbar to remove the
+blur.</p>
+</div>
+<div class="section" id="a-name-modtool-individual-a-modification-tools">
+<h5>2.5.8.2.4. <a name="modTool_individual"></a>Modification Tools<a class="headerlink" href="#a-name-modtool-individual-a-modification-tools" title="Permalink to this headline">¶</a></h5>
+<p><img alt="_images/cbddfd565f43bf5073df81b266482ac3.png" src="_images/cbddfd565f43bf5073df81b266482ac3.png" /></p>
+<p>You have the opportunity to modify the data with these tools, e.g. set the sum
+of all values, set an offset, scale, etc. *.</p>
+<p><em>*Caution: This permanently change the values in the table!</em> (It works with the
+direct values and therefore it is an irreversible process e.g. if you check the
+use the mean value checkbox and then unchecked again you will not get your
+profile back see picture below, you have to upload or create your data again)</p>
+<p><img alt="_images/93ae4a3fe75d091df5bdd81e9d9cbe4e.png" src="_images/93ae4a3fe75d091df5bdd81e9d9cbe4e.png" /></p>
+<p>Irreversible process of the modification tool in the Load Individual Data Tab</p>
+</div>
+<div class="section" id="a-name-saving-tools-a-saving-tools">
+<h5>2.5.8.2.5. <a name="saving_tools"></a>Saving Tools<a class="headerlink" href="#a-name-saving-tools-a-saving-tools" title="Permalink to this headline">¶</a></h5>
+<p><img alt="_images/ad923dfd4a706c0cea67ee9b7bcf740f.png" src="_images/ad923dfd4a706c0cea67ee9b7bcf740f.png" /></p>
+<p>After loading your custom data, or creating a distribution you can choose for
+which profile you want this dataset to be added.</p>
+<p><img alt="_images/e3ebf4be1ed608dff45c92cea9092917.png" src="_images/e3ebf4be1ed608dff45c92cea9092917.png" />
+<a name="caution"></a></p>
+<p>By Pressing the save button your data can be found at the selected profiles (Add
+to) Tab and can be used by selecting it with the name you specified *.</p>
+<p><strong><em>*Caution: The name of the data will always be terminated by the string _1
+after saving</em> (e.g. if you specify individual as your name and saved it to
+Radiation, you will find your profile in the Radiation Tab by the name
+individual_1</strong></p>
+<p><a name="saving_tools2"></a>It is also possible to specify a time specific thermal efficiency for a heat
+generator (or COP for heat pumps).</p>
+<p>To use this feature, you have to select in the Add To-drop down button n_th/COP
+and then select the heat generator (Add To Heatgenerator) which you like to add
+your custom thermal efficiency. Then you press save and you get an information
+in the notification section. The picture below shows an example.</p>
+<p><img alt="_images/d52db1c04ee59c86c04b00da262e35c1.png" src="_images/d52db1c04ee59c86c04b00da262e35c1.png" /></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to Hotmaps Dispatch Module’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, EEG-Hotmapas
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
