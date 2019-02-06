@@ -10,7 +10,7 @@ import bokeh,tornado,xlsxwriter, openpyxl, pyomo, matplotlib, xlrd, numpy, panda
 #XXX: Downgrade back bokeh version "0.12.10"
 assert bokeh.__version__ == '0.12.10', f"Your current bokeh version ist not compatible (Your Version:{bokeh.__version__})\nPlease install version 0.12.10 (type < pip install bokeh==0.12.10 >)"
 #XXX: Downgrade to torndado 4.5.3
-assert tornado.version == '4.5.3',f"Your current tornado version ist not compatible (Your Version:{tornado.version})\nPlease install tornado==4.5.3"
+assert tornado.version == '4.5.3',f"Your current tornado version ist not compatible (Your Version:{tornado.version})\nPlease install version 4.5.3 (type < pip install tornado==4.5.3 >)"
 
 
 #%%
@@ -370,12 +370,55 @@ select_tec2_options= {"heat pump": list(tec_mapper.values()),
 energy_carrier_options = pd.read_excel(path_parameter,sheets[1],skiprows=[0])[input_price_list[0]].values.tolist()
 select_hs_options = pd.read_excel(path_parameter,sheets[3],skiprows=[0])["name"].values.tolist()
 #%%
+def scenario_tools():    
+    sc_select = Select(title="Scenario", value="default scenario", options=["default scenario"], disabled=True)
+    sc_text = TextInput(value="default scenario", title="Scenario-Name", disabled=True)
+    sc_add = Button(label='add',  button_type="success", width=50, disabled=True)
+    sc_del= Button(label="del", button_type="danger", width=50, disabled=True)
+    sc_apply = Button(label='apply', button_type='primary', width=50, disabled=True)
+    
+    tools = dict(sc_select = sc_select, sc_text = sc_text, sc_add = sc_add,
+                 sc_del = sc_del, sc_apply = sc_apply)
+    
+    layout = column(children=[sc_select, sc_text,
+                              row([sc_add, sc_del, sc_apply])
+                              ],width=200)
+    
+    return dict(tools=tools,layout=layout)
+
+def sub_scenario_tools():
+    sc_select = Select(title="Scenario", value="default scenario", options=["default scenario"], disabled=True)    
+    sub_sc_select = Select(title="Sub-Scenario", value="default sub scenario", options=["default sub scenario"], disabled=True)
+    sub_sc_text = TextInput(value="default sub scenario", title="Scenario-Name", disabled=True)
+    sub_sc_del= Button(label="del", button_type="danger", width=50, disabled=True)
+    sub_sc_add = Button(label='add',  button_type="success", width=50, disabled=True)
+    sub_sc_apply = Button(label='apply', button_type='primary', width=50, disabled=True)
+
+    tools = dict(sc_select = sc_select, sub_sc_select = sub_sc_select,
+                 sub_sc_text = sub_sc_text, sub_sc_del = sub_sc_del,
+                 sub_sc_add = sub_sc_add, sub_sc_apply = sub_sc_apply)
+    
+    layout = column(children=[sc_select, sub_sc_select, sub_sc_text, 
+                          row([sub_sc_add, sub_sc_del, sub_sc_apply ])
+                          ],width=200,height=270)
+    
+    return dict(tools=tools,layout=layout)
 #%%
 # =============================================================================
 # Function Handler
 # =============================================================================
 def modify_doc(doc):
 #%%
+    heat_generator_table = dict()
+    heat_storage_table = dict()
+    paramters_table = dict()
+    price_emmission_factor_table = dict()
+    radiation_profile = dict()
+    temperature_profile = dict()
+    electricity_price_profile = dict()
+    sale_electricity_price_profile = dict()
+    heat_demand_profile = dict()
+    
     # Load External Data from .dat files
     price_name_map,price_name_map_inv,prices = load_extern_data("price")
     load_name_map,load_name_map_inv,load_profiles = load_extern_data("load")
@@ -440,19 +483,12 @@ def modify_doc(doc):
     button1_1= Button(label="x",button_type="danger",width=30)
     label2 = Div(text="""<h1 style=" font-size: 20px; text-align: center; text-transform: uppercase; ">Heat Storages </h1>  """, width=180, height=10)
     button2= Button(label='🞧',  button_type="success", width=50)
-    button2_1= Button(label="x",button_type="danger",width=30)
+    button2_1= Button(label="x",button_type="danger",width=30)    
 # =============================================================================
 #   Layout for Main GUI
 # =============================================================================
     col_hp_hs = column([row(label1,button1,button1_1),data_table,row(label2,button2,button2_1),data_table_heat_storage])
     lay = { i : generate_layout(widgets[i]) for i in data_kwargs}
-    grid = Tabs(tabs=[])
-    profiles_tabs = Tabs(tabs=[Panel(child=p, title=name) for name, p in lay.items()])
-    dic = {"Heat Producers and Heat Storage":col_hp_hs,
-           "Adding": grid,
-           "Parameters":data_table_data,
-           "Prices & Emission factors":data_table_prices,
-           "Profiles": profiles_tabs,}
     # Change layout of Heat Demand Tab -> Add Total Demand
     widgets[_hd]["total"].title = "Set Total Demand (MWh)"
     widgets[_hd]["total"].disabled=False
@@ -460,8 +496,15 @@ def modify_doc(doc):
     # Change layout of Electricity Tabs -> Select technologies to add external data
     for i in _elec:
         lay[i].children.append(column(widgetbox(widgets[i]["tec"]), widgetbox(widgets[i]["ok"])))
-
-    tabs_liste = [Panel(child=p, title=name) for name, p in dic.items()]
+#    lay = {name: column(scenario_dict[name]["layout"],layout) for name,layout in lay.items()}
+    grid = Tabs(tabs=[])
+    profiles_tabs = Tabs(tabs=[Panel(child=p, title=name) for name, p in lay.items()])
+    tabs_dic = {"Heat Producers and Heat Storage":col_hp_hs,
+           "Adding": grid,
+           "Parameters":data_table_data,
+           "Prices & Emission factors":data_table_prices,
+           "Profiles": profiles_tabs,}
+    tabs_liste = [Panel(child=p, title=name) for name, p in tabs_dic.items()]
     tabs = Tabs(tabs=tabs_liste)
 # =============================================================================
 #   Callbacks for Main GUI
@@ -880,6 +923,8 @@ def modify_doc(doc):
             dummy.text= dummy.text.replace("1","0")
 # =============================================================================
     def reset_callback():
+        print(heat_generator_table)
+        print(heat_storage_table)
         div_spinner.text = load_text
         output.tabs = []
         div_spinner.text = ""
@@ -999,7 +1044,7 @@ def modify_doc(doc):
     # Pmax Initilizing
     update_pmax(None,None,None)
     # Total Demand initilize with input
-    args_callback(None,None,None)
+    args_callback(None,None,None) #XXX: this throws FutureWarning
 #%%
 # =============================================================================
 #  GUI Elements for adding Technologies
@@ -1603,6 +1648,62 @@ def modify_doc(doc):
     individual_data_upload_button.callback = CustomJS(args=dict(file_source=file_source2), code =upload_code)
     dic_modtools["add"].on_change('value', setCOP)
     dic_modtools["tec"].on_change('value', setCOP)
+#%%
+# =============================================================================
+#   GUI Elelements and Layout for Scenario Mode
+# =============================================================================
+    scenario_button = Toggle(label="Scenario Mode", button_type="danger")
+    scenario_paramters = ["Heat Producers and Heat Storage","Parameters", "Prices & Emission factors"] + widgets_keys  
+    scenario_dict = {name: sub_scenario_tools() if name !="Heat Producers and Heat Storage" else scenario_tools() for name in scenario_paramters}
+# XXX: Prerenders the Scenario Widgets, 
+# =============================================================================
+#   whould be cool to find a solution to show up when clicking the scenario button, 
+#   but not working at the moment if i paste the code in the callback, 
+# =============================================================================
+    for panel in profiles_tabs.tabs:
+        panel.child = column(scenario_dict[panel.title]["layout"],lay[panel.title])
+        
+    for panel in tabs.tabs:
+        if panel.title in scenario_paramters:
+            panel.child = column(scenario_dict[panel.title]["layout"],tabs_dic[panel.title] )
+# =============================================================================
+#   Callbacks for Scenario Mode
+# =============================================================================
+    def scenario_callback(active):
+        div_spinner.text = load_text
+        
+        
+        for _name,sc_dict in scenario_dict.items(): 
+            for __name,tool in sc_dict["tools"].items():
+                tool.disabled = not active
+        if active:
+            
+            heat_generator_table["default"] = pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore').fillna(0)
+            if not bool(heat_generator_table["default"].shape[0]):
+                heat_generator_table["default"] = -1
+                
+                
+            heat_storage_table["default"] = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)
+            if not bool(heat_storage_table["default"].shape[0]):
+                heat_storage_table["default"] = -1
+            
+            
+            div_spinner.text = """<div align="center"> <strong style="color: green;">Scenario Mode is enabled </strong> </div>"""
+        else:
+            for sc in list(heat_generator_table):
+                if sc != "default":
+                    heat_generator_table.pop(sc, None) 
+            for sc in list(heat_storage_table):
+                if sc != "default":
+                    heat_storage_table.pop(sc, None)                 
+                
+            div_spinner.text = """<div align="center"> <strong style="color: red;">Scenario Mode is disabled </strong> </div>"""
+            
+# =============================================================================
+#   Signal Emitting / Coupling for Scenario Mode
+# =============================================================================
+    scenario_button.on_click(scenario_callback)
+#%%
 # =============================================================================
 #   Set Global Layout
 # =============================================================================
@@ -1627,7 +1728,7 @@ def modify_doc(doc):
 
     l = layout([[header],
                     [row([column([download_button,upload_button,run_button,
-                               reset_button,invest_button]),
+                               reset_button,invest_button,scenario_button]),
                      widgetbox(div_spinner,width=500),column([pmax,to_install])])],
                    [widgetbox(dummy)],
                    [widgetbox(output,width=1500)],
