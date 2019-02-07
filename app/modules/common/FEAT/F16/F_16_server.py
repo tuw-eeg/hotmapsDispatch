@@ -4,8 +4,8 @@ Created on Fri Mar  9 15:30:16 2018
 
 @author: root
 """
-#%%
-# Check if modules are installed
+#%% Check if modules are installed
+
 import bokeh,tornado,xlsxwriter, openpyxl, pyomo, matplotlib, xlrd, numpy, pandas, sys
 #XXX: Downgrade back bokeh version "0.12.10"
 assert bokeh.__version__ == '0.12.10', f"Your current bokeh version ist not compatible (Your Version:{bokeh.__version__})\nPlease install version 0.12.10 (type < pip install bokeh==0.12.10 >)"
@@ -13,7 +13,7 @@ assert bokeh.__version__ == '0.12.10', f"Your current bokeh version ist not comp
 assert tornado.version == '4.5.3',f"Your current tornado version ist not compatible (Your Version:{tornado.version})\nPlease install version 4.5.3 (type < pip install tornado==4.5.3 >)"
 
 
-#%%
+#%% import modules
 matplotlib.use('agg',warn=False)
 from tornado.ioloop import IOLoop
 import pandas as pd
@@ -34,7 +34,7 @@ root_dir = os.path.dirname(os.path.abspath(__file__))
 
 if path not in sys.path:
     sys.path.append(path)
-#%%  
+#%%  for bokeh 0.12.10 extent functionality for setting the active tab  and  Implement disabled
 #XXX: for bokeh 0.12.10
 # =============================================================================
 # extent functionality for setting the active tab  and  Implement disabled
@@ -118,7 +118,7 @@ Tabs = CustomTabs
 Select = CustomSelect
 # =============================================================================
 
-#%%
+#%% Import internal modules
 from AD.F16_input.main import extract,find_FiT
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
 import CM.CM_TUWdispatch.run_cm as dispatch
@@ -136,19 +136,15 @@ if not os.path.exists(path_static):
 path_upload_js = os.path.join(root_dir, "upload.js")
 path_spinner_html = os.path.join(root_dir, "spinner2.html")
 path_spinner_load_html = os.path.join(root_dir, "spinner.html")
-#%%
 
-global data_table,data_table_prices,data_table_data,f,carrier_dict,_nth
-carrier_dict ={}
-_nth = dict()
-#%%
+#%% RUN MODEL
 # =============================================================================
 # RUN MODEL
 # =============================================================================
 def execute(data,inv_flag,selection=[[],[]],demand_f=1):
     val = dispatch.main(data,inv_flag,selection,demand_f)
     return val
-#%%
+#%% Global Functions
 # =============================================================================
 # Global Functions
 # =============================================================================
@@ -290,6 +286,63 @@ def disable_widgets(widget_list,flag):
         except:
             continue
 # =============================================================================
+def scenario_tools():    
+    sc_select = Select(title="Scenario", value="default", options=["default"], disabled=True)
+    sc_text = TextInput(value="default scenario", title="Scenario-Name", disabled=True)
+    sc_add = Button(label='add',  button_type="success", width=50, disabled=True)
+    sc_del= Button(label="del", button_type="danger", width=50, disabled=True)
+    sc_apply = Button(label='apply', button_type='primary', width=50, disabled=True)
+    
+    tools = dict(sc_select = sc_select, sc_text = sc_text, sc_add = sc_add,
+                 sc_del = sc_del, sc_apply = sc_apply)
+    
+    layout = column(children=[sc_select, sc_text,
+                              row([sc_add, sc_del, sc_apply])
+                              ],width=200)
+    
+    return dict(tools=tools,layout=layout)
+# =============================================================================
+def sub_scenario_tools():
+    sc_select = Select(title="Scenario", value="default scenario", options=["default scenario"], disabled=True)    
+    sub_sc_select = Select(title="Sub-Scenario", value="default_sub", options=["default_sub"], disabled=True)
+    sub_sc_text = TextInput(value="default sub scenario", title="Scenario-Name", disabled=True)
+    sub_sc_del= Button(label="del", button_type="danger", width=50, disabled=True)
+    sub_sc_add = Button(label='add',  button_type="success", width=50, disabled=True)
+    sub_sc_apply = Button(label='apply', button_type='primary', width=50, disabled=True)
+
+    tools = dict(sc_select = sc_select, sub_sc_select = sub_sc_select,
+                 sub_sc_text = sub_sc_text, sub_sc_del = sub_sc_del,
+                 sub_sc_add = sub_sc_add, sub_sc_apply = sub_sc_apply)
+    
+    layout = column(children=[sc_select, sub_sc_select, sub_sc_text, 
+                          row([sub_sc_add, sub_sc_del, sub_sc_apply ])
+                          ],width=200,height=270)
+    
+    return dict(tools=tools,layout=layout)
+# =============================================================================
+def pop_sc(table):
+    for sc in list(table):
+        if sc != "default":
+            table.pop(sc, None)
+# =============================================================================            
+def pop_sub_sc(table):
+    for sc in list(table):
+        if sc != "default":
+            table.pop(sc, None)
+        else:
+            for sub_sc in list(table[sc]):
+                if sub_sc != "default_sub":
+                    table[sc].pop(sub_sc, None)          
+# =============================================================================
+def df2data (df):
+    return {key:list(dic.values()) for key,dic in df.to_dict().items()}
+# =============================================================================     
+def pop_table(table):
+    for sc in list(table):
+        table.pop(sc, None)
+
+#%% Global Data
+# =============================================================================
 #  Global Data
 # =======================================================================
 
@@ -369,56 +422,13 @@ select_tec2_options= {"heat pump": list(tec_mapper.values()),
                       "boiler":data_tec[data_tec["type"] == "boiler"]["name"].values.tolist()}
 energy_carrier_options = pd.read_excel(path_parameter,sheets[1],skiprows=[0])[input_price_list[0]].values.tolist()
 select_hs_options = pd.read_excel(path_parameter,sheets[3],skiprows=[0])["name"].values.tolist()
-#%%
-def scenario_tools():    
-    sc_select = Select(title="Scenario", value="default scenario", options=["default scenario"], disabled=True)
-    sc_text = TextInput(value="default scenario", title="Scenario-Name", disabled=True)
-    sc_add = Button(label='add',  button_type="success", width=50, disabled=True)
-    sc_del= Button(label="del", button_type="danger", width=50, disabled=True)
-    sc_apply = Button(label='apply', button_type='primary', width=50, disabled=True)
-    
-    tools = dict(sc_select = sc_select, sc_text = sc_text, sc_add = sc_add,
-                 sc_del = sc_del, sc_apply = sc_apply)
-    
-    layout = column(children=[sc_select, sc_text,
-                              row([sc_add, sc_del, sc_apply])
-                              ],width=200)
-    
-    return dict(tools=tools,layout=layout)
 
-def sub_scenario_tools():
-    sc_select = Select(title="Scenario", value="default scenario", options=["default scenario"], disabled=True)    
-    sub_sc_select = Select(title="Sub-Scenario", value="default sub scenario", options=["default sub scenario"], disabled=True)
-    sub_sc_text = TextInput(value="default sub scenario", title="Scenario-Name", disabled=True)
-    sub_sc_del= Button(label="del", button_type="danger", width=50, disabled=True)
-    sub_sc_add = Button(label='add',  button_type="success", width=50, disabled=True)
-    sub_sc_apply = Button(label='apply', button_type='primary', width=50, disabled=True)
-
-    tools = dict(sc_select = sc_select, sub_sc_select = sub_sc_select,
-                 sub_sc_text = sub_sc_text, sub_sc_del = sub_sc_del,
-                 sub_sc_add = sub_sc_add, sub_sc_apply = sub_sc_apply)
-    
-    layout = column(children=[sc_select, sub_sc_select, sub_sc_text, 
-                          row([sub_sc_add, sub_sc_del, sub_sc_apply ])
-                          ],width=200,height=270)
-    
-    return dict(tools=tools,layout=layout)
-#%%
+#%%  BOKEH MAIN: Function Handler
 # =============================================================================
 # Function Handler
 # =============================================================================
 def modify_doc(doc):
-#%%
-    heat_generator_table = dict()
-    heat_storage_table = dict()
-    paramters_table = dict()
-    price_emmission_factor_table = dict()
-    radiation_profile = dict()
-    temperature_profile = dict()
-    electricity_price_profile = dict()
-    sale_electricity_price_profile = dict()
-    heat_demand_profile = dict()
-    
+#%% Main Functionality:  Widgets, callbacks, layouts etc.
     # Load External Data from .dat files
     price_name_map,price_name_map_inv,prices = load_extern_data("price")
     load_name_map,load_name_map_inv,load_profiles = load_extern_data("load")
@@ -455,9 +465,11 @@ def modify_doc(doc):
     widget_to_model_keys_dict = dict(zip(widgets_keys,model_keys))
     data_kwargs = dict(zip(widgets_keys,widgets_data))
     #external_data = dict(zip(widgets_keys,[{}]*len(widgets_keys))) #XXX only copy
+    carrier_dict = {}
+    _nth = dict()
     external_data = dict(zip(widgets_keys,[{} for _ in range(len(widgets_keys))]))
     external_data_map = dict(zip(widgets_keys,[{} for _ in range(len(widgets_keys))]))
-#    _nth = dict()
+
     add_to_tec = Select(title="Add To Heatgenerator", value="", 
                             options=[],disabled=True)
 # =============================================================================
@@ -511,14 +523,14 @@ def modify_doc(doc):
 # ============================================================================= 
     def download_callback():
         try:
-            global carrier_dict
             div_spinner.text = load_text
             print("Download...")
 
             df= pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore')
             if df.shape[0] == 0:
                 del df
-                carrier_dict ={}
+                for k in list(carrier_dict):
+                    carrier_dict.pop(k,None)
                 div_spinner.text = """<div align="center"> <strong style="color: red;">Nothing to download </strong> </div>"""
                 return
     #        df = df.fillna(0)
@@ -569,12 +581,11 @@ def modify_doc(doc):
 # =============================================================================
     def run_callback():
         try:
-            global carrier_dict,_nth
-
             df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
             if df.shape[0] == 0:
                 del df
-                carrier_dict ={}
+                for k in list(carrier_dict):
+                    carrier_dict.pop(k,None)
                 div_spinner.text = """<div align="center"> <strong style="color: red;">No Heat Generators available </strong> </div>"""
                 return
 
@@ -672,7 +683,8 @@ def modify_doc(doc):
                 else:
                     _n_th = {**_n_th,**dict(zip(zip([k]*8760,range(1,8760+1)),[v]*8760))}
             data["n_th"] = _n_th
-            _nth = {}
+            for k in list(_nth):
+                _nth.pop(k,None)
             ## 
             solutions = None
             selection = [[],[]]
@@ -788,7 +800,6 @@ def modify_doc(doc):
 # =============================================================================
     def upload_callback(attr, old, new):
         try:
-            global carrier_dict
             div_spinner.text = load_text
             print('Upload started')
             file_type = file_source.data['file_name'][0].split(".")[1]
@@ -826,10 +837,12 @@ def modify_doc(doc):
                 data_table_heat_storage.source.data.update(data2)
 
                 data2 = excel_object.parse(sheet_name = 'Energy Carrier', index_col = 0)
-                global carrier_dict
                 data2 = data2.set_index(data2["name"])
                 del data2["name"]
-                carrier_dict = data2.to_dict()["carrier"]
+                for k in list(carrier_dict):
+                    carrier_dict.pop(k,None)
+                for k,v in data2.to_dict()["carrier"].items():
+                    carrier_dict[k]=v
                 
                 data3 = data[_elec].set_index(data.name)
                 for i in _elec:
@@ -862,7 +875,8 @@ def modify_doc(doc):
 # =============================================================================
     def args_callback(attrname, old, new):
 
-
+        add_external_data_to_heat_producers()
+        
         _heat_generators= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
         _heat_generators = _heat_generators.fillna(0)
         _opt = list(_heat_generators["name"].values)
@@ -923,8 +937,18 @@ def modify_doc(doc):
             dummy.text= dummy.text.replace("1","0")
 # =============================================================================
     def reset_callback():
+        print("1+++++++++++++")           
         print(heat_generator_table)
-        print(heat_storage_table)
+#        print("2+++++++++++++")           
+#        print(heat_storage_table)
+#        print("3+++++++++++++")           
+#        print(price_emmission_factor_table) 
+#        print("4+++++++++++++")           
+#        print(carrier_table)
+#        print("5+++++++++++++") 
+#        print(external_data_map_table)
+        print("+++++++++++++")           
+
         div_spinner.text = load_text
         output.tabs = []
         div_spinner.text = ""
@@ -977,7 +1001,8 @@ def modify_doc(doc):
             external_data_map[i][widgets[i]["tec"].value] = f" {_name} # {_jahr} {_str}"
             ###
             if widgets[i]["ok"].clicks > 0 :
-                external_data[i][widgets[i]["tec"].value]= widgets[i]["source"].data["y"]
+                _y = widgets[i]["source"].data["y"]
+                external_data[i][widgets[i]["tec"].value]= _y if type(_y) == list else list(_y)
 
                 if widgets[i]["tec"].value == "Default":
                     div_spinner.text = """<div align="center"><strong style="color: green;"> """+i+""" Data is set as """+widgets[i]["tec"].value+"""</strong></div>"""
@@ -1045,7 +1070,8 @@ def modify_doc(doc):
     update_pmax(None,None,None)
     # Total Demand initilize with input
     args_callback(None,None,None) #XXX: this throws FutureWarning
-#%%
+    
+#%% Adding Heat Generators: Widgets callbacks, layouts etc.
 # =============================================================================
 #  GUI Elements for adding Technologies
 # =============================================================================
@@ -1132,11 +1158,11 @@ def modify_doc(doc):
         div_spinner.text = ""
 # =============================================================================
     def add_to_cds():
-        global carrier_dict
         # if user refreshes site, create new dict
         _df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
         if _df.shape[0] == 0:
-            carrier_dict={}
+            for k in list(carrier_dict):
+                carrier_dict.pop(k,None)
         div_spinner.text = load_text
         df2 = pd.DataFrame(data_table.source.data)
         df2.set_index(df2["index"])
@@ -1273,7 +1299,8 @@ def modify_doc(doc):
     flow_temp.on_change('value', cop_callback)
     return_temp.on_change('value', cop_callback)
     energy_carrier_select.on_change('value', change_name_if_carrier_changes)
-#%%
+    
+#%% Adding Heat Storages: Widgets callbacks, layouts etc.
 # =============================================================================
 #   Gui Elements for adding heat storages   
 # =============================================================================
@@ -1376,7 +1403,7 @@ def modify_doc(doc):
 # =============================================================================
     disable_widgets(widget_list_hs,True) 
 
-#%%
+#%% Loading Individual Data: Widgets callbacks, layouts etc.
 # =============================================================================
 #  GUI Elements for Loading External Data
 # =============================================================================
@@ -1648,17 +1675,28 @@ def modify_doc(doc):
     individual_data_upload_button.callback = CustomJS(args=dict(file_source=file_source2), code =upload_code)
     dic_modtools["add"].on_change('value', setCOP)
     dic_modtools["tec"].on_change('value', setCOP)
-#%%
+    
+#%% Scenario Mode: Widgets callbacks, layouts etc.
 # =============================================================================
 #   GUI Elelements and Layout for Scenario Mode
 # =============================================================================
+    heat_generator_table = dict()
+    heat_storage_table = dict()
+    paramters_table = dict()
+    price_emmission_factor_table = dict()
+    profiles_table = {wk:dict() for wk in widgets_keys}
+    carrier_table = dict()           
+    external_data_table = dict()
+    external_data_map_table = dict()
+    
     scenario_button = Toggle(label="Scenario Mode", button_type="danger")
     scenario_paramters = ["Heat Producers and Heat Storage","Parameters", "Prices & Emission factors"] + widgets_keys  
     scenario_dict = {name: sub_scenario_tools() if name !="Heat Producers and Heat Storage" else scenario_tools() for name in scenario_paramters}
 # XXX: Prerenders the Scenario Widgets, 
 # =============================================================================
 #   whould be cool to find a solution to show up when clicking the scenario button, 
-#   but not working at the moment if i paste the code in the callback, 
+#   but not working at the moment if i paste the code in the scenario callback 
+#   all wifget disapear and an error at javascript console is shown, 
 # =============================================================================
     for panel in profiles_tabs.tabs:
         panel.child = column(scenario_dict[panel.title]["layout"],lay[panel.title])
@@ -1669,41 +1707,100 @@ def modify_doc(doc):
 # =============================================================================
 #   Callbacks for Scenario Mode
 # =============================================================================
+       
+    def add_new_scenario(sc_name):
+        heat_generator_table[sc_name] = pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore').fillna(0)
+        if not bool(heat_generator_table[sc_name].shape[0]):
+            heat_generator_table[sc_name] = -1
+        
+        heat_storage_table[sc_name] = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)
+        if not bool(heat_storage_table[sc_name].shape[0]):
+            heat_storage_table[sc_name] = -1
+        
+        paramters_table[sc_name] = dict(default_sub =  pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore').fillna(0))
+        if not bool(paramters_table[sc_name]["default_sub"].shape[0]):
+            paramters_table[sc_name]["default_sub"] = -1            
+        
+        price_emmission_factor_table[sc_name] = dict(default_sub = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore').fillna(0))
+        if not bool(paramters_table[sc_name]["default_sub"].shape[0]):
+            paramters_table[sc_name]["default_sub"] = -1    
+        
+        for wk in widgets_keys:
+            profiles_table[wk][sc_name] = dict(default_sub = dict(zip(range(1,len(widgets[wk]["source"].data["y"])+1),widgets[wk]["source"].data["y"])))
+                
+        carrier_table[sc_name] = pd.DataFrame(carrier_dict,index=[0]).T.to_dict()[0]
+        external_data_table[sc_name] = dict(default_sub = pd.DataFrame(external_data).to_dict())
+        external_data_map_table[sc_name] = dict(default_sub = pd.DataFrame(external_data_map).to_dict())
+# =============================================================================
+        
     def scenario_callback(active):
         div_spinner.text = load_text
-        
-        
+              
         for _name,sc_dict in scenario_dict.items(): 
             for __name,tool in sc_dict["tools"].items():
                 tool.disabled = not active
         if active:
-            
-            heat_generator_table["default"] = pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore').fillna(0)
-            if not bool(heat_generator_table["default"].shape[0]):
-                heat_generator_table["default"] = -1
+            # init with default values when scneario mode is enabled (for the first time after page refresh or when all scenarios are deleted)
+            if not bool(heat_generator_table):
+                add_new_scenario("default")
+            else:
+                sc = scenario_dict[scenario_paramters[0]]["tools"]["sc_select"].value
+                sub_sc = scenario_dict[scenario_paramters[1]]["tools"]["sub_sc_select"].value
                 
+                data_table.source.data = df2data(heat_generator_table[sc])
+                data_table_heat_storage.source.data = df2data(heat_storage_table[sc])
+                data_table_prices.source.data = df2data(price_emmission_factor_table[sc][sub_sc])
+                data_table_data.source.data = df2data(paramters_table[sc][sub_sc])
                 
-            heat_storage_table["default"] = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)
-            if not bool(heat_storage_table["default"].shape[0]):
-                heat_storage_table["default"] = -1
-            
-            
+                pop_table(external_data_map)
+                for i, dict_ in external_data_map_table[sc][sub_sc].items():
+                    external_data_map[i] = dict_ 
+                    ## XXX: callbacks take very long
+                    (c,y),fit_string = extract(external_data_map[i]["Default"])
+                    offset,constant = find_FiT(fit_string)
+                    constant = "" if type(constant) == str else constant
+                    widgets[i]["select"].value = data_kwargs[i]["dic"][c]+"_"+str(y)
+                    widgets[i]["offset"].value = str(offset)
+                    widgets[i]["constant"].value = str(constant)              
+                
             div_spinner.text = """<div align="center"> <strong style="color: green;">Scenario Mode is enabled </strong> </div>"""
         else:
-            for sc in list(heat_generator_table):
-                if sc != "default":
-                    heat_generator_table.pop(sc, None) 
-            for sc in list(heat_storage_table):
-                if sc != "default":
-                    heat_storage_table.pop(sc, None)                 
-                
+            #TODO: Define what should happen when scenario mode is disabled, 
+            # 1. delete all scenario except the default scenario
+            # 2. only show current scenario and sub scenario, and so one can test/run one scenario manually
+            # 3. ??
+            option = 2
+            if option == 1:
+                pop_sc(heat_generator_table)
+                pop_sc(heat_storage_table)
+                pop_sc(carrier_table)   
+                pop_sub_sc(paramters_table)
+                pop_sub_sc(price_emmission_factor_table) 
+                for wk in widgets_keys:
+                    pop_sub_sc(profiles_table[wk])   
+                pop_sub_sc(external_data_table)   
+                pop_sub_sc(external_data_map_table)   
+            
             div_spinner.text = """<div align="center"> <strong style="color: red;">Scenario Mode is disabled </strong> </div>"""
             
+# =============================================================================
+    def add_scenario():
+        sc_name = scenario_dict[scenario_paramters[0]]["tools"]["sc_text"].value
+        
+        scenario_dict[scenario_paramters[0]]["tools"]["sc_select"].options.append(sc_name)
+        add_new_scenario(sc_name)
+
+                    
 # =============================================================================
 #   Signal Emitting / Coupling for Scenario Mode
 # =============================================================================
     scenario_button.on_click(scenario_callback)
-#%%
+    scenario_dict[scenario_paramters[0]]["tools"]["sc_add"].on_click(add_scenario)
+    
+    
+    
+    
+#%%  Global Layout
 # =============================================================================
 #   Set Global Layout
 # =============================================================================
@@ -1740,7 +1837,7 @@ def modify_doc(doc):
     
     
     return doc
-#%%
+#%% PYTHON MAIN
 if __name__ == '__main__':
 
     
