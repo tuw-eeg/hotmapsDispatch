@@ -293,12 +293,22 @@ def scenario_tools():
     sc_add = Button(label='add',  button_type="success", width=50, disabled=True)
     sc_del= Button(label="del", button_type="danger", width=50, disabled=True)
     sc_apply = Button(label='apply', button_type='primary', width=50, disabled=True)
-    
+    sub_sc_select = Select(title="Sub Scenario", value="default_sub", options=["default_sub"], disabled=True)
+    sub_sc_text = TextInput(value="", placeholder="default sub scenario", title="Sub Scenario Name", disabled=True)   
+    sub_sc_del= Button(label="del", button_type="danger", width=50, disabled=True)
+    sub_sc_add = Button(label='add',  button_type="success", width=50, disabled=True)
+    sub_sc_apply = Button(label='apply', button_type='primary', width=50, disabled=True)
     tools = dict(sc_select = sc_select, sc_text = sc_text, sc_add = sc_add,
-                 sc_del = sc_del, sc_apply = sc_apply)
+                 sc_del = sc_del, sc_apply = sc_apply,
+                 sub_sc_select = sub_sc_select, sub_sc_text = sub_sc_text,
+                 sub_sc_del = sub_sc_del, sub_sc_add = sub_sc_add, 
+                 sub_sc_apply = sub_sc_apply)
     
-    layout = column(children=[sc_select, sc_text,
-                              row([sc_add, sc_del, sc_apply])
+    layout = column(children=[row(  column(sc_select, sc_text, 
+                                         row([sc_add, sc_del, sc_apply])), 
+                                    column(sub_sc_select, sub_sc_text,
+                                           row([sub_sc_add, sub_sc_del, sub_sc_apply]))
+                                    )
                               ],width=200)
     
     return dict(tools=tools,layout=layout)
@@ -590,10 +600,11 @@ def modify_doc(doc):
 # =============================================================================
 
     def check_scenarios(scenario_mapper):
-        no_hg  = [sc for sc in list(scenario_mapper) if heat_generator_table[sc].empty]
-        no_cap = [(sc,sub_sc)  for sc in list(scenario_mapper) for sub_sc in scenario_mapper[sc] if (max(external_data_table[sc][sub_sc][_hd]["Default"]) - sum(heat_generator_table[sc][input_list[1]])) > 0]
-        if no_hg != []: 
-            return f"""No Heat Generators available for folowing scenarios: {no_hg} """
+        no_hg  = [(sc,sub_sc)  for sc in list(scenario_mapper) for sub_sc in scenario_mapper[sc]  if heat_generator_table[sc][sub_sc].empty]
+        no_cap = [(sc,sub_sc)  for sc in list(scenario_mapper) for sub_sc in scenario_mapper[sc] if (max(external_data_table[sc][sub_sc][_hd]["Default"]) - sum(heat_generator_table[sc][sub_sc][input_list[1]])) > 0]
+        if no_hg != []:
+            sc,sub_sc = zip(*no_cap)
+            return f"""No Heat Generators available for for the scenarios {sc} in sub scenarios {sub_sc}"""
         elif no_cap != []:
             sc,sub_sc = zip(*no_cap)
             return f"""The installed capacities are not enough to cover the load for the scenarios {sc} in sub scenarios {sub_sc} """
@@ -601,15 +612,14 @@ def modify_doc(doc):
             return  True
         
     def scenario_calculation(sc,sub_sc):
-
         data = {}
         data["energy_carrier_prices"] = {}
         data["energy_carrier"] = {}
         data["threshold_heatpump"] = 0
-        data1 = heat_generator_table[sc]
+        data1 = heat_generator_table[sc][sub_sc]
         data_prices = price_emmission_factor_table[sc][sub_sc]
         data_data = paramters_table[sc][sub_sc]
-        data_heat_storages = heat_storage_table[sc]
+        data_heat_storages = heat_storage_table[sc][sub_sc]
         
         dic_hs = data_heat_storages.set_index("name").to_dict()
         for key in list(dic_hs):
@@ -640,7 +650,7 @@ def modify_doc(doc):
 
         data["all_heat_geneartors"] = data["tec"] + data["tec_hs"]
 
-        data["energy_carrier"] = {**data["energy_carrier"],**carrier_table[sc]}
+        data["energy_carrier"] = {**data["energy_carrier"],**carrier_table[sc][sub_sc]}
         
        ##
         for i in _elec:
@@ -690,13 +700,68 @@ def modify_doc(doc):
         else:
             ok = True
             message = _message
-            
+            output_data = solutions
+        
         return ok,output_data,message
     
-    def save_scenario(sc,sub_sc,output_data,message,scenario_outputs):
+    def get_folder_structure(path):
+        """ Returns a path with the last 3 parts of <path>"""
+        path,file = os.path.split(path)
+        path,sub_sc = os.path.split(path)
+        sc = os.path.split(path)[1]
+        return os.path.join(sc,sub_sc,file)    
+    
+    def zip_all_scenarios(path_scenarios_root,filename = "output.zip"):
+        try:
+            print("Create Zip File for all scenarios...")
+            path_download_zip = os.path.join(path_scenarios_root,filename)
+            for root, dirs, files in os.walk(path_scenarios_root):
+                for file in files:
+                    with ZipFile(path_download_zip,"a") as zip_file:
+                        file_path = os.path.join(root, file)
+                        file_folder_structure = get_folder_structure(file_path)
+                        zip_file.write(file_path,file_folder_structure)
+            print("Create Zip File done")       
+            return True,os.path.join("download",get_folder_structure(path_download_zip))
+        except Exception as e:
+            message = f"Error @ Ziping Scenario Output : {e}"
+            print(message)
+            return False,message
         
-        return None
-    def compare_plot(scenario_outputs):
+    def save_scenario(path_scenarios_root,sc,sub_sc,output_data):
+        print(f"Ploting {sc}#{sub_sc}...")
+        output_tabs = plot_solutions(solution=output_data)
+        ok,message,path_download_zip = False,None,None
+        if output_tabs == "Error4":
+            message = "Error @ Ploting  in {sc}#{sub_sc}!!!"
+        else:
+            path_scenarios = os.path.join(path_scenarios_root,sc,sub_sc)
+            if os.path.exists(path_scenarios):
+                os.makedirs(path_scenarios)
+            ok = True
+            output_sc = Tabs(tabs = output_tabs) 
+            print("Ploting done")
+            print("Download output_graphics started...")
+            filename = f"{sc}_{sub_sc}.html"                    
+            path_download_html = os.path.join(path_scenarios,filename)
+            output_file(path_download_html,title="Dispatch output")
+            save(output_sc)
+            print("Graphics Download done")
+            print("Download output data started...")
+            # -- Download JSON
+            filename = f"{sc}_{sub_sc}.json"  
+            path_download_json = os.path.join(path_scenarios,filename)
+            with open(path_download_json, "w") as f:
+                json.dump(output_data, f)
+            # -- Download XLSX
+            filename = f"{sc}_{sub_sc}.xlsx"              
+            path_download_xlsx = os.path.join(path_scenarios,filename)
+            json2xlsx(output_data,path_download_xlsx) #XXX: change function with return values
+            print("Download output data done")         
+        return ok,message,path_download_zip
+    
+    
+    def compare_plot(dict_of_solutions):
         output_tabs = None
         return output_tabs
 # =============================================================================
@@ -704,6 +769,10 @@ def modify_doc(doc):
         try:
             
             if scenario_button.active:
+                div_spinner.text = spinner_text.replace("###text","Dispatch in progress, please be patient ...")
+                time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")               
+                path_scenarios = create_folder(time_id)
+                
                 print("Running Calculation in Scenario Mode...")
                 print("Checking Scenarios...")
                 text = check_scenarios(scenario_mapper)
@@ -711,18 +780,67 @@ def modify_doc(doc):
                     div_spinner.text = notify(text,"red") 
                     return
                 print("Checking Passed")
-                scenario_outputs = dict()
+                dict_of_solutions = dict()
+                dict_of_solutions_paths = dict()
                 print('Scenario Calculation Started...')
+                k = sum([len(liste) for _,liste in scenario_mapper.items()])
+                j=0
+                ok,message = True,""
                 for sc in list(scenario_mapper):
+                    dict_of_solutions[sc] = dict()
+                    dict_of_solutions_paths[sc] = dict()
                     for sub_sc in scenario_mapper[sc]:
-                        print(f"Calculating  Scenario: {sc} with Sub Scenario {sub_sc}")
-                        ok,output_data,message = scenario_calculation(sc,sub_sc)
+                        j = j + 1
+                        text = f"({j}/{k})... Calculating  scenario ({sc}) with sub scenario ({sub_sc})"
+                        print(text)
                         if ok:
-                            save_scenario(sc,sub_sc,output_data,message,scenario_outputs)
+                            div_spinner.text = spinner_text.replace("###text",text)
                         else:
-                            save_scenario(sc,sub_sc,None,message,scenario_outputs)
+                            div_spinner.text = spinner_text.replace("###text",text).replace("###text2",message).replace("none","true")                            
+                        
+                        ok,output_data,message = scenario_calculation(sc,sub_sc)
+                        dict_of_solutions[sc][sub_sc] = output_data 
+                        
+                        if ok:
+                            ok2,message2,path_download_zip = save_scenario(path_scenarios,sc,sub_sc,output_data)
+                            if ok2:
+                                message = f"Done: {sc} # {sub_sc} : {message}"
+                            else:
+                                message = message2
+                        else:
+                            message = f"Error @  {sc} # {sub_sc} : {message}"
+                        print(message)
+                        
                 print('Scenario Calculation Done')
-                output_tabs = compare_plot(scenario_outputs)
+                ok,message = zip_all_scenarios(path_scenarios)
+                if ok:
+                    div_spinner.text = """<div align="center"> 
+                                        <style>
+                                        a:link, a:visited {
+                                            background-color: white;
+                                            color: green;
+                                            border: 2px solid green;
+                                            padding: 10px 20px;
+                                            text-align: center;
+                                            text-decoration: none;
+                                            display: inline-block;
+                                        }
+                                        
+                                        a:hover, a:active {
+                                            background-color: green;
+                                            color: white;
+                                        }
+                                        </style>
+                                        <strong style="color: green">
+                                        <p>Calculation done<p>
+                                        <p><a href="""+"'"+message+"'"""" download="output.zip">Download ZIP File </a>  <p>                   
+                                        </strong>
+                                        </div>
+                                        """
+                else:
+                    notify(message,"red") 
+                    
+                output_tabs = compare_plot(dict_of_solutions)
                 output.tabs  = output_tabs        
                 return # XXX
                             
@@ -745,7 +863,7 @@ def modify_doc(doc):
             div_spinner.text = ""
 
 
-            div_spinner.text = spinner_text
+            div_spinner.text = spinner_text.replace("###text","Dispatch in progress, please be patient ...")
             print('calculation started...')
 #            data,_ = load_data()
             data = {}
@@ -875,7 +993,7 @@ def modify_doc(doc):
                     time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
                     filename = "output_graphs.html"                    
                     path_download_html = os.path.join(create_folder(time_id),filename)
-                    output_file(path_download_html,title="Dispatch output")
+                    output_file(path_download_html,title="Dispatch output", mode='inline')
                     save(output)
 #                    save(Tabs(tabs=output_tabs))
                     path_download_html_ = os.path.join("download","static",time_id,filename)
@@ -1841,13 +1959,13 @@ def modify_doc(doc):
 # =============================================================================
        
     def add_new_scenario(sc_name,sub_sc_name="default_sub"):
-        heat_generator_table[sc_name] = pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore').fillna(0)
-        heat_storage_table[sc_name] = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)
+        heat_generator_table[sc_name] = { sub_sc_name : pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore').fillna(0)}
+        heat_storage_table[sc_name] = { sub_sc_name : pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)}
         paramters_table[sc_name] = { sub_sc_name : pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore').fillna(0)}
         price_emmission_factor_table[sc_name] = { sub_sc_name : pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore').fillna(0)}
         for wk in widgets_keys:
             profiles_table[wk][sc_name] = { sub_sc_name : dict(zip(range(1,len(widgets[wk]["source"].data["y"])+1),widgets[wk]["source"].data["y"]))}                
-        carrier_table[sc_name] = pd.DataFrame(carrier_dict,index=[0]).T.to_dict()[0]
+        carrier_table[sc_name] = { sub_sc_name : pd.DataFrame(carrier_dict,index=[0]).T.to_dict()[0]}
         external_data_table[sc_name] = { sub_sc_name : pd.DataFrame(external_data).to_dict()}
         external_data_map_table[sc_name] = { sub_sc_name : pd.DataFrame(external_data_map).to_dict()}
 # =============================================================================
@@ -1863,11 +1981,11 @@ def modify_doc(doc):
             if not bool(heat_generator_table):
                 add_new_scenario("default")
             else:
-                sc = scenario_dict[scenario_paramters[1]]["tools"]["sc_select"].value
-                sub_sc = scenario_dict[scenario_paramters[1]]["tools"]["sub_sc_select"].value
+                sc = scenario_dict[scenario_paramters[0]]["tools"]["sc_select"].value
+                sub_sc = scenario_dict[scenario_paramters[0]]["tools"]["sub_sc_select"].value
                 
-                data_table.source.data = df2data(heat_generator_table[sc])
-                data_table_heat_storage.source.data = df2data(heat_storage_table[sc])
+                data_table.source.data = df2data(heat_generator_table[sc][sub_sc])
+                data_table_heat_storage.source.data = df2data(heat_storage_table[sc][sub_sc])
                 data_table_prices.source.data = df2data(price_emmission_factor_table[sc][sub_sc])
                 data_table_data.source.data = df2data(paramters_table[sc][sub_sc])
 
@@ -1891,9 +2009,9 @@ def modify_doc(doc):
             # 3. ??
             option = 2
             if option == 1:
-                pop_sc(heat_generator_table)
-                pop_sc(heat_storage_table)
-                pop_sc(carrier_table)   
+                pop_sub_sc(heat_generator_table)
+                pop_sub_sc(heat_storage_table)
+                pop_sub_sc(carrier_table)   
                 pop_sub_sc(paramters_table)
                 pop_sub_sc(price_emmission_factor_table) 
                 for wk in widgets_keys:
@@ -1907,30 +2025,39 @@ def modify_doc(doc):
     def add_scenario_callback():
         div_spinner.text = load_text
         sc_name = scenario_dict[scenario_paramters[0]]["tools"]["sc_text"].value.strip()
+        sub_sc_name = scenario_dict[scenario_paramters[0]]["tools"]["sub_sc_text"].value.strip()  
+
         if sc_name == "":
             div_spinner.text = notify(f"Error: Please define a name for your scenario !", "red") 
         elif sc_name in list(scenario_mapper):
             div_spinner.text = notify(f""" Error: The name "{sc_name}" is already given please define another""", "red") 
+        elif sub_sc_name == "":
+            div_spinner.text = notify(f"Error: Please define a name for your sub scenario !", "red") 
         else:
-            scenario_mapper[sc_name] = ["default_sub"]
-            add_new_scenario(sc_name)
+            scenario_mapper[sc_name] = [sub_sc_name]
+            add_new_scenario(sc_name,sub_sc_name)
             # fires load_scenario_callback
             for _,dictt in scenario_dict.items():
                 dictt["tools"]["sc_select"].options = list(scenario_mapper)
                 dictt["tools"]["sc_select"].value = sc_name
                 try:
-                    dictt["tools"]["sub_sc_select"].value = "default_sub"
+                    dictt["tools"]["sub_sc_select"].value = sub_sc_name
                 except:
                     pass
-            div_spinner.text = notify(f""" "Scenario {sc_name}" successfully added """, "green") 
+            div_spinner.text = notify(f""" Scenario "{sc_name}" with sub scenario "{sub_sc_name}" successfully added """, "green") 
 # =============================================================================
             
     def  apply_scenario_callback():
         div_spinner.text = load_text
         sc_name_new = scenario_dict[scenario_paramters[0]]["tools"]["sc_text"].value.strip()
         sc_name_old = scenario_dict[scenario_paramters[0]]["tools"]["sc_select"].value
+        ### Check if new name is alradey given
+        if sc_name_new in list(scenario_mapper) and sc_name_new !=sc_name_old :
+            div_spinner.text = notify(f""" Can not change name of scenario "{sc_name_old}" to  "{sc_name_new}" because it is already taken, please choose another name """, "red")         
+            return None
+        
         ### Change name of Scenario
-        if sc_name_new != "":
+        if sc_name_new != "" and sc_name_new !=sc_name_old :
             scenario_mapper[sc_name_new] = scenario_mapper.pop(sc_name_old)
             
             heat_generator_table[sc_name_new] = heat_generator_table.pop(sc_name_old)
@@ -1945,17 +2072,13 @@ def modify_doc(doc):
             external_data_map_table[sc_name_new] = external_data_map_table.pop(sc_name_old)
         else:
             sc_name_new = sc_name_old
-        
-#        add_new_scenario(sc_name_new) ## apply to all with "default_sub" as sub scenario name     
-        heat_generator_table[sc_name_new] = pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore').fillna(0)
-        heat_storage_table[sc_name_new] = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)
-
+            
         # fires load_scenario_callback
         for _,dictt in scenario_dict.items():
             dictt["tools"]["sc_select"].options = list(scenario_mapper)
             dictt["tools"]["sc_select"].value = sc_name_new
 
-        div_spinner.text = notify(f""" Successfully applied in changes {scenario_paramters[0]} to scenario "{sc_name_new}" """, "blue") 
+        div_spinner.text = notify(f""" Successfully changed name in {scenario_paramters[0]} from "{sc_name_old}" to "{sc_name_new}" """, "blue") 
 # =============================================================================
         
     def del_scenario_callback():
@@ -1991,6 +2114,9 @@ def modify_doc(doc):
 # =============================================================================
             
     def add_sub_scenarios(sc_name,sub_sc_name):
+        heat_generator_table[sc_name][sub_sc_name] = pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore').fillna(0)
+        heat_storage_table[sc_name][sub_sc_name] = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)
+        carrier_table[sc_name][sub_sc_name] = pd.DataFrame(carrier_dict,index=[0]).T.to_dict()[0]
         paramters_table[sc_name][sub_sc_name] = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore').fillna(0)
         price_emmission_factor_table[sc_name][sub_sc_name] = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore').fillna(0)
         for wk in widgets_keys:
@@ -2003,6 +2129,11 @@ def modify_doc(doc):
         div_spinner.text = load_text
         sc_name = scenario_dict[sc_param]["tools"]["sc_select"].value
         sub_sc_name = scenario_dict[sc_param]["tools"]["sub_sc_text"].value.strip()  
+        ### Check if name is alradey given
+        if sub_sc_name in scenario_mapper[sc_name]:
+            div_spinner.text = notify(f""" The sub scenario name "{sub_sc_name}" is already taken in scenario {sc_name}, please choose another name """, "red")         
+            return None
+        
         if sub_sc_name == "":
             div_spinner.text = notify(f"Error: Please define a name for your sub scenario !", "red") 
         elif sub_sc_name in scenario_mapper[sc_name]:
@@ -2011,7 +2142,7 @@ def modify_doc(doc):
             scenario_mapper[sc_name] = scenario_mapper[sc_name] + [sub_sc_name]
             add_sub_scenarios(sc_name,sub_sc_name)
             # fires load_scenario_callback
-            for sc_p in scenario_paramters[1:]:
+            for sc_p in scenario_paramters[:]:
                 scenario_dict[sc_p]["tools"]["sub_sc_select"].options = scenario_mapper[sc_name] 
                 scenario_dict[sc_p]["tools"]["sub_sc_select"].value = sub_sc_name
             
@@ -2023,8 +2154,12 @@ def modify_doc(doc):
         sc_name = scenario_dict[sc_param]["tools"]["sc_select"].value
         sub_sc_name_new = scenario_dict[sc_param]["tools"]["sub_sc_text"].value.strip()
         sub_sc_name_old = scenario_dict[sc_param]["tools"]["sub_sc_select"].value
+        ### Check if new name is alradey given
+        if sub_sc_name_new in scenario_mapper[sc_name]:
+            div_spinner.text = notify(f""" Can not rename sub scenario "{sub_sc_name_old}" to  "{sub_sc_name_new}" because it is already taken in scenario {sc_name}, please choose another name """, "red")         
+            return None
         ### Change name of sub scenario
-        if sub_sc_name_new != "":
+        if sub_sc_name_new != "" and sub_sc_name_new != sub_sc_name_old :
             scenario_mapper[sc_name] = [sub_sc_name_new if x==sub_sc_name_old else x for x in scenario_mapper[sc_name]]
             paramters_table[sc_name][sub_sc_name_new] = paramters_table[sc_name].pop(sub_sc_name_old)
             price_emmission_factor_table[sc_name][sub_sc_name_new] = price_emmission_factor_table[sc_name].pop(sub_sc_name_old)
@@ -2034,7 +2169,10 @@ def modify_doc(doc):
             external_data_map_table[sc_name][sub_sc_name_new] = external_data_map_table[sc_name].pop(sub_sc_name_old)
         else:
             sub_sc_name_new = sub_sc_name_old
-        if sc_param == scenario_paramters[1]:
+        if sc_param == scenario_paramters[0]:
+            heat_generator_table[sc_name][sub_sc_name_new] = pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore').fillna(0)
+            heat_storage_table[sc_name][sub_sc_name_new] = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)
+        elif sc_param == scenario_paramters[1]:
             paramters_table[sc_name][sub_sc_name_new] = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore').fillna(0)
         elif sc_param == scenario_paramters[2]:
             price_emmission_factor_table[sc_name][sub_sc_name_new] = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore').fillna(0)
@@ -2043,7 +2181,7 @@ def modify_doc(doc):
             external_data_table[sc_name][sub_sc_name_new] = pd.DataFrame(external_data).to_dict()
             external_data_map_table[sc_name][sub_sc_name_new] = pd.DataFrame(external_data_map).to_dict()             
         # fires load_scenario_callback
-        for sc_p in scenario_paramters[1:]:
+        for sc_p in scenario_paramters[:]:
             scenario_dict[sc_p]["tools"]["sub_sc_select"].options = scenario_mapper[sc_name] 
             scenario_dict[sc_p]["tools"]["sub_sc_select"].value = sub_sc_name_new            
 
@@ -2054,15 +2192,17 @@ def modify_doc(doc):
         div_spinner.text = load_text
         sc_name = scenario_dict[sc_param]["tools"]["sc_select"].value
         sub_sc_name= scenario_dict[sc_param]["tools"]["sub_sc_select"].value
-        
-        
+        print("Here 001")
+        heat_generator_table[sc_name].pop(sub_sc_name)
+        heat_storage_table[sc_name].pop(sub_sc_name)
+        carrier_table[sc_name].pop(sub_sc_name)       
         paramters_table[sc_name].pop(sub_sc_name)
         price_emmission_factor_table[sc_name].pop(sub_sc_name)
         for wk in widgets_keys:
             profiles_table[wk][sc_name].pop(sub_sc_name)
         external_data_table[sc_name].pop(sub_sc_name)
         external_data_map_table[sc_name].pop(sub_sc_name)           
-
+        print("Here 002")
         
         scenario_mapper[sc_name] = [x for x in scenario_mapper[sc_name] if x !=sub_sc_name]
         
@@ -2074,7 +2214,7 @@ def modify_doc(doc):
             
         notify_text = f"""In scenario "{sc_name}"  the sub scenario "{sub_sc_name}" was delted""" if flag else f"""All sub scenarios in scenario "{sc_name}" deleted"""
         sub_sc_new = scenario_mapper[sc_name][0]
-        for sc_p in scenario_paramters[1:]:
+        for sc_p in scenario_paramters[:]:
             scenario_dict[sc_p]["tools"]["sub_sc_select"].options = scenario_mapper[sc_name]
             scenario_dict[sc_p]["tools"]["sub_sc_select"].value = sub_sc_new
         if scenario_button.active:
@@ -2083,16 +2223,17 @@ def modify_doc(doc):
             
     def load_scenario_callback(name,old,new,sc_param):
         sc = scenario_dict[sc_param]["tools"]["sc_select"].value
+        sub_sc = scenario_dict[sc_param]["tools"]["sub_sc_select"].value 
+
+        scenario_dict[sc_param]["tools"]["sub_sc_select"].options = scenario_mapper[sc]
+        if sub_sc not in scenario_mapper[sc]:
+            scenario_dict[sc_param]["tools"]["sub_sc_select"].value = scenario_mapper[sc][0]           
+            sub_sc = scenario_dict[sc_param]["tools"]["sub_sc_select"].value      
         
         if sc_param in [scenario_paramters[0]] + _elec:
-            scenario_dict[ scenario_paramters[0]]["tools"]["sc_select"].value = sc
-            data_table.source.data = df2data(heat_generator_table[sc])
-            data_table_heat_storage.source.data = df2data(heat_storage_table[sc])
-        
-        if sc_param != scenario_paramters[0]:
-            scenario_dict[sc_param]["tools"]["sub_sc_select"].options = scenario_mapper[sc]
-            scenario_dict[sc_param]["tools"]["sub_sc_select"].value = scenario_mapper[sc][0]           
-            sub_sc = scenario_dict[sc_param]["tools"]["sub_sc_select"].value
+            scenario_dict[scenario_paramters[0]]["tools"]["sc_select"].value = sc
+            data_table.source.data = df2data(heat_generator_table[sc][sub_sc])
+            data_table_heat_storage.source.data = df2data(heat_storage_table[sc][sub_sc])
           
         if sc_param == scenario_paramters[1]:
             data_table_data.source.data = df2data(paramters_table[sc][sub_sc])
@@ -2117,9 +2258,11 @@ def modify_doc(doc):
     scenario_dict[scenario_paramters[0]]["tools"]["sc_add"].on_click(add_scenario_callback)
     scenario_dict[scenario_paramters[0]]["tools"]["sc_apply"].on_click(apply_scenario_callback)
     scenario_dict[scenario_paramters[0]]["tools"]["sc_del"].on_click(del_scenario_callback)
-    scenario_dict[scenario_paramters[0]]["tools"]["sc_select"].on_change("value",partial(load_scenario_callback,sc_param=scenario_paramters[0]))
-    
-    for sc_p in scenario_paramters[1:]:
+#    scenario_dict[scenario_paramters[0]]["tools"]["sc_select"].on_change("value",partial(load_scenario_callback,sc_param=scenario_paramters[0]))
+#    scenario_dict[scenario_paramters[0]]["tools"]["sub_sc_select"].on_change("value",partial(load_scenario_callback,sc_param=scenario_paramters[0]))
+#    scenario_dict[scenario_paramters[0]]["tools"]["sub_sc_apply"].on_click(partial(apply_sub_scenario_callback, sc_param = scenario_paramters[0]))
+
+    for sc_p in scenario_paramters[:]:
         scenario_dict[sc_p]["tools"]["sub_sc_add"].on_click(partial(add_sub_scenario_callback, sc_param = sc_p))
         scenario_dict[sc_p]["tools"]["sub_sc_apply"].on_click(partial(apply_sub_scenario_callback, sc_param = sc_p))
         scenario_dict[sc_p]["tools"]["sub_sc_del"].on_click(partial(del_sub_scenario_callback, sc_param = sc_p))
