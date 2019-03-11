@@ -293,11 +293,13 @@ def scenario_tools():
     sc_add = Button(label='add',  button_type="success", width=50, disabled=True)
     sc_del= Button(label="del", button_type="danger", width=50, disabled=True)
     sc_apply = Button(label='apply', button_type='primary', width=50, disabled=True)
+    
     sub_sc_select = Select(title="Sub Scenario", value="default_sub", options=["default_sub"], disabled=True)
     sub_sc_text = TextInput(value="", placeholder="default sub scenario", title="Sub Scenario Name", disabled=True)   
     sub_sc_del= Button(label="del", button_type="danger", width=50, disabled=True)
     sub_sc_add = Button(label='add',  button_type="success", width=50, disabled=True)
     sub_sc_apply = Button(label='apply', button_type='primary', width=50, disabled=True)
+    
     tools = dict(sc_select = sc_select, sc_text = sc_text, sc_add = sc_add,
                  sc_del = sc_del, sc_apply = sc_apply,
                  sub_sc_select = sub_sc_select, sub_sc_text = sub_sc_text,
@@ -744,7 +746,7 @@ def modify_doc(doc):
             print("Download output_graphics started...")
             filename = f"{sc}_{sub_sc}.html"                    
             path_download_html = os.path.join(path_scenarios,filename)
-            output_file(path_download_html,title="Dispatch output")
+            output_file(path_download_html,title=f"Dispatch output: {sc} # {sub_sc}")
             save(output_sc)
             print("Graphics Download done")
             print("Download output data started...")
@@ -767,7 +769,7 @@ def modify_doc(doc):
 # =============================================================================
     def run_callback():
         try:
-            
+# =============================================================================            
             if scenario_button.active:
                 div_spinner.text = spinner_text.replace("###text","Dispatch in progress, please be patient ...")
                 time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")               
@@ -840,220 +842,221 @@ def modify_doc(doc):
                 else:
                     notify(message,"red") 
                     
-                output_tabs = compare_plot(dict_of_solutions)
-                output.tabs  = output_tabs        
-                return # XXX
-                            
-            df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
-            if df.shape[0] == 0:
-                del df
-                for k in list(carrier_dict):
-                    carrier_dict.pop(k,None)
-                div_spinner.text = notify("No Heat Generators available","red") 
-                return
-
-            if float(to_install.value) > 0 and not invest_button.active:
-                div_spinner.text = notify("The installed capacities are not enough to cover the load","red") 
-                return
-
-            div_spinner.text = load_text
-            output.tabs = []
-#            if type(grid.children[0]) != type(Div()):
-#                grid.children = [Div()]
-            div_spinner.text = ""
-
-
-            div_spinner.text = spinner_text.replace("###text","Dispatch in progress, please be patient ...")
-            print('calculation started...')
-#            data,_ = load_data()
-            data = {}
-            data["energy_carrier_prices"] = {}
-            data["energy_carrier"] = {}
-            data["threshold_heatpump"] = 0
-
-
-            data1= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
-            data1 = data1.fillna(0)
-
-            data_prices = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore')
-            data_prices = data_prices.fillna(0)
-
-            data_data = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore')
-            data_data = data_data.fillna(0)
-
-            data_heat_storages = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore')
-            data_heat_storages = data_heat_storages.fillna(0)
-
-            dic_hs = data_heat_storages.set_index("name").to_dict()
-            for key in list(dic_hs):
-                data[heat_storage_list_mapper[key]] = dic_hs[key]
-
-
-            dic1 = data1.set_index("name").to_dict()
-            for key in list(dic1):
-                data[input_list_mapper[key]] = dic1[key]
-
-            dic2 = data_prices.set_index(input_price_list[0]).to_dict()
-
-            for key in list(dic2):
-                data[input_price_list_mapper[key]] = dic2[key]
-
-
-            data["P_co2"] = float(data_data[parameter_list[0]].values[0])
-            data["interest_rate"] = float(data_data[parameter_list[1]].values[0])
-            data["toatl_RF"] = float(data_data[parameter_list[2]].values[0])
-            data["total_demand"] = float(data_data[parameter_list[3]].values[0])
-
-            for wk,mk in widget_to_model_keys_dict.items():
-                if mk == "electricity":
-                   data["energy_carrier_prices"][mk]= dict(zip(range(1,len(widgets[wk]["source"].data["y"])+1),widgets[wk]["source"].data["y"]))
-                else:
-                    data[mk]= dict(zip(range(1,len(widgets[wk]["source"].data["y"])+1),widgets[wk]["source"].data["y"]))
-
-            data["tec_hs"] = list(data_heat_storages["name"].values)
-            data["tec"] = list(data1["name"].values)
-
-            data["all_heat_geneartors"] = data["tec"] + data["tec_hs"]
-
-            data["energy_carrier"] = {**data["energy_carrier"],**carrier_dict}
-            ##
-            for i in _elec:
-                mk = widget_to_model_keys_dict[i]
-                ext=[]
-                for j in data["tec"] :
-                    jt = list(zip([j]*8760,range(1,8760+1)))
-                    if j in list(external_data[i]):
-                        ext.append(dict(zip(jt,external_data[i][j])))
-                    else:
-                        ext.append(dict(zip(jt,external_data[i]["Default"])))
-                ext = {k: v for d in ext for k, v in d.items()}
-                if  mk == "electricity":
-                    data["energy_carrier_prices"][mk] = ext
-                else:
-                    data[mk] = ext
-            ## Categorize
-            data["categorize"] = {}
-            _dataframe= pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore')
-            select_tec_options = [x.replace("CHP Steam Extraction","CHP-SE").replace("CHP Back Pressure","CHP-BP") for x in select_tec_options_model]
-            for j in select_tec_options:
-                data["categorize"][j] = _dataframe["name"][_dataframe["type"] == j].values.tolist()
-            ## thermal efficiencc
-            _n_th = {}
-            data["n_th"] = {**data["n_th"],**_nth}
-            for k,v in data["n_th"].items():
-                if type(v)==list:
-                    _n_th = {**_n_th,**dict(zip(zip([k]*8760,range(1,8760+1)),v))}
-                else:
-                    _n_th = {**_n_th,**dict(zip(zip([k]*8760,range(1,8760+1)),[v]*8760))}
-            data["n_th"] = _n_th
-            for k in list(_nth):
-                _nth.pop(k,None)
-            ## 
-            solutions = None
-            selection = [[],[]]
-            inv_flag = False
-            if invest_button.active:
-                inv_flag = True
-                selection0 = data_table.source.selected["1d"]["indices"] #XXX: 0.12.10
-                selection1 = data_table_heat_storage.source.selected["1d"]["indices"] #XXX: 0.12.10
-#                selection0 = data_table.source.selected.indices #XXX:  > 0.12.10
-#                selection1 = data_table_heat_storage.source.selected.indices #XXX:  > 0.12.10
-                selection = [selection0,selection1]
-                if selection[0] == []:
-                    div_spinner.text = notify("""<p>Error: Please specify the technologies for the invesment model !!!<p><p>Mark Heat Generators by pressing "CTRL" + "left mouse"<p><p>Selection is marked yellow <p>""","red","Please specify the technologies for the invesment model !!!","red") 
-                    return
-            solutions,_message,_ = execute(data,inv_flag,selection)
-
-            print('calculation done')
-            print ("Ploting started..")
-            if solutions == "Error1":
-                div_spinner.text = notify("Error: No Capacities are installed !!!","red")
-            elif solutions == "Error2":
-                div_spinner.text = notify("Error: The installed capacities are not enough to cover the load !!!","red") 
-            elif solutions == "Error3#":
-                print("Error in Saving Solution to JSON !!!")
-                div_spinner.text = notify("Error @ Generating JSON!!!","red")          
-            elif solutions == "Error3":
-                print("Cause: Infeasible or unbounded model !!!")
-                div_spinner.text = notify("Error: Infeasible or unbounded model !!!","red")  
-            elif solutions == None:
-                print("Error: Something get Wrong")
-                print(_message)
-                div_spinner.text = notify("Error: "+_message,"red")
+#                output_tabs = compare_plot(dict_of_solutions)
+#                output.tabs  = output_tabs        
+                return None# XXX
+# =============================================================================
             else:
-                output_tabs = plot_solutions(solution=solutions)
-
-                if output_tabs == "Error4":
-                    print("Error @ Ploting  !!!")
-                    div_spinner.text = notify("Error: @ Ploting !!!","red") 
+                df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
+                if df.shape[0] == 0:
+                    del df
+                    for k in list(carrier_dict):
+                        carrier_dict.pop(k,None)
+                    div_spinner.text = notify("No Heat Generators available","red") 
+                    return
+    
+                if float(to_install.value) > 0 and not invest_button.active:
+                    div_spinner.text = notify("The installed capacities are not enough to cover the load","red") 
+                    return
+    
+                div_spinner.text = load_text
+                output.tabs = []
+    #            if type(grid.children[0]) != type(Div()):
+    #                grid.children = [Div()]
+                div_spinner.text = ""
+    
+    
+                div_spinner.text = spinner_text.replace("###text","Dispatch in progress, please be patient ...")
+                print('calculation started...')
+    #            data,_ = load_data()
+                data = {}
+                data["energy_carrier_prices"] = {}
+                data["energy_carrier"] = {}
+                data["threshold_heatpump"] = 0
+    
+    
+                data1= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
+                data1 = data1.fillna(0)
+    
+                data_prices = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore')
+                data_prices = data_prices.fillna(0)
+    
+                data_data = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore')
+                data_data = data_data.fillna(0)
+    
+                data_heat_storages = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore')
+                data_heat_storages = data_heat_storages.fillna(0)
+    
+                dic_hs = data_heat_storages.set_index("name").to_dict()
+                for key in list(dic_hs):
+                    data[heat_storage_list_mapper[key]] = dic_hs[key]
+    
+    
+                dic1 = data1.set_index("name").to_dict()
+                for key in list(dic1):
+                    data[input_list_mapper[key]] = dic1[key]
+    
+                dic2 = data_prices.set_index(input_price_list[0]).to_dict()
+    
+                for key in list(dic2):
+                    data[input_price_list_mapper[key]] = dic2[key]
+    
+    
+                data["P_co2"] = float(data_data[parameter_list[0]].values[0])
+                data["interest_rate"] = float(data_data[parameter_list[1]].values[0])
+                data["toatl_RF"] = float(data_data[parameter_list[2]].values[0])
+                data["total_demand"] = float(data_data[parameter_list[3]].values[0])
+    
+                for wk,mk in widget_to_model_keys_dict.items():
+                    if mk == "electricity":
+                       data["energy_carrier_prices"][mk]= dict(zip(range(1,len(widgets[wk]["source"].data["y"])+1),widgets[wk]["source"].data["y"]))
+                    else:
+                        data[mk]= dict(zip(range(1,len(widgets[wk]["source"].data["y"])+1),widgets[wk]["source"].data["y"]))
+    
+                data["tec_hs"] = list(data_heat_storages["name"].values)
+                data["tec"] = list(data1["name"].values)
+    
+                data["all_heat_geneartors"] = data["tec"] + data["tec_hs"]
+    
+                data["energy_carrier"] = {**data["energy_carrier"],**carrier_dict}
+                ##
+                for i in _elec:
+                    mk = widget_to_model_keys_dict[i]
+                    ext=[]
+                    for j in data["tec"] :
+                        jt = list(zip([j]*8760,range(1,8760+1)))
+                        if j in list(external_data[i]):
+                            ext.append(dict(zip(jt,external_data[i][j])))
+                        else:
+                            ext.append(dict(zip(jt,external_data[i]["Default"])))
+                    ext = {k: v for d in ext for k, v in d.items()}
+                    if  mk == "electricity":
+                        data["energy_carrier_prices"][mk] = ext
+                    else:
+                        data[mk] = ext
+                ## Categorize
+                data["categorize"] = {}
+                _dataframe= pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore')
+                select_tec_options = [x.replace("CHP Steam Extraction","CHP-SE").replace("CHP Back Pressure","CHP-BP") for x in select_tec_options_model]
+                for j in select_tec_options:
+                    data["categorize"][j] = _dataframe["name"][_dataframe["type"] == j].values.tolist()
+                ## thermal efficiencc
+                _n_th = {}
+                data["n_th"] = {**data["n_th"],**_nth}
+                for k,v in data["n_th"].items():
+                    if type(v)==list:
+                        _n_th = {**_n_th,**dict(zip(zip([k]*8760,range(1,8760+1)),v))}
+                    else:
+                        _n_th = {**_n_th,**dict(zip(zip([k]*8760,range(1,8760+1)),[v]*8760))}
+                data["n_th"] = _n_th
+                for k in list(_nth):
+                    _nth.pop(k,None)
+                ## 
+                solutions = None
+                selection = [[],[]]
+                inv_flag = False
+                if invest_button.active:
+                    inv_flag = True
+                    selection0 = data_table.source.selected["1d"]["indices"] #XXX: 0.12.10
+                    selection1 = data_table_heat_storage.source.selected["1d"]["indices"] #XXX: 0.12.10
+    #                selection0 = data_table.source.selected.indices #XXX:  > 0.12.10
+    #                selection1 = data_table_heat_storage.source.selected.indices #XXX:  > 0.12.10
+                    selection = [selection0,selection1]
+                    if selection[0] == []:
+                        div_spinner.text = notify("""<p>Error: Please specify the technologies for the invesment model !!!<p><p>Mark Heat Generators by pressing "CTRL" + "left mouse"<p><p>Selection is marked yellow <p>""","red","Please specify the technologies for the invesment model !!!","red") 
+                        return
+                solutions,_message,_ = execute(data,inv_flag,selection)
+    
+                print('calculation done')
+                print ("Ploting started..")
+                if solutions == "Error1":
+                    div_spinner.text = notify("Error: No Capacities are installed !!!","red")
+                elif solutions == "Error2":
+                    div_spinner.text = notify("Error: The installed capacities are not enough to cover the load !!!","red") 
+                elif solutions == "Error3#":
+                    print("Error in Saving Solution to JSON !!!")
+                    div_spinner.text = notify("Error @ Generating JSON!!!","red")          
+                elif solutions == "Error3":
+                    print("Cause: Infeasible or unbounded model !!!")
+                    div_spinner.text = notify("Error: Infeasible or unbounded model !!!","red")  
+                elif solutions == None:
+                    print("Error: Something get Wrong")
+                    print(_message)
+                    div_spinner.text = notify("Error: "+_message,"red")
                 else:
-                    output.tabs = output_tabs #TODO: render only when a toggle button is active
-                    print("Ploting done")
-                    print("Download output_graphics started...")
-                    time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
-                    filename = "output_graphs.html"                    
-                    path_download_html = os.path.join(create_folder(time_id),filename)
-                    output_file(path_download_html,title="Dispatch output", mode='inline')
-                    save(output)
-#                    save(Tabs(tabs=output_tabs))
-                    path_download_html_ = os.path.join("download","static",time_id,filename)
-#                    trigger_download(time_id,filename)
-                    print("Graphics Download done")
-                    print("Download output data started...")
-                    # -- Download JSON
-                    time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
-                    filename = "output_data.json"
-                    path_download_json = os.path.join(create_folder(time_id),filename)
-                    with open(path_download_json, "w") as f:
-                        json.dump(solutions, f)
-                    path_download_json_ = os.path.join("download","static",time_id,filename)
-#                    trigger_download(time_id,filename)
-                    # -- Download XLSX
-                    time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
-                    filename = "output_data.xlsx"
-                    path_download_xlsx = os.path.join(create_folder(time_id),filename)
-                    json2xlsx(solutions,path_download_xlsx)
-                    path_download_xlsx_ = os.path.join("download","static",time_id,filename)
-                    print("Download output data done")
-                     # -- Download ZIP
-                    print("Create Zip File...")
-                    time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
-                    filename = "output_data.zip"
-                    path_download_zip = os.path.join(create_folder(time_id),filename)
-                    with ZipFile(path_download_zip,"w") as zip_file:
-                        for file in [path_download_html,path_download_json,
-                                     path_download_xlsx]:
-                            zip_file.write(file,os.path.basename(file))
-                    path_download_zip_ = os.path.join("download","static",time_id,filename)
-                    print("Create Zip File done")
-                    # --                  
-                    div_spinner.text = """<div align="center"> 
-                    <style>
-                    a:link, a:visited {
-                        background-color: white;
-                        color: green;
-                        border: 2px solid green;
-                        padding: 10px 20px;
-                        text-align: center;
-                        text-decoration: none;
-                        display: inline-block;
-                    }
-                    
-                    a:hover, a:active {
-                        background-color: green;
-                        color: white;
-                    }
-                    </style>
-                    <strong style="color: green">
-                    <p>Calculation done<p>
-                    <p><a href="""+"'"+path_download_html_+"'"""" download="output.html">Download HTML File </a> <p>
-                    <p><a href="""+"'"+path_download_xlsx_+"'"""" download="output.xlsx">Download XLSX File </a>  <p>
-                    <p><a href="""+"'"+path_download_zip_+"'"""" download="output.zip">Download ZIP File </a>  <p>                   
-                    </strong>
-                    </div>
-                    """
-                    print("Calculation is Done !")
-                    print("Render in Browser...")
+                    output_tabs = plot_solutions(solution=solutions)
+    
+                    if output_tabs == "Error4":
+                        print("Error @ Ploting  !!!")
+                        div_spinner.text = notify("Error: @ Ploting !!!","red") 
+                    else:
+                        output.tabs = output_tabs #TODO: render only when a toggle button is active
+                        print("Ploting done")
+                        print("Download output_graphics started...")
+                        time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+                        filename = "output_graphs.html"                    
+                        path_download_html = os.path.join(create_folder(time_id),filename)
+                        output_file(path_download_html,title="Dispatch output", mode='inline')
+#                        save(output) #XXX: not working , dont know why, need to create new objecs !!
+                        save(Tabs(tabs=plot_solutions(solution=solutions)))
+                        path_download_html_ = os.path.join("download","static",time_id,filename)
+    #                    trigger_download(time_id,filename)
+                        print("Graphics Download done")
+                        print("Download output data started...")
+                        # -- Download JSON
+#                        time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+                        filename = "output_data.json"
+                        path_download_json = os.path.join(create_folder(time_id),filename)
+                        with open(path_download_json, "w") as f:
+                            json.dump(solutions, f)
+                        path_download_json_ = os.path.join("download","static",time_id,filename)
+    #                    trigger_download(time_id,filename)
+                        # -- Download XLSX
+#                        time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+                        filename = "output_data.xlsx"
+                        path_download_xlsx = os.path.join(create_folder(time_id),filename)
+                        json2xlsx(solutions,path_download_xlsx)
+                        path_download_xlsx_ = os.path.join("download","static",time_id,filename)
+                        print("Download output data done")
+                         # -- Download ZIP
+                        print("Create Zip File...")
+#                        time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+                        filename = "output_data.zip"
+                        path_download_zip = os.path.join(create_folder(time_id),filename)
+                        with ZipFile(path_download_zip,"w") as zip_file:
+                            for file in [path_download_html,path_download_json,
+                                         path_download_xlsx]:
+                                zip_file.write(file,os.path.basename(file))
+                        path_download_zip_ = os.path.join("download","static",time_id,filename)
+                        print("Create Zip File done")
+                        # --                  
+                        div_spinner.text = """<div align="center"> 
+                        <style>
+                        a:link, a:visited {
+                            background-color: white;
+                            color: green;
+                            border: 2px solid green;
+                            padding: 10px 20px;
+                            text-align: center;
+                            text-decoration: none;
+                            display: inline-block;
+                        }
+                        
+                        a:hover, a:active {
+                            background-color: green;
+                            color: white;
+                        }
+                        </style>
+                        <strong style="color: green">
+                        <p>Calculation done<p>
+                        <p><a href="""+"'"+path_download_html_+"'"""" download="output.html">Download HTML File </a> <p>
+                        <p><a href="""+"'"+path_download_xlsx_+"'"""" download="output.xlsx">Download XLSX File </a>  <p>
+                        <p><a href="""+"'"+path_download_zip_+"'"""" download="output.zip">Download ZIP File </a>  <p>                   
+                        </strong>
+                        </div>
+                        """
+                        print("Calculation is Done !")
+                        print("Render in Browser...")
         except Exception as e:
             print(str(e))
             print(e)
@@ -1121,10 +1124,6 @@ def modify_doc(doc):
                     widgets[i]["offset"].value = str(offset)
                     widgets[i]["constant"].value = str(constant)
                     
-                    
-                    
-                
-                
                 div_spinner.text = notify("Upload Done","green")
             else:
                 print("Not a valid file to upload")
@@ -2161,14 +2160,18 @@ def modify_doc(doc):
         ### Change name of sub scenario
         if sub_sc_name_new != "" and sub_sc_name_new != sub_sc_name_old :
             scenario_mapper[sc_name] = [sub_sc_name_new if x==sub_sc_name_old else x for x in scenario_mapper[sc_name]]
+            heat_generator_table[sc_name][sub_sc_name_new] = heat_generator_table[sc_name].pop(sub_sc_name_old)
+            heat_storage_table[sc_name][sub_sc_name_new] = heat_storage_table[sc_name].pop(sub_sc_name_old)
+            carrier_table[sc_name][sub_sc_name_new] = carrier_table[sc_name].pop(sub_sc_name_old)
             paramters_table[sc_name][sub_sc_name_new] = paramters_table[sc_name].pop(sub_sc_name_old)
             price_emmission_factor_table[sc_name][sub_sc_name_new] = price_emmission_factor_table[sc_name].pop(sub_sc_name_old)
             for wk in widgets_keys:
                 profiles_table[wk][sc_name][sub_sc_name_new] = profiles_table[wk][sc_name].pop(sub_sc_name_old)
             external_data_table[sc_name][sub_sc_name_new] = external_data_table[sc_name].pop(sub_sc_name_old)
-            external_data_map_table[sc_name][sub_sc_name_new] = external_data_map_table[sc_name].pop(sub_sc_name_old)
+            external_data_map_table[sc_name][sub_sc_name_new] = external_data_map_table[sc_name].pop(sub_sc_name_old) 
         else:
             sub_sc_name_new = sub_sc_name_old
+            
         if sc_param == scenario_paramters[0]:
             heat_generator_table[sc_name][sub_sc_name_new] = pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore').fillna(0)
             heat_storage_table[sc_name][sub_sc_name_new] = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)
@@ -2183,7 +2186,7 @@ def modify_doc(doc):
         # fires load_scenario_callback
         for sc_p in scenario_paramters[:]:
             scenario_dict[sc_p]["tools"]["sub_sc_select"].options = scenario_mapper[sc_name] 
-            scenario_dict[sc_p]["tools"]["sub_sc_select"].value = sub_sc_name_new            
+            scenario_dict[sc_p]["tools"]["sub_sc_select"].value = sub_sc_name_new    
 
         div_spinner.text = notify(f""" Successfully applied changes to "{sc_param}" in scenario "{sc_name}" for sub scenario "{sub_sc_name_new}" """, "blue")         
 # =============================================================================
@@ -2192,7 +2195,6 @@ def modify_doc(doc):
         div_spinner.text = load_text
         sc_name = scenario_dict[sc_param]["tools"]["sc_select"].value
         sub_sc_name= scenario_dict[sc_param]["tools"]["sub_sc_select"].value
-        print("Here 001")
         heat_generator_table[sc_name].pop(sub_sc_name)
         heat_storage_table[sc_name].pop(sub_sc_name)
         carrier_table[sc_name].pop(sub_sc_name)       
@@ -2202,7 +2204,6 @@ def modify_doc(doc):
             profiles_table[wk][sc_name].pop(sub_sc_name)
         external_data_table[sc_name].pop(sub_sc_name)
         external_data_map_table[sc_name].pop(sub_sc_name)           
-        print("Here 002")
         
         scenario_mapper[sc_name] = [x for x in scenario_mapper[sc_name] if x !=sub_sc_name]
         
@@ -2229,7 +2230,6 @@ def modify_doc(doc):
         if sub_sc not in scenario_mapper[sc]:
             scenario_dict[sc_param]["tools"]["sub_sc_select"].value = scenario_mapper[sc][0]           
             sub_sc = scenario_dict[sc_param]["tools"]["sub_sc_select"].value      
-        
         if sc_param in [scenario_paramters[0]] + _elec:
             scenario_dict[scenario_paramters[0]]["tools"]["sc_select"].value = sc
             data_table.source.data = df2data(heat_generator_table[sc][sub_sc])
