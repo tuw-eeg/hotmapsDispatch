@@ -6,12 +6,15 @@ Created on Fri Mar  9 15:30:16 2018
 """
 #%% Check if modules are installed
 
-import bokeh,tornado,xlsxwriter, openpyxl, pyomo, matplotlib, xlrd, numpy, pandas, sys
+import bokeh,tornado,xlsxwriter, openpyxl, pyomo.environ, matplotlib, xlrd, numpy, pandas, sys,subprocess
+
+assert not subprocess.call("node -v"), "Please install nodejs (type: <conda install -c bokeh nodejs>)"
 #XXX: Downgrade back bokeh version "0.12.10"
 assert bokeh.__version__ == '0.12.10', f"Your current bokeh version ist not compatible (Your Version:{bokeh.__version__})\nPlease install version 0.12.10 (type < pip install bokeh==0.12.10 >)"
 #XXX: Downgrade to torndado 4.5.3
 assert tornado.version == '4.5.3',f"Your current tornado version ist not compatible (Your Version:{tornado.version})\nPlease install version 4.5.3 (type < pip install tornado==4.5.3 >)"
 
+assert pyomo.environ.SolverFactory("gurobi").available(), "No Gurobi Solver Found, Please check your System Path Variable or purchase the GUROBI Solver"
 
 #%% import modules
 matplotlib.use('agg',warn=False)
