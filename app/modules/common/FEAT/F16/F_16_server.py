@@ -314,7 +314,7 @@ def scenario_tools():
                                     column(sub_sc_select, sub_sc_text,
                                            row([sub_sc_add, sub_sc_del, sub_sc_apply]))
                                     )
-                              ],width=200)
+                              ],width=200,css_classes=["scenario_tools"])
     
     return dict(tools=tools,layout=layout)
 # =============================================================================
@@ -332,7 +332,7 @@ def sub_scenario_tools():
     
     layout = column(children=[sc_select, sub_sc_select, sub_sc_text, 
                           row([sub_sc_add, sub_sc_del, sub_sc_apply ])
-                          ],width=200,height=270)
+                          ],width=200,height=270,css_classes=["sub_scenario_tools"])
     
     return dict(tools=tools,layout=layout)
 # =============================================================================
@@ -1944,6 +1944,16 @@ def modify_doc(doc):
     scenario_button = Toggle(label="Scenario Mode", button_type="danger")
     scenario_paramters = ["Heat Producers and Heat Storage","Parameters", "Prices & Emission factors"] + widgets_keys  
     scenario_dict = {name: sub_scenario_tools() if name !="Heat Producers and Heat Storage" else scenario_tools() for name in scenario_paramters}
+
+    div = Div(text = """ <style>
+              .scenario_tools {
+                      display: none;
+                      } 
+              .sub_scenario_tools {
+                      display: none;
+                      }
+                        """)
+        
 # XXX: Prerenders the Scenario Widgets, 
 # =============================================================================
 #   whould be cool to find a solution to show up when clicking the scenario button, 
@@ -1973,6 +1983,11 @@ def modify_doc(doc):
 # =============================================================================
         
     def scenario_mode_callback(active):
+        if active:
+            div.text = div.text.replace("none","true")
+        else:
+            div.text = div.text.replace("true","none")
+            
         div_spinner.text = load_text
               
         for _name,sc_dict in scenario_dict.items(): 
@@ -2300,7 +2315,7 @@ def modify_doc(doc):
                     [row([column([download_button,upload_button,run_button,
                                reset_button,invest_button,scenario_button]),
                      widgetbox(div_spinner,width=500),column([pmax,to_install])])],
-                   [widgetbox(dummy)],
+                   [widgetbox(dummy,div)],
                    [widgetbox(output,width=1500)],
                    [widgetbox(tabs,width=1500)],
             ],sizing_mode='scale_width')
