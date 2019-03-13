@@ -533,10 +533,13 @@ def modify_doc(doc):
     for i in _elec:
         lay[i].children.append(column(widgetbox(widgets[i]["tec"]), widgetbox(widgets[i]["ok"])))
 #    lay = {name: column(scenario_dict[name]["layout"],layout) for name,layout in lay.items()}
-    grid = Tabs(tabs=[])
+    grid = Tabs(tabs=[],css_classes=["adding_hg_hs"])
+    div2 = Div(text=""" <style>
+              .adding_hg_hs {
+                      display: none;
+                      } """)
     profiles_tabs = Tabs(tabs=[Panel(child=p, title=name) for name, p in lay.items()])
     tabs_dic = {"Heat Producers and Heat Storage":col_hp_hs,
-           "Adding": grid,
            "Parameters":data_table_data,
            "Prices & Emission factors":data_table_prices,
            "Profiles": profiles_tabs,}
@@ -1392,7 +1395,8 @@ def modify_doc(doc):
 # =============================================================================
     def add_heat_generator():
         div_spinner.text = load_text
-        tabs.active = 1
+        div2.text = div2.text.replace("none","true")
+#        tabs.active = 1
         grid.active = 0
         disable_widgets(hg_widget_list,False)
         output.tabs = []
@@ -1403,6 +1407,7 @@ def modify_doc(doc):
 # =============================================================================
     def cancel():
         div_spinner.text = load_text
+        div2.text = div2.text.replace("true","none")
         tabs.active = 0
         disable_widgets(hg_widget_list+cop_widget_list,True)
         div_spinner.text = ""
@@ -1610,7 +1615,9 @@ def modify_doc(doc):
                 element.value = str(df.loc[select_hs.value][key])   
 # =============================================================================
     def add_heat_storage():
-        tabs.active = 1
+        div_spinner.text = load_text
+        div2.text = div2.text.replace("none","true")
+#        tabs.active = 1  
         output.tabs = []
         div_spinner.text = load_text   
         grid.active = 1  
@@ -1640,8 +1647,11 @@ def modify_doc(doc):
         div_spinner.text = notify("Heat Storage added","green")
 # =============================================================================
     def cancel_hs():
+        div_spinner.text = load_text
+        div2.text = div2.text.replace("true","none")
         disable_widgets(widget_list_hs,True) 
         tabs.active = 0
+        div_spinner.text = ""
 # =============================================================================
 #   Signal Emitting / Coupling for adding heat_storages
 # =============================================================================
@@ -2315,8 +2325,9 @@ def modify_doc(doc):
                     [row([column([download_button,upload_button,run_button,
                                reset_button,invest_button,scenario_button]),
                      widgetbox(div_spinner,width=500),column([pmax,to_install])])],
-                   [widgetbox(dummy,div)],
+                   [widgetbox(dummy,div,div2)],
                    [widgetbox(output,width=1500)],
+                   [grid],
                    [widgetbox(tabs,width=1500)],
             ],sizing_mode='scale_width')
     
