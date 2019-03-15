@@ -647,12 +647,13 @@ def modify_doc(doc):
         data["toatl_RF"] = float(data_data[parameter_list[2]].values[0])
         data["total_demand"] = float(data_data[parameter_list[3]].values[0])
         
+        print("Here 1")
         for wk,mk in widget_to_model_keys_dict.items():
             if mk == "electricity":
-               data["energy_carrier_prices"][mk]=  profiles_table[sc][sub_sc][wk]
+               data["energy_carrier_prices"][mk]=  profiles_table[wk][sc][sub_sc]
             else:
-                data[mk]= profiles_table[sc][sub_sc][wk]
-
+                data[mk]= profiles_table[wk][sc][sub_sc]
+        print("Here2")
         data["tec_hs"] = list(data_heat_storages["name"].values)
         data["tec"] = list(data1["name"].values)
 
@@ -677,7 +678,7 @@ def modify_doc(doc):
                 data[mk] = ext
         ## Categorize
         data["categorize"] = {}
-        _dataframe= heat_generator_table[sc][input_list+["type"]].apply(pd.to_numeric, errors='ignore')
+        _dataframe= heat_generator_table[sc][sub_sc][input_list+["type"]].apply(pd.to_numeric, errors='ignore')
         for j in select_tec_options_model:
             data["categorize"][j] = _dataframe["name"][_dataframe["type"] == j].values.tolist()
         ## thermal efficiencc
@@ -1628,6 +1629,7 @@ def modify_doc(doc):
     def add_data_table():
         div_spinner.text = load_text
         df2 = pd.DataFrame(data_table_heat_storage.source.data)
+        df2["index"] = df2.index
         df2.set_index(df2["index"])
         del df2["index"]
         new_data={}
@@ -1949,12 +1951,13 @@ def modify_doc(doc):
     carrier_table = dict()           
     external_data_table = dict()
     external_data_map_table = dict()
-    scenario_mapper = {"default":["default_sub"]}
+    scenario_mapper = dict()
     
     scenario_button = Toggle(label="Scenario Mode", button_type="danger")
     scenario_paramters = ["Heat Producers and Heat Storage","Parameters", "Prices & Emission factors"] + widgets_keys  
     scenario_dict = {name: sub_scenario_tools() if name !="Heat Producers and Heat Storage" else scenario_tools() for name in scenario_paramters}
-
+    
+    # CSS snippet for (showwing)hide scneario widgets
     div = Div(text = """ <style>
               .scenario_tools {
                       display: none;
@@ -1963,13 +1966,8 @@ def modify_doc(doc):
                       display: none;
                       }
                         """)
-        
-# XXX: Prerenders the Scenario Widgets, 
-# =============================================================================
-#   whould be cool to find a solution to show up when clicking the scenario button, 
-#   but not working at the moment if i paste the code in the scenario_mode_callback 
-#   all widgets disapear and an error at javascript console is shown, 
-# =============================================================================
+    
+    # Prerenders the Scenario Widgets, 
     for panel in profiles_tabs.tabs:
         panel.child = column(scenario_dict[panel.title]["layout"],lay[panel.title])
         
@@ -1990,8 +1988,21 @@ def modify_doc(doc):
         carrier_table[sc_name] = { sub_sc_name : pd.DataFrame(carrier_dict,index=[0]).T.to_dict()[0]}
         external_data_table[sc_name] = { sub_sc_name : pd.DataFrame(external_data).to_dict()}
         external_data_map_table[sc_name] = { sub_sc_name : pd.DataFrame(external_data_map).to_dict()}
+        scenario_mapper[sc_name] = [sub_sc_name]
 # =============================================================================
+    def replace_name_of_scenario(sc_name_old,sc_name_new):       
+        heat_generator_table[sc_name_new] = heat_generator_table.pop(sc_name_old)
+        heat_storage_table[sc_name_new] = heat_storage_table.pop(sc_name_old)
+        paramters_table[sc_name_new] = paramters_table.pop(sc_name_old)
+        price_emmission_factor_table[sc_name_new] = price_emmission_factor_table.pop(sc_name_old)
+        for wk in widgets_keys:
+            profiles_table[wk][sc_name_new] = profiles_table[wk].pop(sc_name_old)
         
+        carrier_table[sc_name_new] = carrier_table.pop(sc_name_old)
+        external_data_table[sc_name_new] = external_data_table.pop(sc_name_old)
+        external_data_map_table[sc_name_new] = external_data_map_table.pop(sc_name_old)
+        scenario_mapper[sc_name_new] = scenario_mapper.pop(sc_name_old)
+# =============================================================================        
     def scenario_mode_callback(active):
         if active:
             div.text = div.text.replace("none","true")
@@ -2061,7 +2072,6 @@ def modify_doc(doc):
         elif sub_sc_name == "":
             div_spinner.text = notify(f"Error: Please define a name for your sub scenario !", "red") 
         else:
-            scenario_mapper[sc_name] = [sub_sc_name]
             add_new_scenario(sc_name,sub_sc_name)
             # fires load_scenario_callback
             for _,dictt in scenario_dict.items():
@@ -2085,18 +2095,7 @@ def modify_doc(doc):
         
         ### Change name of Scenario
         if sc_name_new != "" and sc_name_new !=sc_name_old :
-            scenario_mapper[sc_name_new] = scenario_mapper.pop(sc_name_old)
-            
-            heat_generator_table[sc_name_new] = heat_generator_table.pop(sc_name_old)
-            heat_storage_table[sc_name_new] = heat_storage_table.pop(sc_name_old)
-            paramters_table[sc_name_new] = paramters_table.pop(sc_name_old)
-            price_emmission_factor_table[sc_name_new] = price_emmission_factor_table.pop(sc_name_old)
-            for wk in widgets_keys:
-                profiles_table[wk][sc_name_new] = profiles_table[wk].pop(sc_name_old)
-            
-            carrier_table[sc_name_new] = carrier_table.pop(sc_name_old)
-            external_data_table[sc_name_new] = external_data_table.pop(sc_name_old)
-            external_data_map_table[sc_name_new] = external_data_map_table.pop(sc_name_old)
+            replace_name_of_scenario(sc_name_old,sc_name_new)
         else:
             sc_name_new = sc_name_old
             
@@ -2107,36 +2106,36 @@ def modify_doc(doc):
 
         div_spinner.text = notify(f""" Successfully changed name in {scenario_paramters[0]} from "{sc_name_old}" to "{sc_name_new}" """, "blue") 
 # =============================================================================
-        
-    def del_scenario_callback():
-        div_spinner.text = load_text
-        sc_name = scenario_dict[scenario_paramters[0]]["tools"]["sc_select"].value
-        
+
+    def del_scenario(sc_name):
         heat_generator_table.pop(sc_name)
         heat_storage_table.pop(sc_name)
         paramters_table.pop(sc_name)
         price_emmission_factor_table.pop(sc_name)
         for wk in widgets_keys:
             profiles_table[wk].pop(sc_name)
-        
         carrier_table.pop(sc_name)
         external_data_table.pop(sc_name)
         external_data_map_table.pop(sc_name)
-        
         scenario_mapper.pop(sc_name)
+# =============================================================================
+
+    def del_scenario_callback():
+        div_spinner.text = load_text
+        sc_name = scenario_dict[scenario_paramters[0]]["tools"]["sc_select"].value
+        
+        del_scenario(sc_name)
+        
         options = list(scenario_mapper)
-        
         if not options:
-            div_spinner.text = notify("All scenarios deleted", "red") 
             scenario_button.active = False
-            options = ["default"]
-        
-        sc_new = options[0]
-        # fires load_scenario_callback
-        for _,dictt in scenario_dict.items():
-            dictt["tools"]["sc_select"].options = options
-            dictt["tools"]["sc_select"].value = sc_new
-        if scenario_button.active:
+            div_spinner.text = notify("All scenarios deleted", "red") 
+        else:
+            sc_new = options[0]
+            # fires load_scenario_callback
+            for _,dictt in scenario_dict.items():
+                dictt["tools"]["sc_select"].options = options
+                dictt["tools"]["sc_select"].value = sc_new
             div_spinner.text =  notify(f"""Scenario "{sc_name}" was delted""", "red") 
 # =============================================================================
             
@@ -2149,7 +2148,24 @@ def modify_doc(doc):
         for wk in widgets_keys:
             profiles_table[wk][sc_name][sub_sc_name] = dict(zip(range(1,len(widgets[wk]["source"].data["y"])+1),widgets[wk]["source"].data["y"]))               
         external_data_table[sc_name][sub_sc_name] = pd.DataFrame(external_data).to_dict()
-        external_data_map_table[sc_name][sub_sc_name] = pd.DataFrame(external_data_map).to_dict()             
+        external_data_map_table[sc_name][sub_sc_name] = pd.DataFrame(external_data_map).to_dict()   
+        if scenario_mapper[sc_name]:
+            scenario_mapper[sc_name].append(sub_sc_name)
+        else:
+            scenario_mapper[sc_name] = [sub_sc_name]
+# =============================================================================
+        
+    def repace_name_of_sub_scenario(sc_name,sub_sc_name_old,sub_sc_name_new):
+        heat_generator_table[sc_name][sub_sc_name_new] = heat_generator_table[sc_name].pop(sub_sc_name_old)
+        heat_storage_table[sc_name][sub_sc_name_new] = heat_storage_table[sc_name].pop(sub_sc_name_old)
+        carrier_table[sc_name][sub_sc_name_new] = carrier_table[sc_name].pop(sub_sc_name_old)
+        paramters_table[sc_name][sub_sc_name_new] = paramters_table[sc_name].pop(sub_sc_name_old)
+        price_emmission_factor_table[sc_name][sub_sc_name_new] = price_emmission_factor_table[sc_name].pop(sub_sc_name_old)
+        for wk in widgets_keys:
+            profiles_table[wk][sc_name][sub_sc_name_new] = profiles_table[wk][sc_name].pop(sub_sc_name_old)
+        external_data_table[sc_name][sub_sc_name_new] = external_data_table[sc_name].pop(sub_sc_name_old)
+        external_data_map_table[sc_name][sub_sc_name_new] = external_data_map_table[sc_name].pop(sub_sc_name_old) 
+        scenario_mapper[sc_name] = [sub_sc_name_new if x==sub_sc_name_old else x for x in scenario_mapper[sc_name]]
 # =============================================================================
         
     def add_sub_scenario_callback(sc_param):
@@ -2166,7 +2182,6 @@ def modify_doc(doc):
         elif sub_sc_name in scenario_mapper[sc_name]:
             div_spinner.text = notify(f""" Error: The name "{sub_sc_name}" is already given please define another""", "red") 
         else:
-            scenario_mapper[sc_name] = scenario_mapper[sc_name] + [sub_sc_name]
             add_sub_scenarios(sc_name,sub_sc_name)
             # fires load_scenario_callback
             for sc_p in scenario_paramters[:]:
@@ -2187,16 +2202,7 @@ def modify_doc(doc):
             return None
         ### Change name of sub scenario
         if sub_sc_name_new != "" and sub_sc_name_new != sub_sc_name_old :
-            scenario_mapper[sc_name] = [sub_sc_name_new if x==sub_sc_name_old else x for x in scenario_mapper[sc_name]]
-            heat_generator_table[sc_name][sub_sc_name_new] = heat_generator_table[sc_name].pop(sub_sc_name_old)
-            heat_storage_table[sc_name][sub_sc_name_new] = heat_storage_table[sc_name].pop(sub_sc_name_old)
-            carrier_table[sc_name][sub_sc_name_new] = carrier_table[sc_name].pop(sub_sc_name_old)
-            paramters_table[sc_name][sub_sc_name_new] = paramters_table[sc_name].pop(sub_sc_name_old)
-            price_emmission_factor_table[sc_name][sub_sc_name_new] = price_emmission_factor_table[sc_name].pop(sub_sc_name_old)
-            for wk in widgets_keys:
-                profiles_table[wk][sc_name][sub_sc_name_new] = profiles_table[wk][sc_name].pop(sub_sc_name_old)
-            external_data_table[sc_name][sub_sc_name_new] = external_data_table[sc_name].pop(sub_sc_name_old)
-            external_data_map_table[sc_name][sub_sc_name_new] = external_data_map_table[sc_name].pop(sub_sc_name_old) 
+            repace_name_of_sub_scenario(sc_name,sub_sc_name_old,sub_sc_name_new)
         else:
             sub_sc_name_new = sub_sc_name_old
             
@@ -2218,11 +2224,8 @@ def modify_doc(doc):
 
         div_spinner.text = notify(f""" Successfully applied changes to "{sc_param}" in scenario "{sc_name}" for sub scenario "{sub_sc_name_new}" """, "blue")         
 # =============================================================================
-        
-    def del_sub_scenario_callback(sc_param):
-        div_spinner.text = load_text
-        sc_name = scenario_dict[sc_param]["tools"]["sc_select"].value
-        sub_sc_name= scenario_dict[sc_param]["tools"]["sub_sc_select"].value
+
+    def del_sub_scenario(sc_name,sub_sc_name):
         heat_generator_table[sc_name].pop(sub_sc_name)
         heat_storage_table[sc_name].pop(sub_sc_name)
         carrier_table[sc_name].pop(sub_sc_name)       
@@ -2232,17 +2235,23 @@ def modify_doc(doc):
             profiles_table[wk][sc_name].pop(sub_sc_name)
         external_data_table[sc_name].pop(sub_sc_name)
         external_data_map_table[sc_name].pop(sub_sc_name)           
-        
         scenario_mapper[sc_name] = [x for x in scenario_mapper[sc_name] if x !=sub_sc_name]
+# =============================================================================
         
-        flag = True
+    def del_sub_scenario_callback(sc_param):
+        div_spinner.text = load_text
+        sc_name = scenario_dict[sc_param]["tools"]["sc_select"].value
+        sub_sc_name= scenario_dict[sc_param]["tools"]["sub_sc_select"].value
+        
+        del_sub_scenario(sc_name,sub_sc_name)
+        
+        notify_text = f"""In scenario "{sc_name}"  the sub scenario "{sub_sc_name}" was delted"""
         if not scenario_mapper[sc_name]:
-            flag = False
-            scenario_mapper[sc_name] = ["default_sub"]
+            notify_text = f"""All sub scenarios in scenario "{sc_name}" deleted"""
             add_sub_scenarios(sc_name,"default_sub")
             
-        notify_text = f"""In scenario "{sc_name}"  the sub scenario "{sub_sc_name}" was delted""" if flag else f"""All sub scenarios in scenario "{sc_name}" deleted"""
         sub_sc_new = scenario_mapper[sc_name][0]
+        # fires load_scenario_callback
         for sc_p in scenario_paramters[:]:
             scenario_dict[sc_p]["tools"]["sub_sc_select"].options = scenario_mapper[sc_name]
             scenario_dict[sc_p]["tools"]["sub_sc_select"].value = sub_sc_new
@@ -2286,9 +2295,6 @@ def modify_doc(doc):
     scenario_dict[scenario_paramters[0]]["tools"]["sc_add"].on_click(add_scenario_callback)
     scenario_dict[scenario_paramters[0]]["tools"]["sc_apply"].on_click(apply_scenario_callback)
     scenario_dict[scenario_paramters[0]]["tools"]["sc_del"].on_click(del_scenario_callback)
-#    scenario_dict[scenario_paramters[0]]["tools"]["sc_select"].on_change("value",partial(load_scenario_callback,sc_param=scenario_paramters[0]))
-#    scenario_dict[scenario_paramters[0]]["tools"]["sub_sc_select"].on_change("value",partial(load_scenario_callback,sc_param=scenario_paramters[0]))
-#    scenario_dict[scenario_paramters[0]]["tools"]["sub_sc_apply"].on_click(partial(apply_sub_scenario_callback, sc_param = scenario_paramters[0]))
 
     for sc_p in scenario_paramters[:]:
         scenario_dict[sc_p]["tools"]["sub_sc_add"].on_click(partial(add_sub_scenario_callback, sc_param = sc_p))
