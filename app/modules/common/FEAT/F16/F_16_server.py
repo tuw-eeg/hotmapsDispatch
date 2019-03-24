@@ -647,13 +647,11 @@ def modify_doc(doc):
         data["toatl_RF"] = float(data_data[parameter_list[2]].values[0])
         data["total_demand"] = float(data_data[parameter_list[3]].values[0])
         
-        print("Here 1")
         for wk,mk in widget_to_model_keys_dict.items():
             if mk == "electricity":
                data["energy_carrier_prices"][mk]=  profiles_table[wk][sc][sub_sc]
             else:
                 data[mk]= profiles_table[wk][sc][sub_sc]
-        print("Here2")
         data["tec_hs"] = list(data_heat_storages["name"].values)
         data["tec"] = list(data1["name"].values)
 
@@ -682,14 +680,14 @@ def modify_doc(doc):
         for j in select_tec_options_model:
             data["categorize"][j] = _dataframe["name"][_dataframe["type"] == j].values.tolist()
         ## thermal efficiencc
-#        _n_th = {}
-#        data["n_th"] = {**data["n_th"],**_nth}
-#        for k,v in data["n_th"].items():
-#            if type(v)==list:
-#                _n_th = {**_n_th,**dict(zip(zip([k]*8760,range(1,8760+1)),v))}
-#            else:
-#                _n_th = {**_n_th,**dict(zip(zip([k]*8760,range(1,8760+1)),[v]*8760))}
-#        data["n_th"] = _n_th
+        _n_th = {}
+        data["n_th"] = {**data["n_th"],**_nth_table[sc][sub_sc]}
+        for k,v in data["n_th"].items():
+            if type(v)==list:
+                _n_th = {**_n_th,**dict(zip(zip([k]*8760,range(1,8760+1)),v))}
+            else:
+                _n_th = {**_n_th,**dict(zip(zip([k]*8760,range(1,8760+1)),[v]*8760))}
+        data["n_th"] = _n_th
 #        for k in list(_nth):
 #            _nth.pop(k,None)
         ## 
@@ -745,7 +743,7 @@ def modify_doc(doc):
             message = "Error @ Ploting  in {sc}#{sub_sc}!!!"
         else:
             path_scenarios = os.path.join(path_scenarios_root,sc,sub_sc)
-            if os.path.exists(path_scenarios):
+            if not os.path.exists(path_scenarios):
                 os.makedirs(path_scenarios)
             ok = True
             output_sc = Tabs(tabs = output_tabs) 
@@ -1157,6 +1155,8 @@ def modify_doc(doc):
             carrier_dict[new_key] = carrier_dict.pop(old_key)
         #
         add_to_tec.options = _opt
+        if _opt:
+            add_to_tec.value = _opt[0]
         _options = ["Default"] + _opt
         
         for i in data_kwargs:
@@ -1266,9 +1266,10 @@ def modify_doc(doc):
 # =============================================================================
     def delete_hg():
         df = pd.DataFrame(data_table.source.data)
+        for hg in df.iloc[data_table.source.selected["1d"]["indices"]].name.tolist():
+            _nth.pop(hg,None)
 #        df = df.drop(data_table.source.selected.indices).reset_index(drop=True)  #XXX: >0.12.10
-        df = df.drop(data_table.source.selected["1d"]["indices"]).reset_index(drop=True)  #XXX: 0.12.10
-
+        df = df.drop(data_table.source.selected["1d"]["indices"]).reset_index(drop=True)  #XXX: 0.12.10       
         data_table.source.data = {key:list(dic.values()) for key,dic in df.to_dict().items()}
         
     def delete_hs():
@@ -1706,8 +1707,7 @@ def modify_doc(doc):
     modtools += [individual_data_name,add_to_tec]
     dic_modtools = dict(zip(["offset","constant","scale","mean","total","add",
                             "save","name","tec"],
-                            modtools))
-    
+                            modtools))          
     def setLabel(widgets,**kwargs):
         for i in range(2):
             widgets[i].title = kwargs["title"][i]
@@ -1717,7 +1717,7 @@ def modify_doc(doc):
 
     dirichlet_options = dict(title=["sum Σ",""], value=["100",""], 
                              placeholder=[">0","-"],disabled=[False,True])
-    normal_options = dict(title=["sigma σ","my µ"], value=["100","100"], 
+    normal_options = dict(title=["my µ","sigma σ"], value=["100","100"], 
                           placeholder=["-","-"], disabled=[False,False])
     linear_options = dict(title=["start","stop"], value=["-10","100"], 
                           placeholder=["-","-"], disabled=[False,False])
@@ -1856,8 +1856,8 @@ def modify_doc(doc):
             else:
                 if dic_modtools["tec"].value != "None":
                     _nth[dic_modtools["tec"].value] = list(individual_data_data_table.source.data["y"])
-                    print("COP/ n_th added to"+dic_modtools["tec"].value)
-                    div_spinner.text = notify("###text","n_th/COP - External Data added to "+dic_modtools["tec"].value, "green")
+                    print(f"""COP/ n_th added to {dic_modtools["tec"].value}""")
+                    div_spinner.text = notify(f"""n_th - External Data added to {dic_modtools["tec"].value}""", "green")
                 else:
                     div_spinner.text = notify("Nothing to save","red")
         else:
@@ -1952,6 +1952,7 @@ def modify_doc(doc):
     external_data_table = dict()
     external_data_map_table = dict()
     scenario_mapper = dict()
+    _nth_table = dict()
     
     scenario_button = Toggle(label="Scenario Mode", button_type="danger")
     scenario_paramters = ["Heat Producers and Heat Storage","Parameters", "Prices & Emission factors"] + widgets_keys  
@@ -1989,6 +1990,7 @@ def modify_doc(doc):
         external_data_table[sc_name] = { sub_sc_name : pd.DataFrame(external_data).to_dict()}
         external_data_map_table[sc_name] = { sub_sc_name : pd.DataFrame(external_data_map).to_dict()}
         scenario_mapper[sc_name] = [sub_sc_name]
+        _nth_table[sc_name] = { sub_sc_name : _nth }
 # =============================================================================
     def replace_name_of_scenario(sc_name_old,sc_name_new):       
         heat_generator_table[sc_name_new] = heat_generator_table.pop(sc_name_old)
@@ -2002,6 +2004,7 @@ def modify_doc(doc):
         external_data_table[sc_name_new] = external_data_table.pop(sc_name_old)
         external_data_map_table[sc_name_new] = external_data_map_table.pop(sc_name_old)
         scenario_mapper[sc_name_new] = scenario_mapper.pop(sc_name_old)
+        _nth_table[sc_name_new] = _nth_table.pop(sc_name_old)
 # =============================================================================        
     def scenario_mode_callback(active):
         if active:
@@ -2118,6 +2121,7 @@ def modify_doc(doc):
         external_data_table.pop(sc_name)
         external_data_map_table.pop(sc_name)
         scenario_mapper.pop(sc_name)
+        _nth_table.pop(sc_name)
 # =============================================================================
 
     def del_scenario_callback():
@@ -2153,6 +2157,7 @@ def modify_doc(doc):
             scenario_mapper[sc_name].append(sub_sc_name)
         else:
             scenario_mapper[sc_name] = [sub_sc_name]
+        _nth_table[sc_name][sub_sc_name]  = _nth
 # =============================================================================
         
     def repace_name_of_sub_scenario(sc_name,sub_sc_name_old,sub_sc_name_new):
@@ -2166,6 +2171,7 @@ def modify_doc(doc):
         external_data_table[sc_name][sub_sc_name_new] = external_data_table[sc_name].pop(sub_sc_name_old)
         external_data_map_table[sc_name][sub_sc_name_new] = external_data_map_table[sc_name].pop(sub_sc_name_old) 
         scenario_mapper[sc_name] = [sub_sc_name_new if x==sub_sc_name_old else x for x in scenario_mapper[sc_name]]
+        _nth_table[sc_name][sub_sc_name_new] = _nth_table[sc_name].pop(sub_sc_name_old)
 # =============================================================================
         
     def add_sub_scenario_callback(sc_param):
@@ -2209,6 +2215,7 @@ def modify_doc(doc):
         if sc_param == scenario_paramters[0]:
             heat_generator_table[sc_name][sub_sc_name_new] = pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore').fillna(0)
             heat_storage_table[sc_name][sub_sc_name_new] = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)
+            carrier_table[sc_name][sub_sc_name_new] = pd.DataFrame(carrier_dict,index=[0]).T.to_dict()[0]
         elif sc_param == scenario_paramters[1]:
             paramters_table[sc_name][sub_sc_name_new] = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore').fillna(0)
         elif sc_param == scenario_paramters[2]:
@@ -2217,6 +2224,9 @@ def modify_doc(doc):
             profiles_table[sc_param][sc_name][sub_sc_name_new] = dict(zip(range(1,len(widgets[sc_param]["source"].data["y"])+1),widgets[sc_param]["source"].data["y"]))               
             external_data_table[sc_name][sub_sc_name_new] = pd.DataFrame(external_data).to_dict()
             external_data_map_table[sc_name][sub_sc_name_new] = pd.DataFrame(external_data_map).to_dict()             
+        #XXX: need extra apply button for custom _nth
+        _nth_table[sc_name][sub_sc_name_new] = _nth
+        
         # fires load_scenario_callback
         for sc_p in scenario_paramters[:]:
             scenario_dict[sc_p]["tools"]["sub_sc_select"].options = scenario_mapper[sc_name] 
@@ -2236,6 +2246,7 @@ def modify_doc(doc):
         external_data_table[sc_name].pop(sub_sc_name)
         external_data_map_table[sc_name].pop(sub_sc_name)           
         scenario_mapper[sc_name] = [x for x in scenario_mapper[sc_name] if x !=sub_sc_name]
+        _nth_table[sc_name].pop(sub_sc_name)
 # =============================================================================
         
     def del_sub_scenario_callback(sc_param):
