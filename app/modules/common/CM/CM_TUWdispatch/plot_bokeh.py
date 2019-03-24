@@ -611,7 +611,10 @@ def plotExtra_table (decision_vars,dic,path2output):
             formatted_val = []
             for item in list(dic[decision_var].values()):
 #                formatted_val.append("%.3e"%item)
-                formatted_val.append(str(EngNumber(item)))
+                try:
+                    formatted_val.append(str(EngNumber(item)))
+                except:
+                    formatted_val.append(str(item)) 
 
             line = [[decision_var] + formatted_val]
             data = data + line
@@ -919,7 +922,7 @@ def plot_solutions(show_plot=False, path2json=path2json,
                          "Anual Investment Cost (of existing power plants and heat storages)",
                          "Operational Cost:", "Fuel Costs:", "Revenue From Electricity:"]
         p8 = costBarStack_chart(dic,decision_vars,path2output,cmap)
-        decision_vars += ["Total CO2 Emission:","Full Load Hours:"]
+        decision_vars += ["Total CO2 Emission:","Full Load Hours:","LCOH:"]
         p11 = plotExtra_table(decision_vars,dic,path2output)
         l2 = layout([[p8],[p11]])
         

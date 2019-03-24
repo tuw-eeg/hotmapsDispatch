@@ -153,7 +153,11 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Full Load Hours"] = { j: int(sum(np.array(solution["Thermal Power Energymix"][j])>0)) for j in instance.j} 
         solution["Full Load Hours Heat Storage"] = {hs: int(sum(np.array(solution["Unloading Heat Storage"][hs])>0)) for hs in instance.j_hs} 
         solution["Full Load Hours:"] = {**solution["Full Load Hours"],**solution["Full Load Hours Heat Storage"]}
-       
+
+        solution["LCOH"] =  {j:(solution["Anual Investment Cost"][j]+solution["Anual Investment Cost (of existing power plants)"][j]+solution["Operational Cost"][j]+solution["Fuel Costs"][j]-solution["Revenue From Electricity"][j])/solution["Thermal Generation Mix"][j] if solution["Thermal Generation Mix"][j]>0 else "" for j in instance.j  } 
+        solution["LCOH Heat Storage"] =  {hs:(solution["Anual Investment Cost Heat Storage"][hs]+solution["Anual Investment Cost (of existing heat storages)"][hs]+solution["Operational Cost of Heat Storages"][hs]+solution["Fuel Costs Heat Storages"][hs]-solution["Revenue from Heat Storages"][hs])/solution["Unloading Heat Storage over year"][hs] if solution["Unloading Heat Storage over year"][hs]>0 else "" for hs in instance.j_hs  } 
+        solution["LCOH:"] = {**solution["LCOH"] ,**solution["LCOH Heat Storage"]} 
+        
         # only sum effective energy -> producton of solar thermal over  heat
         # demand is not shown in the Thermal Generation mix
 
