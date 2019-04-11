@@ -109,7 +109,9 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Specific Capital Costs of installed Heat Storages"] = {hs:instance.IK_hs[hs] * instance.alpha_hs[hs] for hs in solution["HS-Capacities"].keys() if solution["HS-Capacities"][hs] !=0 }
         solution["Fuel Costs Heat Storages"] = {hs:0 for hs in instance.j_hs}
         solution["Installed Capacities Heat Storages"] = {hs:instance.unload_cap_hs[hs] for hs in instance.j_hs}
-
+        solution["Turn Over Rate Heat Storages"] = {hs: solution["Unloading Heat Storage over year"][hs]  / solution["HS-Capacities"][hs] if solution["HS-Capacities"][hs]>0 else "" for hs in instance.j_hs } 
+        solution["Turn Over Rate"] = {j:"" for j in instance.j } 
+        solution["Turn Over Rate:"] =  {**solution["Turn Over Rate"] ,**solution["Turn Over Rate Heat Storages"]}  
 #XXX
         solution["Technologies:"] =  solution["Technologies"] + solution["Heat Storage Technologies"]
 

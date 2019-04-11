@@ -1219,7 +1219,10 @@ def modify_doc(doc):
             to_install.value = "0"
 # =============================================================================
     def load_callback2(attrname, old, new):
-        data_table_data.source.data[parameter_list[3]] = [new]
+#        data_table_data.source.data[parameter_list[3]] = [new]  #XXX: this throws FutureWarning 
+        df = pd.DataFrame(data_table_data.source.data) 
+        df.loc[0,parameter_list[3]] = new 
+        data_table_data.source.data.update(df) 
 # =============================================================================
     def ivest_callback(active):
         if active:
@@ -1324,7 +1327,7 @@ def modify_doc(doc):
     # Pmax Initilizing
     update_pmax(None,None,None)
     # Total Demand initilize with input
-    args_callback(None,None,None) #XXX: this throws FutureWarning
+    args_callback(None,None,None) 
     
 #%% Adding Heat Generators: Widgets callbacks, layouts etc.
 # =============================================================================
