@@ -609,7 +609,7 @@ def modify_doc(doc):
 
     def check_scenarios(scenario_mapper):
         no_hg  = [(sc,sub_sc)  for sc in list(scenario_mapper) for sub_sc in scenario_mapper[sc]  if heat_generator_table[sc][sub_sc].empty]
-        no_cap = [(sc,sub_sc)  for sc in list(scenario_mapper) for sub_sc in scenario_mapper[sc] if (max(external_data_table[sc][sub_sc][_hd]["Default"]) - sum(heat_generator_table[sc][sub_sc][input_list[1]])) > 0]
+        no_cap = [(sc,sub_sc)  for sc in list(scenario_mapper) for sub_sc in scenario_mapper[sc] if (max(profiles_table[_hd][sc][sub_sc].values()) - sum(heat_generator_table[sc][sub_sc][input_list[1]])) > 0]
         if no_hg != []:
             sc,sub_sc = zip(*no_cap)
             return f"""No Heat Generators available for for the scenarios {sc} in sub scenarios {sub_sc}"""
