@@ -749,24 +749,71 @@ def modify_doc(doc):
             output_sc = Tabs(tabs = output_tabs) 
             print("Ploting done")
             print("Download output_graphics started...")
-            filename = f"{sc}_{sub_sc}.html"                    
+            filename = f"output_{sc}_{sub_sc}.html"                    
             path_download_html = os.path.join(path_scenarios,filename)
             output_file(path_download_html,title=f"Dispatch output: {sc} # {sub_sc}")
             save(output_sc)
             print("Graphics Download done")
             print("Download output data started...")
             # -- Download JSON
-            filename = f"{sc}_{sub_sc}.json"  
+            filename = f"output_{sc}_{sub_sc}.json"  
             path_download_json = os.path.join(path_scenarios,filename)
             with open(path_download_json, "w") as f:
                 json.dump(output_data, f)
-            # -- Download XLSX
-            filename = f"{sc}_{sub_sc}.xlsx"              
+            # -- output XLSX
+            filename = f"output_{sc}_{sub_sc}.xlsx"              
             path_download_xlsx = os.path.join(path_scenarios,filename)
             json2xlsx(output_data,path_download_xlsx) #XXX: change function with return values
+            # -- input XLSX
+            filename = f"input_{sc}_{sub_sc}.xlsx"              
+            path_download_xlsx = os.path.join(path_scenarios,filename)
+            ok = get_input_data(sc,sub_sc,path_download_xlsx)
             print("Download output data done")         
         return ok,message,path_download_zip
     
+    def get_input_data(sc,sub_sc,path):
+        print("Save Input as Excel File...")
+
+        writer = pd.ExcelWriter(path)
+        ok = True
+        try:        
+            df = heat_generator_table[sc][sub_sc]
+            df = df.set_index(df.name)
+            
+            data = pd.DataFrame(external_data_map_table[sc][sub_sc]).drop("Default")[_elec]
+            df = df.join(data)
+            df = df.reset_index(drop=True)
+            df.to_excel(writer,sheets[0])
+            
+            data_prices_df = price_emmission_factor_table[sc][sub_sc]
+            data_prices_df.to_excel(writer,sheets[1])
+            
+            data_data_df = paramters_table[sc][sub_sc]
+            data_data_df.to_excel(writer,"Data")
+            
+            data_hs_df = heat_storage_table[sc][sub_sc]
+            data_hs_df.to_excel(writer,sheets[3])
+            
+            df_carrier = pd.DataFrame.from_dict(carrier_table[sc][sub_sc],orient="index")
+            df_carrier["name"]=df_carrier.index
+            df_carrier["carrier"] = df_carrier[0]
+            del df_carrier[0]
+            df_carrier.index = range(df_carrier.shape[0])
+            df_carrier.to_excel(writer,'Energy Carrier')
+            
+            df_default_external_data = pd.DataFrame(external_data_map_table[sc][sub_sc]).loc["Default"].to_frame().T.reset_index(drop= True)           
+            df_default_external_data.to_excel(writer,"Default - External Data")
+            
+        except:
+            ok = False
+            pass
+        
+        writer.save()
+        print("Input saved !")
+
+ 
+        return ok
+        
     
     def compare_plot(dict_of_solutions):
         output_tabs = None
