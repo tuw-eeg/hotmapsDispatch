@@ -1122,7 +1122,37 @@ def modify_doc(doc):
             file_type = file_source.data['file_name'][0].split(".")[1]
             raw_contents = file_source.data['file_contents'][0]
             prefix, b64_contents = raw_contents.split(",", 1)
+            time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f") 
             file_contents = base64.b64decode(b64_contents)
+            path_scenarios = create_folder(time_id)
+            zip_file_path = os.path.join(path_scenarios,"upload.zip")
+            print(file_contents)
+            print(type(file_contents))
+            try:
+                with open(zip_file_path, 'wb') as zf:
+                    zf.write(file_contents)                
+                with ZipFile(zip_file_path,"r") as zip_ref:
+                    zip_ref.extractall(path_scenarios)
+                    sc_sub_sc = zip_ref.namelist()
+                
+                _scenario_mapper = dict()
+                for x in sc_sub_sc:
+                    sc,sub_sc = os.path.split(x)
+                    sub_sc = [] if os.path.isdir(x) else [sub_sc.split(".")[0]]
+                    _scenario_mapper[sc] = _scenario_mapper.get(sc,[]) + sub_sc
+                    
+                for x in list(scenario_mapper):
+                    scenario_mapper.pop(x)
+                    
+                for x in list(_scenario_mapper):
+                    scenario_mapper[x] = _scenario_mapper[x]
+                
+                        
+                os.remove(zip_file_path)
+                
+            except Exception as e:
+                print(str(e))   
+            
             if  file_type in ["xlsx","xls"]:
                 print(file_type)
                 file_io = io.BytesIO(file_contents)
