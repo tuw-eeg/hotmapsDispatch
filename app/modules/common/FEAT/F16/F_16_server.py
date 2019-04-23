@@ -1153,23 +1153,34 @@ def modify_doc(doc):
             file_contents = base64.b64decode(b64_contents)
             path_scenarios = create_folder(time_id)
             zip_file_path = os.path.join(path_scenarios,"upload.zip")
-            print(file_contents)
-            print(type(file_contents))
-            try:
-                with open(zip_file_path, 'wb') as zf:
-                    zf.write(file_contents)                
-                with ZipFile(zip_file_path,"r") as zip_ref:
-                    zip_ref.extractall(path_scenarios)
-                    sc_sub_sc = zip_ref.namelist()
-                
-                _scenario_mapper = dict()
-                for x in sc_sub_sc:
-                    sc,sub_sc = os.path.split(x)
-                    sub_sc = [] if os.path.isdir(x) else [sub_sc.split(".")[0]]
-                    _scenario_mapper[sc] = _scenario_mapper.get(sc,[]) + sub_sc
+            if  file_type in ["zip"] and scenario_button.active:
+                print("Uploading Scenarios")
+                try:
+                    with open(zip_file_path, 'wb') as zf:
+                        zf.write(file_contents)   
+                    with ZipFile(zip_file_path,"r") as zip_ref:
+                        zip_ref.extractall(path_scenarios)
+                        sc_sub_sc = zip_ref.namelist()
                     
-                for x in list(scenario_mapper):
-                    scenario_mapper.pop(x)
+                    _scenario_mapper = dict()
+                    for x in sc_sub_sc:
+                        sc,sub_sc = os.path.split(x)
+                        _path = os.path.join(path_scenarios,x)
+                        sub_sc = [] if os.path.isdir(_path) else [sub_sc.split(".")[0]]
+                        _scenario_mapper[sc] = _scenario_mapper.get(sc,[]) + sub_sc
+                    ###    
+                    pop_table(heat_generator_table)
+                    pop_table(heat_storage_table)
+                    pop_table(paramters_table)
+                    pop_table(price_emmission_factor_table)
+                    for wk in widgets_keys:
+                        pop_table(profiles_table[wk])
+                    pop_table(carrier_table)           
+                    pop_table(external_data_table)
+                    pop_table(external_data_map_table)
+                    pop_table(scenario_mapper)
+                    pop_table(_nth_table)                    
+                    ##
                     
                     for x in list(_scenario_mapper):
                         scenario_mapper[x] = _scenario_mapper[x]
@@ -1231,7 +1242,7 @@ def modify_doc(doc):
                     print(str(e))
                     div_spinner.text = notify("Fatal Error @ Upload in Scenario Mode ", "red")
             
-            if  file_type in ["xlsx","xls"]:
+            elif  file_type in ["xlsx","xls"]:
                 print(file_type)
                 file_io = io.BytesIO(file_contents)
                 excel_object = pd.ExcelFile(file_io, engine='xlrd')
@@ -1359,6 +1370,7 @@ def modify_doc(doc):
 # =============================================================================
     def reset_callback():
         div_spinner.text = load_text
+        print(scenario_mapper)
         output.tabs = []
         div_spinner.text = ""
 #        grid.children = [Div()] # XXX
