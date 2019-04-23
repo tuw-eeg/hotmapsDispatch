@@ -552,56 +552,86 @@ def modify_doc(doc):
         try:
             div_spinner.text = load_text
             print("Download...")
-
-            df= pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore')
-            if df.shape[0] == 0:
-                del df
-                for k in list(carrier_dict):
-                    carrier_dict.pop(k,None)
-                div_spinner.text = notify("Nothing to download","red") 
-                return
-    #        df = df.fillna(0)
             time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
-            filename = "download_input.xlsx"
-            path_download = os.path.join(create_folder(time_id),filename)
-            writer = pd.ExcelWriter(path_download)
-            
-            df = df.set_index(df.name)
-            data = pd.DataFrame(external_data_map).drop("Default")[_elec]
-            df = df.join(data)
-            df = df.reset_index(drop=True)
-            df.to_excel(writer,sheets[0])
+            if scenario_button.active:
+                _hgs = [f"{sc}-{sub_sc}"  for sc in list(scenario_mapper) for sub_sc in scenario_mapper[sc]  if heat_generator_table[sc][sub_sc].empty]
+                if _hgs != []:
+                    div_spinner.text = notify(f"Nothing to download for {_hgs}","red") 
+                    return
+                filename = "scenario_inputs.zip"
+                path_download = create_folder(time_id)
+                print("Downloading Scenarios...")
+                try:
+                    for sc in list(scenario_mapper):
+                        _path = os.path.join(path_download,sc)
+                        if not os.path.exists(_path):
+                            os.makedirs(_path)
+                        for sub_sc in scenario_mapper[sc]:
+                             _path = os.path.join(path_download,sc,f"{sub_sc}.xlsx")
+                             ok = get_input_data(sc,sub_sc,_path)
+                             if not ok:
+                                 div_spinner.text = notify(f"Error @ Downloading Data for {sc}-{sub_sc} ","red") 
+                                 return
+                    ok,message = zip_all_scenarios(path_download,filename,downlad_flag=True)
+                    if ok:
+                        print("Download done.\nSaved to <"+path_download+">")
+                        trigger_download(time_id,filename)
+                        div_spinner.text = notify("Download done","green")
+                    else:
+                        text = f"Error @ Downloading : {message}"
+                        div_spinner.text = notify(text,"red")                
+                except Exception as e:
+                    print(str(e))
+                    div_spinner.text = notify("Fatal Error @ Downloading in Scenario Mode","red")                    
 
-            data_prices_df = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore')
-    #        data_prices_df = data_prices_df.fillna(0)
-            data_prices_df.to_excel(writer,sheets[1])
-
-            data_data_df = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore')
-    #        data_data_df = data_data_df.fillna(0)
-            data_data_df.to_excel(writer,"Data")
-
-            data_hs_df = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore')
-    #        data_hs_df = data_hs_df.fillna(0)
-            data_hs_df.to_excel(writer,sheets[3])
-
-
-            df_carrier = pd.DataFrame.from_dict(carrier_dict,orient="index")
-            df_carrier["name"]=df_carrier.index
-            df_carrier["carrier"] = df_carrier[0]
-            del df_carrier[0]
-            df_carrier.index = range(df_carrier.shape[0])
-            df_carrier.to_excel(writer,'Energy Carrier')
-            
-            df_default_external_data = pd.DataFrame(external_data_map).loc["Default"].to_frame().T.reset_index(drop= True)
-            df_default_external_data.to_excel(writer,"Default - External Data")
-            
-            writer.save()
-            trigger_download(time_id,filename)
-            print("Download done.\nSaved to <"+path_download+">")
-    #TODO wait untill download has finished and delete folder
-    #       or extra script that delete te content of the static folder after 2 hours or something else
-    #        shutil.rmtree(path_download_dir, ignore_errors=True)
-            div_spinner.text = notify("Download done","green") 
+            else:
+                df= pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore')
+                if df.shape[0] == 0:
+                    del df
+                    for k in list(carrier_dict):
+                        carrier_dict.pop(k,None)
+                    div_spinner.text = notify("Nothing to download","red") 
+                    return
+        #        df = df.fillna(0)
+                filename = "download_input.xlsx"
+                path_download = os.path.join(create_folder(time_id),filename)
+                writer = pd.ExcelWriter(path_download)           
+                df = df.set_index(df.name)
+                data = pd.DataFrame(external_data_map).drop("Default")[_elec]
+                df = df.join(data)
+                df = df.reset_index(drop=True)
+                df.to_excel(writer,sheets[0])
+    
+                data_prices_df = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore')
+        #        data_prices_df = data_prices_df.fillna(0)
+                data_prices_df.to_excel(writer,sheets[1])
+    
+                data_data_df = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore')
+        #        data_data_df = data_data_df.fillna(0)
+                data_data_df.to_excel(writer,"Data")
+    
+                data_hs_df = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore')
+        #        data_hs_df = data_hs_df.fillna(0)
+                data_hs_df.to_excel(writer,sheets[3])
+    
+    
+                df_carrier = pd.DataFrame.from_dict(carrier_dict,orient="index")
+                df_carrier["name"]=df_carrier.index
+                df_carrier["carrier"] = df_carrier[0]
+                del df_carrier[0]
+                df_carrier.index = range(df_carrier.shape[0])
+                df_carrier.to_excel(writer,'Energy Carrier')
+                
+                df_default_external_data = pd.DataFrame(external_data_map).loc["Default"].to_frame().T.reset_index(drop= True)
+                df_default_external_data.to_excel(writer,"Default - External Data")
+                
+                writer.save()
+                trigger_download(time_id,filename)
+                print("Download done.\nSaved to <"+path_download+">")
+        #TODO wait untill download has finished and delete folder
+        #       or extra script that delete te content of the static folder after 2 hours or something else
+        #        shutil.rmtree(path_download_dir, ignore_errors=True)
+                div_spinner.text = notify("Download done","green") 
         except Exception as e:
             print(str(e))
             div_spinner.text = notify("Fatal Error @ Download","red")
@@ -710,14 +740,17 @@ def modify_doc(doc):
         
         return ok,output_data,message
     
-    def get_folder_structure(path):
+    def get_folder_structure(path,downlad_flag=False):
         """ Returns a path with the last 3 parts of <path>"""
         path,file = os.path.split(path)
         path,sub_sc = os.path.split(path)
         sc = os.path.split(path)[1]
-        return os.path.join(sc,sub_sc,file)    
+        if downlad_flag:
+            return os.path.join(sub_sc,file)
+        else:
+            return os.path.join(sc,sub_sc,file)
     
-    def zip_all_scenarios(path_scenarios_root,filename = "output.zip"):
+    def zip_all_scenarios(path_scenarios_root,filename = "output.zip",downlad_flag=False):
         try:
             print("Create Zip File for all scenarios...")
             path_download_zip = os.path.join(path_scenarios_root,filename)
@@ -725,10 +758,10 @@ def modify_doc(doc):
                 for file in files:
                     with ZipFile(path_download_zip,"a") as zip_file:
                         file_path = os.path.join(root, file)
-                        file_folder_structure = get_folder_structure(file_path)
+                        file_folder_structure = get_folder_structure(file_path,downlad_flag)
                         zip_file.write(file_path,file_folder_structure)
             print("Create Zip File done")       
-            return True,os.path.join("download",get_folder_structure(path_download_zip))
+            return True,os.path.join("download",get_folder_structure(path_download_zip,downlad_flag))
         except Exception as e:
             message = f"Error @ Ziping Scenario Output : {e}"
             print(message)
@@ -772,10 +805,9 @@ def modify_doc(doc):
     
     def get_input_data(sc,sub_sc,path):
         print("Save Input as Excel File...")
-
-        writer = pd.ExcelWriter(path)
         ok = True
-        try:        
+        try:       
+            writer = pd.ExcelWriter(path)
             df = heat_generator_table[sc][sub_sc]
             df = df.set_index(df.name)
             
@@ -802,15 +834,11 @@ def modify_doc(doc):
             
             df_default_external_data = pd.DataFrame(external_data_map_table[sc][sub_sc]).loc["Default"].to_frame().T.reset_index(drop= True)           
             df_default_external_data.to_excel(writer,"Default - External Data")
-            
-        except:
-            ok = False
-            pass
-        
-        writer.save()
-        print("Input saved !")
-
- 
+            writer.save()
+            print("Input saved !")
+        except Exception as e :
+            print(str(e))
+            ok = False     
         return ok
         
     
