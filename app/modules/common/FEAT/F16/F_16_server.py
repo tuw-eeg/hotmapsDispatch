@@ -658,7 +658,6 @@ def modify_doc(doc):
         data["all_heat_geneartors"] = data["tec"] + data["tec_hs"]
 
         data["energy_carrier"] = {**data["energy_carrier"],**carrier_table[sc][sub_sc]}
-        
        ##
         for i in _elec:
             mk = widget_to_model_keys_dict[i]
@@ -1144,14 +1143,65 @@ def modify_doc(doc):
                 for x in list(scenario_mapper):
                     scenario_mapper.pop(x)
                     
-                for x in list(_scenario_mapper):
-                    scenario_mapper[x] = _scenario_mapper[x]
-                
-                        
-                os.remove(zip_file_path)
-                
-            except Exception as e:
-                print(str(e))   
+                    for x in list(_scenario_mapper):
+                        scenario_mapper[x] = _scenario_mapper[x]
+                    for sc_name,sub_sc_list in scenario_mapper.items():                
+                        heat_generator_table[sc_name] = dict()
+                        heat_storage_table[sc_name] = dict()
+                        paramters_table[sc_name] = dict()
+                        price_emmission_factor_table[sc_name] = dict()
+                        for wk in widgets_keys:
+                            profiles_table[wk][sc_name] = dict()
+                        carrier_table[sc_name] = dict()
+                        external_data_table[sc_name] = dict()
+                        external_data_map_table[sc_name] = dict()
+                        _nth_table[sc_name] = dict()
+                        for sub_sc_name in sub_sc_list:
+                            _path = os.path.join(path_scenarios,sc_name,sub_sc_name+".xlsx")
+                            heat_generator_table[sc_name][sub_sc_name] = pd.read_excel(_path,sheet_name = sheets[0], index_col = 0)[input_list+["type"]].apply(pd.to_numeric, errors='ignore').fillna(0)
+                            heat_storage_table[sc_name][sub_sc_name] = pd.read_excel(_path,sheet_name = sheets[3], index_col = 0)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)
+                            paramters_table[sc_name][sub_sc_name] = pd.read_excel(_path,sheet_name = "Data", index_col = 0)[parameter_list].apply(pd.to_numeric, errors='ignore').fillna(0)
+                            price_emmission_factor_table[sc_name][sub_sc_name] = pd.read_excel(_path,sheet_name = sheets[1], index_col = 0)[input_price_list].apply(pd.to_numeric, errors='ignore').fillna(0)
+                            carrier_table[sc_name][sub_sc_name] = pd.read_excel(_path,sheet_name = "Energy Carrier", index_col = 0).set_index("name")["carrier"].to_dict()
+                            data2 =  pd.read_excel(_path,sheet_name = "Default - External Data", index_col = 0)
+                            external_data_map_table[sc_name][sub_sc_name] = {i:dict(Default = data2[i][0]) for i in external_data_map}
+                            data3 = pd.read_excel(_path,sheet_name = sheets[0], index_col = 0)
+                            data3 = data3[_elec].set_index(data3.name)
+                            for i in _elec:
+                                external_data_map_table[sc_name][sub_sc_name][i]= data3[i][~data3[i].isna()].to_dict()
+                                external_data_map_table[sc_name][sub_sc_name][i]["Default"] = data2[i][0]            
+                            external_data_table[sc_name][sub_sc_name] = dict()
+                            for i,_dict in external_data_map_table[sc_name][sub_sc_name].items():
+                                external_data_table[sc_name][sub_sc_name][i] = dict()
+                                for j,string in _dict.items():
+                                    (c,y),fit_string = extract(string)
+                                    if (c,y) == (0,0):
+                                        string = external_data_map_table[sc_name][sub_sc_name][i]["Default"]
+                                        (c,y),fit_string = extract(string)
+                                    offset,constant = find_FiT(fit_string)
+                                    if type(constant) == str:
+                                        profile = data_kwargs[i]["data"][c,y] + offset
+                                    else:
+                                        profile = np.ones(8760)*constant + offset
+                                    
+                                    profile = profile.tolist()
+                                    if j == "Default":
+                                        profiles_table[i][sc_name][sub_sc_name] = dict(zip(range(1,len(profile)+1),profile))
+                                    external_data_table[sc_name][sub_sc_name][i][j] = profile                              
+                            _nth_table[sc_name][sub_sc_name] = dict()
+
+#                    # fires load_scenario_callback
+                    for _,dictt in scenario_dict.items():
+                        dictt["tools"]["sc_select"].options = list(scenario_mapper)
+                        dictt["tools"]["sc_select"].value = sc_name
+                    
+                    div_spinner.text = notify(f"""Scenario Upload Done""", "green") 
+                                
+                    #os.remove(zip_file_path)
+                    
+                except Exception as e:
+                    print(str(e))
+                    div_spinner.text = notify("Fatal Error @ Upload in Scenario Mode ", "red")
             
             if  file_type in ["xlsx","xls"]:
                 print(file_type)

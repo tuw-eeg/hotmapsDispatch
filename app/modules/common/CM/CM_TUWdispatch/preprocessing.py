@@ -46,7 +46,6 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     j_gt =      [key for key in tec if key in data["categorize"]["Geo Thermal"] ]
     j_hs =      tec_hs
 
-
     #%% Parameter - #TODO: depends on how the input data looks finally
     demand_th_t =           data["demand_th"]
     max_demad =             max(data["demand_th"].values())
