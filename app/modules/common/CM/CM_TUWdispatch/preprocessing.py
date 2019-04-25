@@ -159,7 +159,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
 
     keys = ['j', 'j_hp', 'j_pth', 'j_st', 'j_waste', 'j_chp', 'j_bp', 'j_wh',
             'j_gt', 'j_hs', 'demand_th_t', 'max_demad', 'radiation_t', 'IK_j',
-            'OP_fix_j', 'n_el_j', 'electricity_price_t', 'P_min_el_chp',
+            'OP_fix_j', 'n_el_j', 'electricity_price_jt', 'P_min_el_chp',
             'Q_min_th_chp', 'ratioPMaxFW', 'ratioPMax', 'mc_jt', 'n_th_jt',
             'x_th_cap_j', 'x_el_cap_j', 'pot_j', 'lt_j', 'el_surcharge', 'ir',
             'alpha_j', 'load_cap_hs', 'unload_cap_hs', 'n_hs', 'loss_hs',

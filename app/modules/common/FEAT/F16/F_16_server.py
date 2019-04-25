@@ -359,12 +359,41 @@ def pop_table(table):
 # ============================================================================= 
 with open(path_snackbar_html) as file:
     snackbar=file.read()
-    
+# =============================================================================
 def notify(text1,color1,text2=False,color2=False,snackbar=snackbar):
     text2 = text2 if text2 else text1
     color2 = color2 if color2 else color1
     html_code = snackbar.replace("###color1",color1).replace("###color2",color2).replace("###text1",text1).replace("###text2",text2)
     return html_code        
+# =============================================================================
+def customCmap(list_of_tuples):
+    cmap ={}
+    for liste,palette in list_of_tuples:
+        for i,j in enumerate(liste):
+            
+            l = len(liste)
+            if l<3:
+                cmap[j]=palette[3][i]
+            else:
+                cmap[j]=palette[l][i]
+    return cmap
+# =============================================================================
+from bokeh.palettes import Blues,Greens,Greys,Oranges,Purples,Reds,Pastel1,BrBG,Category20c,Category20b
+
+# keys are from <select_tec_options_model>
+cmap_glob = {
+        "heat pump":Blues,
+        "boiler":Oranges,
+        "CHP-SE":Purples,
+        "CHP-BP":Reds,
+        "waste treatment":Pastel1,
+        "Solar Thermal":Greens,
+        "Power To Heat":BrBG,
+        "Waste Heat":Category20c,
+        "Geo Thermal":Category20b,
+        "heat storage": Greys,
+}
+# =============================================================================
 #%% Global Data
 # =============================================================================
 #  Global Data
@@ -767,9 +796,9 @@ def modify_doc(doc):
             print(message)
             return False,message
         
-    def save_scenario(path_scenarios_root,sc,sub_sc,output_data):
+    def save_scenario(path_scenarios_root,sc,sub_sc,output_data,cmap=-1):
         print(f"Ploting {sc}#{sub_sc}...")
-        output_tabs = plot_solutions(solution=output_data)
+        output_tabs = plot_solutions(solution=output_data,cmap=cmap)
         ok,message,path_download_zip = False,None,None
         if output_tabs == "Error4":
             message = "Error @ Ploting  in {sc}#{sub_sc}!!!"
@@ -845,6 +874,18 @@ def modify_doc(doc):
     def compare_plot(dict_of_solutions):
         output_tabs = None
         return output_tabs
+
+    def create_cmap_for_all_scenarios():
+        hgs = dict()
+        for sc in list(scenario_mapper):
+            for sub_sc in scenario_mapper[sc]:
+                _hgs = { typ: df["name"].values.tolist() for typ,df in heat_generator_table[sc][sub_sc].groupby("type") } 
+                _hgs["heat storage"] = heat_storage_table[sc][sub_sc]["name"].values.tolist()
+                for typ,liste in _hgs.items():
+                    hgs[typ] = list(set(hgs.get(typ,[]) + liste))
+    
+        return customCmap( [ (liste,cmap_glob[typ]) for typ,liste in hgs.items()] )
+    
 # =============================================================================
     def run_callback():
         try:
@@ -867,6 +908,7 @@ def modify_doc(doc):
                 k = sum([len(liste) for _,liste in scenario_mapper.items()])
                 j=0
                 ok,message = True,""
+                cmap = create_cmap_for_all_scenarios()
                 for sc in list(scenario_mapper):
                     dict_of_solutions[sc] = dict()
                     dict_of_solutions_paths[sc] = dict()
@@ -881,9 +923,9 @@ def modify_doc(doc):
                         
                         ok,output_data,message = scenario_calculation(sc,sub_sc)
                         dict_of_solutions[sc][sub_sc] = output_data 
-                        
+
                         if ok:
-                            ok2,message2,path_download_zip = save_scenario(path_scenarios,sc,sub_sc,output_data)
+                            ok2,message2,path_download_zip = save_scenario(path_scenarios,sc,sub_sc,output_data,cmap)
                             if ok2:
                                 message = f"Done: {sc} # {sub_sc} : {message}"
                             else:

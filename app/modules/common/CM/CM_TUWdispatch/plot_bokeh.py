@@ -730,7 +730,7 @@ path2cmap = os.path.join(path, "AD", "F16_input", "cmap.dat")
 #%%
 def plot_solutions(show_plot=False, path2json=path2json, 
                    path2output=path2output, solution=-1, 
-                   cmap= -1):
+                   cmap= -1,path2cmap=-1):
     """
     This function geneartes a HTML file representeing the results of the model
     and saves it in "\AD\F16_input\Output_Graphics" as "output.html".
@@ -874,7 +874,7 @@ def plot_solutions(show_plot=False, path2json=path2json,
         y3 = matrix(dic,decison_var,legend,t)
         
         if cmap == -1:
-            cmap = cmapping(dic["Technologies:"])
+            cmap = cmapping(dic["Technologies:"],path2cmap)
 
         
         dic["Marginal Costs"] = dic["Marginal Costs:"]

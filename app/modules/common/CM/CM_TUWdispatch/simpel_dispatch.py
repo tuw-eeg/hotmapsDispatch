@@ -48,7 +48,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.IK_j = pe.Param(m.j,initialize=val["IK_j"])
     m.OP_fix_j = pe.Param(m.j,initialize=val["OP_fix_j"])
     m.n_el_j = pe.Param(m.j ,initialize=val["n_el_j"])
-    m.electricity_price_jt = pe.Param(m.j,m.t,initialize=val["sale_electricity_price_jt"])
+    m.electricity_price_jt = pe.Param(m.j,m.t,initialize=val["electricity_price_jt"])
     m.P_min_el_chp = pe.Param(initialize=val["P_min_el_chp"])
     m.Q_min_th_chp = pe.Param(initialize=val["Q_min_th_chp"])
     m.ratioPMaxFW = pe.Param(initialize=val["ratioPMaxFW"])
