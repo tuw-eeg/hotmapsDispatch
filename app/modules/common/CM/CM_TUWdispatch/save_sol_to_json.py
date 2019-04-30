@@ -160,6 +160,7 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["LCOH Heat Storage"] =  {hs:(solution["Anual Investment Cost Heat Storage"][hs]+solution["Anual Investment Cost (of existing heat storages)"][hs]+solution["Operational Cost of Heat Storages"][hs]+solution["Fuel Costs Heat Storages"][hs]-solution["Revenue from Heat Storages"][hs])/solution["Unloading Heat Storage over year"][hs] if solution["Unloading Heat Storage over year"][hs]>0 else "" for hs in instance.j_hs  } 
         solution["LCOH:"] = {**solution["LCOH"] ,**solution["LCOH Heat Storage"]} 
         
+        solution["Renewable Share"] = 100*sum([sum([(instance.x_th_jt[j,t]()+instance.x_el_jt[j,t]()) for t in instance.t])*instance.rf_j[j] for j in instance.j]) / sum([sum([(instance.x_th_jt[j,t]()+instance.x_el_jt[j,t]()) for t in instance.t])for j in instance.j]) 
         # only sum effective energy -> producton of solar thermal over  heat
         # demand is not shown in the Thermal Generation mix
 

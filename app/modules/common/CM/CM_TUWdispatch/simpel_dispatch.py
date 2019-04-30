@@ -324,7 +324,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     instance = m.create_instance(report_timing= False)  #TODO
     print("*****************\ntime to create model: " + str(datetime.now()-solv_start)+"\n*****************")
     solv_start = datetime.now()
-    print("*****************\nStart Solving...\n*****************")
+    print("*****************\nSolving...\n*****************")
     opt = pe.SolverFactory("gurobi")
 #    opt.options['MIPGap'] = 0.5
 #    opt.options['Threads'] = 4

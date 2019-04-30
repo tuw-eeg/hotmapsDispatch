@@ -394,6 +394,58 @@ cmap_glob = {
         "heat storage": Greys,
 }
 # =============================================================================
+from bokeh.models import Legend
+from bokeh.transform import dodge
+from bokeh.palettes import Category10,Category20
+
+def color(i,j):
+    if i<=10:
+        if i<3:
+            i=3
+        return Category10[i][j]
+    else:
+        return Category20[i][j]
+
+def scenario_chart(scenario_mapper,dict_of_solutions,
+                   invert_category=False, space=0.13, width = 0.12,
+                   **kwargs):
+    
+    # Data Preperation
+    sc_list = list(scenario_mapper)
+    sub_sc_list =  list(sorted(set([sub_sc for sc,sub_sc_list in scenario_mapper.items() for sub_sc in sub_sc_list])))
+    data = {sub_sc: [dict_of_solutions[sc].get(sub_sc,0) for sc in sc_list] for sub_sc in sub_sc_list}
+    data["category"] = sc_list
+    if invert_category:
+        data = {sc: [dict_of_solutions[sc].get(sub_sc,0) for sub_sc in sub_sc_list]  for sc in sc_list}
+        sc_list, sub_sc_list = sub_sc_list ,sc_list
+        data["category"] = sc_list
+        
+    source = ColumnDataSource(data=data)
+    
+    p = figure(x_range=sc_list, title=kwargs["title"])
+    legend_items = [(sc,[p.vbar( x=dodge( 'category', 
+                                             -space*(len(sub_sc_list)-1)/2+i*space,
+                                             range=p.x_range),
+                                    top=sc, width=width, source=source,
+                                    color = color(len(sub_sc_list)+1,i))
+                        ]) for i,sc in enumerate(sub_sc_list)]
+    
+    p.x_range.range_padding = 0.1
+    p.xgrid.grid_line_color = None
+    legend = Legend(items=legend_items,location=(10, 10))
+    p.add_layout(legend, 'right')
+    p.legend.click_policy="hide"
+    p.xaxis.axis_label = kwargs["xlabel"]
+    p.yaxis.axis_label = kwargs["ylabel"]
+
+    p.toolbar.logo = None
+    p.toolbar_location = None
+    p.plot_width = 850
+    return p
+# =============================================================================
+    
+
+# =============================================================================
 #%% Global Data
 # =============================================================================
 #  Global Data
@@ -776,6 +828,8 @@ def modify_doc(doc):
         sc = os.path.split(path)[1]
         if downlad_flag:
             return os.path.join(sub_sc,file)
+        elif file == "output_scenarios_compare.html":
+            return file
         else:
             return os.path.join(sc,sub_sc,file)
     
@@ -870,10 +924,61 @@ def modify_doc(doc):
             ok = False     
         return ok
         
-    
-    def compare_plot(dict_of_solutions):
-        output_tabs = None
-        return output_tabs
+    def get_indicator(indicator,dict_of_solutions):
+        indicator_dict = dict()
+        for sc,sub_sc_list in scenario_mapper.items():
+            indicator_dict[sc] = dict()
+            for sub_sc in sub_sc_list:
+                indicator_dict[sc][sub_sc] = dict_of_solutions[sc][sub_sc][indicator]
+        return indicator_dict
+            
+        
+    def compare_plot(dict_of_solutions,path2output):
+        print("creating comparison charts...")
+        print("loading indicators..")
+        lcoh = get_indicator("Mean Value Heat Price (with costs of existing power plants and heat storages)",dict_of_solutions)
+        renewable_share = get_indicator("Renewable Share",dict_of_solutions)
+        print("creating charts..")
+        lcoh_sc_vs_subSc = scenario_chart(scenario_mapper,
+                       lcoh,
+                       title="Levelized Cost of Heating",
+                       xlabel="Scenarios",
+                       ylabel="LCOH in EUR / MWh_th",
+                       invert_category=False)
+        
+        lcoh_subSc_vs_sc = scenario_chart(scenario_mapper,
+                       lcoh,
+                       title="Levelized Cost of Heating",
+                       xlabel="Sub Scenarios",
+                       ylabel="LCOH in EUR / MWh_th",
+                       invert_category=True)        
+        
+        renewable_share_sc_vs_subSc = scenario_chart(scenario_mapper,
+                       renewable_share,
+                       title="Renewable Share",
+                       xlabel="Scenarios",
+                       ylabel="Renewable Share in %",
+                       invert_category=False)
+        
+        renewable_share_subSc_vs_sc = scenario_chart(scenario_mapper,
+                       renewable_share,
+                       title="Renewable Share",
+                       xlabel="Sub Scenarios",
+                       ylabel="Renewable Share in %",
+                       invert_category=True) 
+        
+        lcoh_sc_vs_subSc = Panel(child=lcoh_sc_vs_subSc, title="LCOH Scenarios VS Sub Scenarios")
+        lcoh_subSc_vs_sc = Panel(child=lcoh_subSc_vs_sc, title="LCOH Sub Scenarios VS  Scenarios")
+        renewable_share_sc_vs_subSc = Panel(child=renewable_share_sc_vs_subSc, title="Renewable Share VS Sub Scenarios")
+        renewable_share_subSc_vs_sc = Panel(child=renewable_share_subSc_vs_sc, title="Renewable Share VS  Scenarios")        
+        
+        output = [ lcoh_sc_vs_subSc, lcoh_subSc_vs_sc,renewable_share_sc_vs_subSc,renewable_share_subSc_vs_sc ]
+        output_tabs = Tabs(tabs=output)
+        print("save chart...")
+        output_file(os.path.join(path2output,"output_scenarios_compare.html"),title="Compare Scenarios")
+        save(output_tabs)
+        print("creating comparison charts done")
+        return output
 
     def create_cmap_for_all_scenarios():
         hgs = dict()
@@ -935,6 +1040,7 @@ def modify_doc(doc):
                         print(message)
                         
                 print('Scenario Calculation Done')
+                output_tabs = compare_plot(dict_of_solutions,path_scenarios)
                 ok,message = zip_all_scenarios(path_scenarios)
                 if ok:
                     div_spinner.text = """<div align="center"> 
@@ -963,9 +1069,8 @@ def modify_doc(doc):
                 else:
                     notify(message,"red") 
                     
-#                output_tabs = compare_plot(dict_of_solutions)
-#                output.tabs  = output_tabs        
-                return None# XXX
+                print("Render in chart in browser...")
+                output.tabs  = output_tabs        
 # =============================================================================
             else:
                 df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
