@@ -828,7 +828,7 @@ def modify_doc(doc):
         sc = os.path.split(path)[1]
         if downlad_flag:
             return os.path.join(sub_sc,file)
-        elif file == "output_scenarios_compare.html":
+        elif file in ["output_scenarios_compare.html","results.xlsx"]:
             return file
         else:
             return os.path.join(sc,sub_sc,file)
@@ -931,8 +931,80 @@ def modify_doc(doc):
             for sub_sc in sub_sc_list:
                 indicator_dict[sc][sub_sc] = dict_of_solutions[sc][sub_sc][indicator]
         return indicator_dict
-            
+# =============================================================================
+    def scenario_table(**kwargs):
+        """
+        solutions
+        output
+        """
+        decision_vars =      ["Anual Total Costs",
+                             "Anual Total Costs (with costs of existing power plants and heat storages)",
+                             "Electricity Production by CHP",
+                             "Thermal Production by CHP",
+                             "Mean Value Heat Price",
+                             "Mean Value Heat Price (with costs of existing power plants and heat storages)",
+                             "Median Value Heat Price",
+                             "Electrical Consumption of Heatpumps and Power to Heat devices",
+                             "Maximum Electrical Load of Heatpumps and Power to Heat devices",
+                             "Revenue From Electricity:",
+                             "Ramping Costs",
+                             "Operational Cost:",
+                             "Anual Investment Cost",
+                             "Anual Investment Cost (of existing power plants)",
+                             "Electrical Peak Load Costs",
+                             "Variable Cost CHP's",
+                             "Fuel Costs",
+                             "Total CO2 Emissions",
+                             "Renewable Share",
+                             ]
         
+        vals = {sc+"#"+sub_sc: None for sc,sub_sc_list in scenario_mapper.items() for sub_sc in sub_sc_list}
+        vals2 = {sc+"#"+sub_sc: None for sc,sub_sc_list in scenario_mapper.items() for sub_sc in sub_sc_list}
+        for sc,sub_sc_list in scenario_mapper.items():
+            for sub_sc in sub_sc_list:
+                dic = kwargs["solutions"][sc][sub_sc]
+                if dic:
+                    val = []
+                    for decision_var in decision_vars:
+                        if type(dic[decision_var]) == dict:
+                            val.append(sum(dic[decision_var].values()))
+                        elif type(dic[decision_var]) == list:
+                            val.append(sum(dic[decision_var]))
+                        else:
+                            val.append(dic[decision_var])
+                    
+                    formatted_val = [f"{item:.3e}"for item in val]
+
+                    vals[sc+"#"+sub_sc]=formatted_val
+                    vals2[sc+"#"+sub_sc] = [round(x,3) for x in val]
+                else:
+                    del vals[sc+"#"+sub_sc]
+        
+        data = {**{"topic": decision_vars},**vals}
+                
+        source = ColumnDataSource(data)
+        cols = [TableColumn(field=key, title=key) for key in vals]
+        columns = [TableColumn(field="topic", title="Topic")] + cols
+                
+        data_table = DataTable(source=source, columns=columns, width=1000, height=1000)
+        # Save to excel 
+        writer = pd.ExcelWriter(os.path.join(kwargs["output"],"results.xlsx"),engine='xlsxwriter')
+        df = pd.DataFrame({**{"topic": decision_vars},**vals2}).set_index("topic")
+        tuples = [tuple(x.split("#")) for x in df.columns]
+        cols  = pd.MultiIndex.from_tuples(tuples, names=['Portfolio / Scenario', 'Sub Scenario'])
+        df.columns = cols
+        df.to_excel(writer, sheet_name="Results")
+        worksheet = writer.sheets["Results"]  
+        for idx, col in enumerate(df): 
+            series = df[col]
+            max_len = max((
+                series.astype(str).map(len).max(),  
+                len(str(series.name[-1] if type(series.name)!=str else series.name)) 
+                )) + 1  
+            worksheet.set_column(idx, idx, max_len)  
+        writer.save()    
+        return widgetbox(data_table)
+# =============================================================================
     def compare_plot(dict_of_solutions,path2output):
         print("creating comparison charts...")
         print("loading indicators..")
@@ -967,12 +1039,15 @@ def modify_doc(doc):
                        ylabel="Renewable Share in %",
                        invert_category=True) 
         
+        table_scenario = scenario_table(solutions=dict_of_solutions,output=path2output)
+        
         lcoh_sc_vs_subSc = Panel(child=lcoh_sc_vs_subSc, title="LCOH Scenarios VS Sub Scenarios")
         lcoh_subSc_vs_sc = Panel(child=lcoh_subSc_vs_sc, title="LCOH Sub Scenarios VS  Scenarios")
         renewable_share_sc_vs_subSc = Panel(child=renewable_share_sc_vs_subSc, title="Renewable Share VS Sub Scenarios")
         renewable_share_subSc_vs_sc = Panel(child=renewable_share_subSc_vs_sc, title="Renewable Share VS  Scenarios")        
-        
-        output = [ lcoh_sc_vs_subSc, lcoh_subSc_vs_sc,renewable_share_sc_vs_subSc,renewable_share_subSc_vs_sc ]
+        table_scenario = Panel(child=table_scenario, title="Results"
+                               )
+        output = [ lcoh_sc_vs_subSc, lcoh_subSc_vs_sc,renewable_share_sc_vs_subSc,renewable_share_subSc_vs_sc,table_scenario ]
         output_tabs = Tabs(tabs=output)
         print("save chart...")
         output_file(os.path.join(path2output,"output_scenarios_compare.html"),title="Compare Scenarios")
