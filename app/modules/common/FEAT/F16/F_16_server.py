@@ -1220,7 +1220,7 @@ def modify_doc(doc):
                 data["all_heat_geneartors"] = data["tec"] + data["tec_hs"]
     
                 data["energy_carrier"] = {**data["energy_carrier"],**carrier_dict}
-                ##
+                ## #TODO: change this if also the other profiles are technology dependend 
                 for i in _elec:
                     mk = widget_to_model_keys_dict[i]
                     ext=[]
@@ -1428,7 +1428,7 @@ def modify_doc(doc):
                             external_data_map_table[sc_name][sub_sc_name] = {i:dict(Default = data2[i][0]) for i in external_data_map}
                             data3 = pd.read_excel(_path,sheet_name = sheets[0], index_col = 0)
                             data3 = data3[_elec].set_index(data3.name)
-                            for i in _elec:
+                            for i in _elec: #TODO: change this if also the other profiles are technology dependend 
                                 external_data_map_table[sc_name][sub_sc_name][i]= data3[i][~data3[i].isna()].to_dict()
                                 external_data_map_table[sc_name][sub_sc_name][i]["Default"] = data2[i][0]            
                             external_data_table[sc_name][sub_sc_name] = dict()
@@ -1446,6 +1446,12 @@ def modify_doc(doc):
                                         profile = np.ones(8760)*constant + offset
                                     
                                     profile = profile.tolist()
+                                    # Scale anaul Heat Demand
+                                    if i == _hd: 
+                                        profile,_ = profil(profile) 
+                                        profile = profile * float(paramters_table[sc_name][sub_sc_name][parameter_list[3]].values[0]) 
+                                        profile = profile.tolist()
+                                    
                                     if j == "Default":
                                         profiles_table[i][sc_name][sub_sc_name] = dict(zip(range(1,len(profile)+1),profile))
                                     external_data_table[sc_name][sub_sc_name][i][j] = profile                              
@@ -1501,9 +1507,10 @@ def modify_doc(doc):
                     carrier_dict.pop(k,None)
                 for k,v in data2.to_dict()["carrier"].items():
                     carrier_dict[k]=v
-                
+                    
+                #TODO: change this if also the other profiles are technology dependend 
                 data3 = data[_elec].set_index(data.name)
-                for i in _elec:
+                for i in _elec: 
                     external_data_map[i]= data3[i][~data3[i].isna()].to_dict()
                     
                 data2 = excel_object.parse(sheet_name = 'Default - External Data',index_col=0)
@@ -1516,7 +1523,21 @@ def modify_doc(doc):
                     widgets[i]["select"].value = data_kwargs[i]["dic"][c]+"_"+str(y)
                     widgets[i]["offset"].value = str(offset)
                     widgets[i]["constant"].value = str(constant)
-                    
+                # add profile to external_data
+                for i,_dict in external_data_map.items(): 
+                    for j,string in _dict.items(): 
+                        (c,y),fit_string = extract(string) 
+                        if (c,y) == (0,0): 
+                            string = external_data_map[i]["Default"] 
+                            (c,y),fit_string = extract(string) 
+                        offset,constant = find_FiT(fit_string) 
+                        if type(constant) == str: 
+                            profile = data_kwargs[i]["data"][c,y] + offset 
+                        else: 
+                            profile = np.ones(8760)*constant + offset                       
+                        profile = profile.tolist() 
+                        external_data[i][j] = profile
+                        
                 div_spinner.text = notify("Upload Done","green")
             else:
                 print("Not a valid file to upload")
