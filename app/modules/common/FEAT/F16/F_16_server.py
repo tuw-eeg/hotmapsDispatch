@@ -1002,6 +1002,28 @@ def modify_doc(doc):
                 len(str(series.name[-1] if type(series.name)!=str else series.name)) 
                 )) + 1  
             worksheet.set_column(idx, idx, max_len)  
+
+# ============================================================================= 
+#  
+# ============================================================================= 
+        decision_vars2 = ["Full Load Hours", "Thermal Generation Mix"]
+        all_tecs = list(set([x for sc,sub_sc_list in scenario_mapper.items() for sub_sc in sub_sc_list for x in kwargs["solutions"][sc][sub_sc]["Technologies"]])) 
+        data={(dec_var,sc,sub_sc):[kwargs["solutions"][sc][sub_sc][dec_var].get(tec,"") for tec in all_tecs] for dec_var in decision_vars2 for sc,sub_sc_list in scenario_mapper.items() for sub_sc in sub_sc_list} 
+        data["Technologies"]=all_tecs 
+        df2 = pd.DataFrame(data).set_index("Technologies") 
+        tuples = [(dec_var,sc,sub_sc) for dec_var in decision_vars2 for sc,sub_sc_list in scenario_mapper.items() for sub_sc in sub_sc_list] 
+        cols  = pd.MultiIndex.from_tuples(tuples, names=['Topic','Portfolio / Scenario', 'Sub Scenario']) 
+        df2.columns = cols 
+        df2.to_excel(writer,sheet_name="More Results") 
+        worksheet = writer.sheets["More Results"]   
+        for idx, col in enumerate(df2):  
+            series = df2[col] 
+            max_len = max(( 
+                series.astype(str).map(len).max(),   
+                len(str(series.name[-1] if type(series.name)!=str else series.name))  
+                )) + 1   
+            worksheet.set_column(idx, idx, max_len) 
+            
         writer.save()    
         return widgetbox(data_table)
 # =============================================================================
