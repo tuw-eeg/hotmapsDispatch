@@ -62,14 +62,15 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     OP_fix_j =              {key:data["OP_fix"][key] for key in tec}
     OP_var_j =              {key:data["OP_var"][key] for key in tec}
     n_el_j =                {key:data["n_el"][key] for key in tec}
-    electricity_price_t =   data["energy_carrier_prices"]["electricity"]
+    electricity_price_t =   {(key,t):data["energy_carrier_prices"]["electricity"][key,t] for t in range(1,8760+1) for key in tec}
     try:
-        sale_electricity_price_t =   data["sale_electricity"]
+        sale_electricity_price_t =   {(key,t): data["sale_electricity"][key,t] for t in range(1,8760+1) for key in tec}
     except:
-        sale_electricity_price_t =   data["energy_carrier_prices"]["electricity"]
+        sale_electricity_price_t =   electricity_price_t
 
 
-    P_min_el_chp =          0
+    P_min_el_chp =          {j:0 for j in j_chp}
+    P_max_el_chp = {j:200 for j in j_chp}
     Q_min_th_chp =          0
     ratioPMaxFW =           450/700
     ratioPMax =             450/820
@@ -155,7 +156,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
             IK_hs, cap_hs, c_ramp_chp, c_ramp_waste, alpha_hs,
             rf_j, rf_tot, OP_var_j, temperature, thresh,
             sale_electricity_price_t, OP_fix_hs, all_heat_geneartors,
-            mr_j,j_chp_se,j_chp_bp,em_j,cap_losse_hs]
+            mr_j,j_chp_se,j_chp_bp,em_j,cap_losse_hs,P_max_el_chp]
 
     keys = ['j', 'j_hp', 'j_pth', 'j_st', 'j_waste', 'j_chp', 'j_bp', 'j_wh',
             'j_gt', 'j_hs', 'demand_th_t', 'max_demad', 'radiation_t', 'IK_j',
@@ -166,6 +167,6 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
             'IK_hs', 'cap_hs', 'c_ramp_chp', 'c_ramp_waste', 'alpha_hs',
             'rf_j', 'rf_tot', 'OP_var_j', 'temperature_t', 'thresh',
             'sale_electricity_price_jt', 'OP_fix_hs', 'all_heat_geneartors',
-            'mr_j' , 'j_chp_se' , 'j_chp_bp','em_j','cap_losse_hs' ]
+            'mr_j' , 'j_chp_se' , 'j_chp_bp','em_j','cap_losse_hs',"P_max_el_chp"]
 
     return dict(zip(keys,args))

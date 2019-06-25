@@ -49,7 +49,8 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.OP_fix_j = pe.Param(m.j,initialize=val["OP_fix_j"])
     m.n_el_j = pe.Param(m.j ,initialize=val["n_el_j"])
     m.electricity_price_jt = pe.Param(m.j,m.t,initialize=val["electricity_price_jt"])
-    m.P_min_el_chp = pe.Param(initialize=val["P_min_el_chp"])
+    m.P_min_el_chp = pe.Param(m.j_chp,initialize=val["P_min_el_chp"])
+    m.P_max_el_chp = pe.Param(m.j_chp,initialize=val["P_max_el_chp"])
     m.Q_min_th_chp = pe.Param(initialize=val["Q_min_th_chp"])
     m.ratioPMaxFW = pe.Param(initialize=val["ratioPMaxFW"])
     m.ratioPMax = pe.Param(initialize=val["ratioPMax"])
@@ -92,8 +93,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.x_el_jt = pe.Var(m.j,m.t,within=pe.NonNegativeReals)
     m.P_el_max = pe.Var(within=pe.NonNegativeReals)
 
-    m.x_load_hs_t = pe.Var(m.j_hs,m.t,within=pe.NonNegativeReals)
-    m.x_unload_hs_t = pe.Var(m.j_hs,m.t,within=pe.NonNegativeReals)
+    m.x_load_hs_t = pe.Var(m.j_hs,m.t,within=pe.Reals)
     m.Cap_hs = pe.Var(m.j_hs,within=pe.NonNegativeReals)
     m.store_level_hs_t = pe.Var(m.j_hs,m.t,within=pe.NonNegativeReals)
 
@@ -114,7 +114,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     def genearation_covers_demand_t_rule(m,t):
 #        rule = sum([m.x_th_jt[j,t] for j in m.j]) >= demand_f * m.demand_th_t[t]
         rule = sum([m.x_th_jt[j,t] for j in m.j]) + \
-                sum([m.x_unload_hs_t[hs,t] - m.x_load_hs_t[hs,t]  for hs in m.j_hs]) >= demand_f * m.demand_th_t[t]
+                sum([- m.x_load_hs_t[hs,t]  for hs in m.j_hs]) >= demand_f * m.demand_th_t[t]
         return rule
     m.genearation_covers_demand_t = pe.Constraint(m.t,rule=genearation_covers_demand_t_rule)
 
@@ -180,38 +180,36 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
         return m.x_th_jt[j,t] <=  max_demad
     m.power_to_heat_restriction_jt = pe.Constraint(m.j_pth,m.t,rule=power_to_heat_restriction_jt_rule)
 
-    #% The maximum installed capacity for CHP plants is limited by the maximum heat demand. #TODO: Define upper Limit
-    def chp_capacity_restriction_j_rule (m,j):
-        rule = m.Cap_j[j] <= max_demad
-        return rule
-
-    m.chp_capacity_restriction_j = pe.Constraint(m.j_chp,rule=chp_capacity_restriction_j_rule)
-
-    #% With full heat extraction, a loss of power can occur which, only reduces the maximum power.
-    def chp_geneartion_restriction1_jt_rule(m,j,t):
+    #% The maximum installed capacity for CHP plants is limited by the maximum heat demand. 
+    def chp_electricity_driven_jt_rule (m,j,t,flag):
         if j in val["j_chp_se"]:
-            sv_chp = (m.ratioPMaxFW - m.ratioPMax) / (m.ratioPMax*m.ratioPMaxFW)
-            rule = m.x_el_jt[j,t] <= m.Cap_j[j]/m.ratioPMax - sv_chp * m.x_th_jt[j,t]
+            k = ( m.P_max_el_chp[j]/m.x_th_cap_j[j] - m.n_el_j[j] / m.n_th_jt[j,t] ) #TODO: invest mode not possible nonlinear
+            if flag:
+                rule = m.x_el_jt[j,t] <= m.P_max_el_chp[j] - m.x_th_jt[j,t] * k  
+            else:
+                rule = m.x_el_jt[j,t] >= m.P_min_el_chp[j] - m.x_th_jt[j,t] * k     
         else:
             rule = pe.Constraint.Skip
         return rule
-    m.chp_geneartion_restriction1_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction1_jt_rule)   # should be adopted using binary variables
 
+    m.chp_electricity_driven_jt = pe.Constraint(m.j_chp,m.t,[True,False],rule=chp_electricity_driven_jt_rule)
+
+   
     def chp_geneartion_restriction2_jt_rule(m,j,t):
-        rule = m.P_min_el_chp <=  m.x_el_jt[j,t]
+        rule = m.P_min_el_chp[j] <=  m.x_el_jt[j,t]
         return rule
     m.chp_geneartion_restriction2_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction2_jt_rule)
 
     def chp_geneartion_restriction5_jt_rule(m,j,t):
         rule = m.Q_min_th_chp <=  m.x_th_jt[j,t]
         return rule
-#    m.chp_geneartion_restriction5_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction5_jt_rule)
+    m.chp_geneartion_restriction5_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction5_jt_rule)
 
     #% The ratio of the maximum heat decoupling to the maximum electrical power determines the decrease in the maximum heat decoupling
     #with the produced electrical net power.
     def chp_geneartion_restriction3_jt_rule(m,j,t):
         if j in val["j_chp_se"]:
-            rule = m.x_el_jt[j,t] >= m.x_th_jt[j,t] / m.ratioPMaxFW    # should be adopted using binary variables
+            rule = m.x_el_jt[j,t] >= m.x_th_jt[j,t] / m.n_th_jt[j,t] * m.n_el_j[j]
         else:
             rule = m.x_el_jt[j,t] == m.x_th_jt[j,t] / m.n_th_jt[j,t] * m.n_el_j[j]
         return rule
@@ -230,7 +228,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
         elif t == 8760:
             return m.store_level_hs_t[hs,t] == 0
         else:
-            return m.store_level_hs_t[hs,t] == m.store_level_hs_t[hs,t-1]*(1-m.cap_losse_hs[hs]) - m.x_unload_hs_t[hs,t]/m.loss_hs[hs] + m.x_load_hs_t[hs,t-1]*m.n_hs[hs]
+            return m.store_level_hs_t[hs,t] == m.store_level_hs_t[hs,t-1]*(1-m.cap_losse_hs[hs]) + m.x_load_hs_t[hs,t-1]*m.n_hs[hs]
     m.storage_state_hs_t = pe.Constraint(m.j_hs,m.t,rule=storage_state_hs_t_rule)
 
     # The storage_level is restricted by the installed capcities
@@ -240,17 +238,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
         else:
             return m.store_level_hs_t[hs,t] <= m.cap_hs[hs]
     m.storage_state_capacity_restriction_hs_t = pe.Constraint(m.j_hs,m.t,rule=storage_state_capacity_restriction_hs_t_rule)
-
-    def storage_cap_restriction_hs_rule(m,hs,t,flag):
-        if flag :
-            if inv_flag:
-                return m.x_load_hs_t[hs,t] <=  m.Cap_hs[hs] + m.cap_hs[hs] - m.store_level_hs_t[hs,t]
-            else:
-                return m.x_load_hs_t[hs,t] <=  m.cap_hs[hs] - m.store_level_hs_t[hs,t]
-        else:
-            return m.x_unload_hs_t[hs,t] <=  m.store_level_hs_t[hs,t] - m.unload_cap_hs[hs]
-
-#    m.storage_cap_restriction_hs = pe.Constraint(m.j_hs,m.t,[True,False],rule=storage_cap_restriction_hs_rule)
+    
 
     # The discharge and charge amounts are limited
     def load_hs_t_restriction_rule (m,hs,t):
@@ -260,9 +248,9 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     def unload_hs_t_restriction_rule (m,hs,t,flag):
 
         if flag:
-            return m.x_unload_hs_t[hs,t] <=  m.unload_cap_hs[hs]
+            return m.x_load_hs_t[hs,t] >=  - m.unload_cap_hs[hs]
         else:
-            return m.x_unload_hs_t[hs,t] <=  m.store_level_hs_t[hs,t]
+            return m.x_load_hs_t[hs,t] >=  - m.store_level_hs_t[hs,t]
 
     m.unload_hs_t_restriction = pe.Constraint(m.j_hs,m.t,[True,False],rule=unload_hs_t_restriction_rule)
     #%
@@ -306,9 +294,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
         c_var = c_var
         c_peak_el = m.P_el_max*10000
         c_ramp = sum ([m.ramp_j_waste_t[j,t] * m.c_ramp_waste for j in m.j_waste for t in m.t]) + sum ([m.ramp_j_chp_t[j,t] * m.c_ramp_chp for j in m.j_chp for t in m.t])
-        c_hs_penalty_load = sum([m.x_load_hs_t[hs,t]*5e-2  for hs in m.j_hs for t in m.t])      # for modeling reasons
-        c_hs_penalty_unload = sum([m.x_unload_hs_t[hs,t]*5e-2  for hs in m.j_hs for t in m.t])  # for modeling reasons
-        c_tot = c_inv + c_var + c_op_fix + c_op_var + c_peak_el + c_ramp +c_hs_penalty_load + c_hs_penalty_unload
+        c_tot = c_inv + c_var + c_op_fix + c_op_var + c_peak_el + c_ramp
 
         rev_gen_electricity = sum([m.x_el_jt[j,t]*(m.sale_electricity_price_jt[j,t]) for j in m.j for t in m.t])
 

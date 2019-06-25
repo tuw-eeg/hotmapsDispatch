@@ -1288,6 +1288,12 @@ def modify_doc(doc):
                     if selection[0] == []:
                         div_spinner.text = notify("""<p>Error: Please specify the technologies for the invesment model !!!<p><p>Mark Heat Generators by pressing "CTRL" + "left mouse"<p><p>Selection is marked yellow <p>""","red","Please specify the technologies for the invesment model !!!","red") 
                         return
+                    _chp_se = pd.DataFrame(data_table.source.data).loc[data_table.source.selected["1d"]["indices"]]
+                    _mask =  _chp_se["type"] == "CHP-SE"
+                    _chp_se = _chp_se.loc[_mask,"name"].tolist()
+                    if sum(_mask) > 0:
+                        div_spinner.text = notify(f"""<p>Error: Steam Extraction CHP`s are not allowed in investment mode<p><p>Please remove the Steam Extraction CHP`s from your selection: {_chp_se} <p>""","red","Error: Steam Extraction CHP`s are not allowed in investment mode","red") 
+                        return                        
                 solutions,_message,_ = execute(data,inv_flag,selection)
     
                 print('calculation done')
