@@ -463,14 +463,14 @@ with open(path_upload_js) as file:
 
 # Specify Sheet Names of the Excel Database (If Changed)
 sheets = ['Heat Generators','prices and emmision factors',
-          'financal and other parameteres',"Heat Storage", "Techologies"]
+          'financal and other parameteres',"Heat Storage", "Technologies"]
 # Mapping model names with names to display in browser, specified in Database-Excel
 input_list_mapper = mapper(path_parameter)
 input_price_list_mapper = mapper(path_parameter,sheets[1])
 parameter_list_mapper = mapper(path_parameter,sheets[2])
 heat_storage_list_mapper = mapper(path_parameter,sheets[3])
 # select witch parameters to show
-input_list= ['name',
+input_list_gui= ['name',
  'installed capacity (MW_th)',
  'efficiency th',
  'efficiency el',
@@ -480,6 +480,8 @@ input_list= ['name',
  'life time',
  'renewable factor',
  'must run [0-1]']
+
+input_list = input_list_gui + ['type', 'input']
 
 input_price_list = ["energy carrier","prices(EUR/MWh)","emission factor [tCO2/MWh]"]
 
@@ -505,6 +507,7 @@ _elec = widgets_keys[2:4]
 #  Data for adding Technologies
 # =============================================================================
 data_tec = pd.read_excel(path_parameter,skiprows=[0])
+grp_data_tec = data_tec.groupby(["type"])
 heat_pumps = {}
 flow_temp_dic = {}
 return_temp_dic = {}
@@ -517,14 +520,11 @@ for sheet in pd.ExcelFile(path_parameter).sheet_names:
     flow_temp_dic[sheet] = heat_pumps[sheet].columns.values.tolist()
     return_temp_dic[sheet] = heat_pumps[sheet].index.values.tolist()
 
-select_tec_options_model = pd.read_excel(path_parameter,"Techologies")["Techologies"].values.tolist()
-select_tec_options = [x.replace("CHP-SE","CHP Steam Extraction").replace("CHP-BP","CHP Back Pressure") for x in select_tec_options_model]
-select_tec_mapper = dict(zip(select_tec_options,select_tec_options_model))
+select_tec_mapper = pd.read_excel(path_parameter,sheets[-1],index_col=1).to_dict()["Technologies"]
+select_tec_options_model = list(select_tec_mapper.values())
+select_tec_options = list(select_tec_mapper.keys())
 tec_mapper_inv = invert_dict(tec_mapper)
-select_tec2_options= {"heat pump": list(tec_mapper.values()),
-                      "CHP Back Pressure": data_tec[data_tec["output"] == "CHP-BP"]["name"].values.tolist(),
-                      "CHP Steam Extraction": data_tec[data_tec["output"] == "CHP-SE"]["name"].values.tolist(),
-                      "boiler":data_tec[data_tec["type"] == "boiler"]["name"].values.tolist()}
+select_tec2_options= {key:df["name"].tolist() for key,df in grp_data_tec} 
 energy_carrier_options = pd.read_excel(path_parameter,sheets[1],skiprows=[0])[input_price_list[0]].values.tolist()
 select_hs_options = pd.read_excel(path_parameter,sheets[3],skiprows=[0])["name"].values.tolist()
 
@@ -666,7 +666,7 @@ def modify_doc(doc):
                     div_spinner.text = notify("Fatal Error @ Downloading in Scenario Mode","red")                    
 
             else:
-                df= pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore')
+                df= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
                 if df.shape[0] == 0:
                     del df
                     for k in list(carrier_dict):
@@ -786,7 +786,7 @@ def modify_doc(doc):
                 data[mk] = ext
         ## Categorize
         data["categorize"] = {}
-        _dataframe= heat_generator_table[sc][sub_sc][input_list+["type"]].apply(pd.to_numeric, errors='ignore')
+        _dataframe= heat_generator_table[sc][sub_sc][input_list].apply(pd.to_numeric, errors='ignore')
         for j in select_tec_options_model:
             data["categorize"][j] = _dataframe["name"][_dataframe["type"] == j].values.tolist()
         ## thermal efficiencc
@@ -1259,9 +1259,8 @@ def modify_doc(doc):
                         data[mk] = ext
                 ## Categorize
                 data["categorize"] = {}
-                _dataframe= pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore')
-                select_tec_options = [x.replace("CHP Steam Extraction","CHP-SE").replace("CHP Back Pressure","CHP-BP") for x in select_tec_options_model]
-                for j in select_tec_options:
+                _dataframe= pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore')
+                for j in select_tec_options_model:
                     data["categorize"][j] = _dataframe["name"][_dataframe["type"] == j].values.tolist()
                 ## thermal efficiencc
                 _n_th = {}
@@ -1447,7 +1446,7 @@ def modify_doc(doc):
                         _nth_table[sc_name] = dict()
                         for sub_sc_name in sub_sc_list:
                             _path = os.path.join(path_scenarios,sc_name,sub_sc_name+".xlsx")
-                            heat_generator_table[sc_name][sub_sc_name] = pd.read_excel(_path,sheet_name = sheets[0], index_col = 0)[input_list+["type"]].apply(pd.to_numeric, errors='ignore').fillna(0)
+                            heat_generator_table[sc_name][sub_sc_name] = pd.read_excel(_path,sheet_name = sheets[0], index_col = 0)[input_list].apply(pd.to_numeric, errors='ignore').fillna(0)
                             heat_storage_table[sc_name][sub_sc_name] = pd.read_excel(_path,sheet_name = sheets[3], index_col = 0)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)
                             paramters_table[sc_name][sub_sc_name] = pd.read_excel(_path,sheet_name = "Data", index_col = 0)[parameter_list].apply(pd.to_numeric, errors='ignore').fillna(0)
                             price_emmission_factor_table[sc_name][sub_sc_name] = pd.read_excel(_path,sheet_name = sheets[1], index_col = 0)[input_price_list].apply(pd.to_numeric, errors='ignore').fillna(0)
@@ -1504,7 +1503,7 @@ def modify_doc(doc):
                 excel_object = pd.ExcelFile(file_io, engine='xlrd')
 #                data2 = excel_object.parse(sheet_name = sheets[0], index_col = 0,skiprows = range(22,50)).apply(pd.to_numeric, errors='ignore')
                 data = excel_object.parse(sheet_name = sheets[0], index_col = 0)
-                data2 = data[input_list+["type"]].apply(pd.to_numeric, errors='ignore')
+                data2 = data[input_list].apply(pd.to_numeric, errors='ignore')
                 data2 = data2.fillna(0)
                 data2["index"] = data2.index
                 data_table.source.data.update(data2)
@@ -1797,10 +1796,9 @@ def modify_doc(doc):
 
     name_label = TextInput(placeholder="-", title="Name",disabled=False)
 
-    widgets_list= [
-            [select_tec,select_tec2], installed_cap, n_th_label, n_el_label,
+    widgets_list= [name_label,installed_cap, n_th_label, n_el_label,
             ik_label, opex_fix_label, opex_var_label,lt_label,
-            renewable_factor, must_run_box
+            renewable_factor, must_run_box,select_tec,energy_carrier_select
             ]
 
     widgets_dict = dict(zip(input_list,widgets_list))
@@ -1904,48 +1902,32 @@ def modify_doc(doc):
         div_spinner.text = load_text
         n_th_label.disabled = False
         disable_widgets(cop_widget_list,True)
-        ###
-        energy_carier_search = data_tec["input"][data_tec["type"].str.contains(select_tec.value)]
-        if energy_carier_search.empty:
-            energy_carrier_value = energy_carrier_select.options[0]
-        else:
-            energy_carrier_value = str(energy_carier_search.iloc[0])
-        energy_carrier_select.value = energy_carrier_value
-        ###
-        for x in input_list:
-            if x == "name":
-                if widgets_dict[x][0].value not in widgets_dict[x][1].value:
-                    name_label.value =  widgets_dict[x][0].value
+                
+        try:
+            search = grp_data_tec.get_group((select_tec_mapper[select_tec.value])).set_index("name",drop=False)
+            for x in input_list:
+                if x == 'must run [0-1]':  
+                    widgets_dict[x] = bool(int(search.loc[select_tec2.value,x]))
+                elif x == 'installed capacity (MW_th)':
+                    widgets_dict[x] = float(search.loc[select_tec2.value,x])
                 else:
-                    name_label.value =  widgets_dict[x][1].value
-                continue
-            search = data_tec[x][data_tec["type"].str.contains(select_tec.value)]
-            if search.empty:
-                value = ""
-            else:
-                value = str(search.iloc[0])
-            try:
-                widgets_dict[x].value = value
-            except:
-                if x == 'must run [0-1]':
-                    try:
-                        widgets_dict[x].active = bool(int(x))
-                    except:
-                        widgets_dict[x].active = False
-                    continue
-                widgets_dict[x].value = 0
+                    widgets_dict[x].value = str(search.loc[select_tec2.value,x])
+                            
 
-        if select_tec.value in ["heat pump","CHP Back Pressure", "CHP Steam Extraction", "boiler"]:
-            select_tec2.title= "Select a "+str(select_tec.value)+":"
-            select_tec2.options = select_tec2_options[select_tec.value]
-            tec_buttons.children = [select_tec,select_tec2]
-            select_tec2.value = select_tec2.options[0]
-            if select_tec.value == "heat pump": 
-                disable_widgets(cop_widget_list,False)   
-                cop_label.disabled = True
-            select_tec2.disabled = False
-        else:
-            select_tec2.disabled = True
+        except:
+            search = pd.DataFrame()
+            for x in input_list:
+                if x == 'must run [0-1]':  
+                    widgets_dict[x] = False
+                elif x == 'installed capacity (MW_th)':
+                    widgets_dict[x] = 0
+                else:
+                    widgets_dict[x].value = ""
+        
+#        if select_tec.value == "heat pump": 
+#            disable_widgets(cop_widget_list,False)   
+#            cop_label.disabled = True
+
 
         div_spinner.text = ""
 # =============================================================================

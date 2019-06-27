@@ -183,7 +183,8 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     #% The maximum installed capacity for CHP plants is limited by the maximum heat demand. 
     def chp_electricity_driven_jt_rule (m,j,t,flag):
         if j in val["j_chp_se"]:
-            k = ( m.P_max_el_chp[j]/m.x_th_cap_j[j] - m.n_el_j[j] / m.n_th_jt[j,t] ) #TODO: invest mode not possible nonlinear
+            #TODO: invest mode not possible nonlinear x_th_cap  is Cap_j
+            k = ( m.P_max_el_chp[j]/m.x_th_cap_j[j] - m.n_el_j[j] / m.n_th_jt[j,t] ) 
             if flag:
                 rule = m.x_el_jt[j,t] <= m.P_max_el_chp[j] - m.x_th_jt[j,t] * k  
             else:
