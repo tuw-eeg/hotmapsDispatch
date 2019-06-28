@@ -222,8 +222,7 @@ def generate_tables(columns,name="",):
     col = [TableColumn(field=name, title=name) for name in columns]
     source = ColumnDataSource(data)
     #,width=1550,height=700
-    table = DataTable(source=source,columns=col,width=1550,
-                           editable=True,height=350)
+    table = DataTable(source=source,columns=col,width=1550,editable=True,height=250)
     return table
 # ===========================================================================
 def modification_tools(**kwargs):
@@ -479,7 +478,8 @@ input_list_gui= ['name',
  'life time',
  'renewable factor',
  'must run [0-1]',
- "Ramping Costs [EUR/MWh]"]
+ "Ramping Costs [EUR/MWh]",
+ "P_max in condensing mode [MWel]"]
 
 input_list = input_list_gui + ['type']#, 'input']
 
@@ -489,6 +489,10 @@ parameter_list = ['CO2 Price [EUR/tC02]',
  'Interest Rate [0-1]',
  'Minimum Renewable Factor [0-1]',
  'Total Demand[ MWh]']
+
+input_list_hs = list(heat_storage_list_mapper)
+
+
 # select default labels for the modification tools
 lab = dict(offset="Offset",constant="Set To Constant",
            mean="Use mean value",total="Sum",scale="Scale")
@@ -588,7 +592,7 @@ def modify_doc(doc):
     data_table = generate_tables(input_list_gui)
     data_table_prices = generate_tables(input_price_list,sheets[1])
     data_table_data = generate_tables(parameter_list,sheets[2])
-    data_table_heat_storage = generate_tables(list(heat_storage_list_mapper),sheets[3])
+    data_table_heat_storage = generate_tables(input_list_hs,sheets[3])
     widgets= { i : generate_widgets(data_kwargs[i]) for i in data_kwargs}
     dummy = Div(text="""<strong style=" display: none;">1</strong>""")
     download_button = Button(label='Download Power Plant Parameters', button_type='success')
@@ -696,7 +700,7 @@ def modify_doc(doc):
         #        data_data_df = data_data_df.fillna(0)
                 data_data_df.to_excel(writer,"Data")
     
-                data_hs_df = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore')
+                data_hs_df = pd.DataFrame(data_table_heat_storage.source.data)[input_list_hs].apply(pd.to_numeric, errors='ignore')
         #        data_hs_df = data_hs_df.fillna(0)
                 data_hs_df.to_excel(writer,sheets[3])
     
@@ -725,7 +729,7 @@ def modify_doc(doc):
 
     def check_scenarios(scenario_mapper):
         no_hg  = [(sc,sub_sc)  for sc in list(scenario_mapper) for sub_sc in scenario_mapper[sc]  if heat_generator_table[sc][sub_sc].empty]
-        no_cap = [(sc,sub_sc)  for sc in list(scenario_mapper) for sub_sc in scenario_mapper[sc] if (max(profiles_table[_hd][sc][sub_sc].values()) - sum(heat_generator_table[sc][sub_sc][input_list[1]])) > 0]
+        no_cap = [(sc,sub_sc)  for sc in list(scenario_mapper) for sub_sc in scenario_mapper[sc] if (max(profiles_table[_hd][sc][sub_sc].values()) - sum(heat_generator_table[sc][sub_sc][input_list[1]]) - sum(heat_storage_table[sc][sub_sc][input_list_hs[3]])) > 0]
         if no_hg != []:
             sc,sub_sc = zip(*no_cap)
             return f"""No Heat Generators available for for the scenarios {sc} in sub scenarios {sub_sc}"""
@@ -1212,7 +1216,7 @@ def modify_doc(doc):
                 data_data = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore')
                 data_data = data_data.fillna(0)
     
-                data_heat_storages = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore')
+                data_heat_storages = pd.DataFrame(data_table_heat_storage.source.data)[input_list_hs].apply(pd.to_numeric, errors='ignore')
                 data_heat_storages = data_heat_storages.fillna(0)
     
                 dic_hs = data_heat_storages.set_index("name").to_dict()
@@ -1452,7 +1456,7 @@ def modify_doc(doc):
                         for sub_sc_name in sub_sc_list:
                             _path = os.path.join(path_scenarios,sc_name,sub_sc_name+".xlsx")
                             heat_generator_table[sc_name][sub_sc_name] = pd.read_excel(_path,sheet_name = sheets[0], index_col = 0)[input_list].apply(pd.to_numeric, errors='ignore').fillna(0)
-                            heat_storage_table[sc_name][sub_sc_name] = pd.read_excel(_path,sheet_name = sheets[3], index_col = 0)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)
+                            heat_storage_table[sc_name][sub_sc_name] = pd.read_excel(_path,sheet_name = sheets[3], index_col = 0)[input_list_hs].apply(pd.to_numeric, errors='ignore').fillna(0)
                             paramters_table[sc_name][sub_sc_name] = pd.read_excel(_path,sheet_name = "Data", index_col = 0)[parameter_list].apply(pd.to_numeric, errors='ignore').fillna(0)
                             price_emmission_factor_table[sc_name][sub_sc_name] = pd.read_excel(_path,sheet_name = sheets[1], index_col = 0)[input_price_list].apply(pd.to_numeric, errors='ignore').fillna(0)
                             carrier_table[sc_name][sub_sc_name] = pd.read_excel(_path,sheet_name = "Energy Carrier", index_col = 0).set_index("name")["carrier"].to_dict()
@@ -1653,7 +1657,10 @@ def modify_doc(doc):
         pmax.value = str(round(max(widgets[_hd]["source"].data["y"]),2))
         _data1= pd.DataFrame(data_table.source.data)[input_list[1]].apply(pd.to_numeric, errors='ignore')
         _data1 = _data1.fillna(0)
-        x = float(pmax.value) - sum(_data1)
+        
+        _data2 = pd.DataFrame(data_table_heat_storage.source.data)[input_list_hs[3]].apply(pd.to_numeric, errors='ignore')
+        _data2 = _data2.fillna(0)
+        x = float(pmax.value) - sum(_data1) - sum(_data2)
         if x>=0 :
             to_install.value = str(round(x,2))
         else:
@@ -1741,7 +1748,7 @@ def modify_doc(doc):
     data_table_data.source.on_change("data",args_callback)
     data_table.source.on_change("data",args_callback)
     data_table_heat_storage.source.on_change("data",args_callback)
-
+    data_table_heat_storage.source.on_change("data",update_pmax)
     widgets[_hd]["source"].on_change("data",update_pmax)
 
     invest_button.on_click(ivest_callback)
@@ -1801,10 +1808,11 @@ def modify_doc(doc):
     name_label = TextInput(placeholder="-", title="Name",disabled=False)
     
     c_ramp_label = TextInput(placeholder="0", title="Ramping Costs [EUR/MWh]",disabled=False)
-    
+    pmax_el = TextInput(placeholder="",title="",disabled=True)
+
     widgets_list= [name_label,installed_cap, n_th_label, n_el_label,
             ik_label, opex_fix_label, opex_var_label,lt_label,
-            renewable_factor, must_run_box,c_ramp_label,select_tec,]#,energy_carrier_select]
+            renewable_factor, must_run_box,c_ramp_label,pmax_el,select_tec]#,energy_carrier_select]
             
 
     widgets_dict = dict(zip(input_list,widgets_list))
@@ -1824,7 +1832,7 @@ def modify_doc(doc):
     finance_param_layout = column(children=[row(children=[ik_label,lt_label]),
                                             row(children=[opex_fix_label,
                                                           opex_var_label])])
-    model_param_layout = row([column([must_run_box,c_ramp_label]),
+    model_param_layout = row([column([must_run_box,c_ramp_label,pmax_el]),
                               column([renewable_factor,installed_cap])])
 
     cop_panel = Panel(child=cop_layout, title="Coefficient of Performance, COP")
@@ -1907,11 +1915,29 @@ def modify_doc(doc):
         n_th_label.disabled = True
 #        tabs_geneator.tabs = layout1
 # =============================================================================
+    def update_pmax_el(name,old,new):
+        if select_tec_mapper[select_tec.value] == "CHP-SE":
+            pmax_el.title = "P_max in condensing mode [MWel]"
+            pmax_el.disabled = False
+            
+            try:
+                val = float(installed_cap.value) / float(n_th_label.value) * float(n_el_label.value) + 10
+                val = str(round(val,2))
+                pmax_el.value = val
+            except:
+                pmax_el.value  = "0"
+        else:
+            pmax_el.title = ""
+            pmax_el.disabled = True
+            pmax_el.value = "0"
+            
+        
     def add_tec(name,old,new):
         div_spinner.text = load_text
         
         n_th_label.disabled = False
         disable_widgets(cop_widget_list,True)
+        update_pmax_el(None,None,None)
         
         select_tec2.title= "Select a "+str(select_tec.value)+":"
         select_tec2.options = select_tec2_options[select_tec_mapper[select_tec.value]]
@@ -1984,6 +2010,10 @@ def modify_doc(doc):
     flow_temp.on_change('value', cop_callback)
     return_temp.on_change('value', cop_callback)
     energy_carrier_select.on_change('value', change_name_if_carrier_changes)
+    installed_cap.on_change('value',update_pmax_el)
+    n_th_label.on_change('value',update_pmax_el)
+    n_el_label.on_change('value',update_pmax_el)
+    
     
 #%% Adding Heat Storages: Widgets callbacks, layouts etc.
 # =============================================================================
@@ -2007,7 +2037,7 @@ def modify_doc(doc):
     widget_hs = [name_hs, capacity_hs, losses_hs, unloding_power,
                  loading_power, loading_efficiency, 
                  inv_cost_hs, opex_fix_hs, lt_hs]
-    widgets_dict_hs = dict(zip((list(heat_storage_list_mapper)),widget_hs))
+    widgets_dict_hs = dict(zip((input_list_hs),widget_hs))
     
     widget_list_hs = [ok_button_hs, cancel_button_s, select_hs, ] + widget_hs
 # =============================================================================
@@ -2406,7 +2436,7 @@ def modify_doc(doc):
        
     def add_new_scenario(sc_name,sub_sc_name="default_sub"):
         heat_generator_table[sc_name] = { sub_sc_name : pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore').fillna(0)}
-        heat_storage_table[sc_name] = { sub_sc_name : pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)}
+        heat_storage_table[sc_name] = { sub_sc_name : pd.DataFrame(data_table_heat_storage.source.data)[input_list_hs].apply(pd.to_numeric, errors='ignore').fillna(0)}
         paramters_table[sc_name] = { sub_sc_name : pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore').fillna(0)}
         price_emmission_factor_table[sc_name] = { sub_sc_name : pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore').fillna(0)}
         for wk in widgets_keys:
@@ -2570,7 +2600,7 @@ def modify_doc(doc):
             
     def add_sub_scenarios(sc_name,sub_sc_name):
         heat_generator_table[sc_name][sub_sc_name] = pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore').fillna(0)
-        heat_storage_table[sc_name][sub_sc_name] = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)
+        heat_storage_table[sc_name][sub_sc_name] = pd.DataFrame(data_table_heat_storage.source.data)[input_list_hs].apply(pd.to_numeric, errors='ignore').fillna(0)
         carrier_table[sc_name][sub_sc_name] = pd.DataFrame(carrier_dict,index=[0]).T.to_dict()[0]
         paramters_table[sc_name][sub_sc_name] = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore').fillna(0)
         price_emmission_factor_table[sc_name][sub_sc_name] = pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore').fillna(0)
@@ -2639,7 +2669,7 @@ def modify_doc(doc):
             
         if sc_param == scenario_paramters[0]:
             heat_generator_table[sc_name][sub_sc_name_new] = pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore').fillna(0)
-            heat_storage_table[sc_name][sub_sc_name_new] = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)
+            heat_storage_table[sc_name][sub_sc_name_new] = pd.DataFrame(data_table_heat_storage.source.data)[input_list_hs].apply(pd.to_numeric, errors='ignore').fillna(0)
             carrier_table[sc_name][sub_sc_name_new] = pd.DataFrame(carrier_dict,index=[0]).T.to_dict()[0]
         elif sc_param == scenario_paramters[1]:
             paramters_table[sc_name][sub_sc_name_new] = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore').fillna(0)

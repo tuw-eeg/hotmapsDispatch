@@ -49,18 +49,16 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.OP_fix_j = pe.Param(m.j,initialize=val["OP_fix_j"])
     m.n_el_j = pe.Param(m.j ,initialize=val["n_el_j"])
     m.electricity_price_jt = pe.Param(m.j,m.t,initialize=val["electricity_price_jt"])
-    m.P_min_el_chp = pe.Param(m.j_chp,initialize=val["P_min_el_chp"])
-    m.P_max_el_chp = pe.Param(m.j_chp,initialize=val["P_max_el_chp"])
-    m.Q_min_th_chp = pe.Param(initialize=val["Q_min_th_chp"])
-    m.ratioPMaxFW = pe.Param(initialize=val["ratioPMaxFW"])
-    m.ratioPMax = pe.Param(initialize=val["ratioPMax"])
+    m.P_min_el_j = pe.Param(m.j,initialize=val["P_min_el_j"])
+    m.P_max_el_j = pe.Param(m.j,initialize=val["P_max_el_j"])
+    m.Q_min_th_j = pe.Param(m.j_chp,initialize=val["Q_min_th_j"])
+
     m.mc_jt = pe.Param(m.j,m.t,initialize= val["mc_jt"])
     m.n_th_jt = pe.Param(m.j,m.t,initialize=val["n_th_jt"])
     m.x_th_cap_j = pe.Param(m.j,initialize=val["x_th_cap_j"])
-#    m.x_el_cap_j = pe.Param(m.j,initialize=val["x_el_cap_j"])
-#    m.pot_j = pe.Param(m.j,initialize=val["pot_j"])
+
     m.lt_j = pe.Param(m.j,initialize=val["lt_j"])
-#    m.el_surcharge = pe.Param(m.j,initialize=val[27])  # Taxes for electricity price
+
     m.ir = pe.Param(initialize=val["ir"])
     m.alpha_j = pe.Param(m.j,initialize=val["alpha_j"])
     m.c_ramp_j = pe.Param(m.j,initialize =val["c_ramp_j"] )
@@ -184,11 +182,11 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     def chp_electricity_driven_jt_rule (m,j,t,flag):
         if j in val["j_chp_se"]:
             #TODO: invest mode not possible nonlinear x_th_cap  is Cap_j
-            k = ( m.P_max_el_chp[j]/m.x_th_cap_j[j] - m.n_el_j[j] / m.n_th_jt[j,t] ) 
+            k = ( m.P_max_el_j[j]/m.x_th_cap_j[j] - m.n_el_j[j] / m.n_th_jt[j,t] ) 
             if flag:
-                rule = m.x_el_jt[j,t] <= m.P_max_el_chp[j] - m.x_th_jt[j,t] * k  
+                rule = m.x_el_jt[j,t] <= m.P_max_el_j[j] - m.x_th_jt[j,t] * k  
             else:
-                rule = m.x_el_jt[j,t] >= m.P_min_el_chp[j] - m.x_th_jt[j,t] * k     
+                rule = m.x_el_jt[j,t] >= m.P_min_el_j[j] - m.x_th_jt[j,t] * k     
         else:
             rule = pe.Constraint.Skip
         return rule
@@ -197,12 +195,12 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
 
    
     def chp_geneartion_restriction2_jt_rule(m,j,t):
-        rule = m.P_min_el_chp[j] <=  m.x_el_jt[j,t]
+        rule = m.P_min_el_j[j] <=  m.x_el_jt[j,t]
         return rule
     m.chp_geneartion_restriction2_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction2_jt_rule)
 
     def chp_geneartion_restriction5_jt_rule(m,j,t):
-        rule = m.Q_min_th_chp <=  m.x_th_jt[j,t]
+        rule = m.Q_min_th_j[j] <=  m.x_th_jt[j,t]
         return rule
     m.chp_geneartion_restriction5_jt = pe.Constraint(m.j_chp,m.t,rule=chp_geneartion_restriction5_jt_rule)
 
