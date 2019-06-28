@@ -119,7 +119,6 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     load_cap_hs =           {hs: data["load_cap_hs"][hs] for hs in j_hs}
     unload_cap_hs =         {hs: data["unload_cap_hs"][hs] for hs in j_hs}
     n_hs =                  {hs: data["n_pump_hs"][hs] for hs in j_hs}
-    loss_hs =               {hs: data["n_turb_hs"][hs] for hs in j_hs}
     IK_hs =                 {hs: data["IK_cap_hs"][hs] for hs in j_hs}
     cap_hs =                {hs: data["cap_hs"][hs] for hs in j_hs}
     OP_fix_hs =             {hs: data["OP_fix_hs"][hs] for hs in j_hs}
@@ -131,8 +130,8 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
 
 
     # Ramping Costs
-    c_ramp_chp =            100
-    c_ramp_waste =          100
+    c_ramp_j =  {key:data["c_ramp"][key] for key in tec}
+    print(c_ramp_j)
 
     rf_j =                  {key:data["RF"][key] for key in tec}
     rf_tot =                data["toatl_RF"]
@@ -152,21 +151,21 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
             OP_fix_j, n_el_j, electricity_price_t, P_min_el_chp,
             Q_min_th_chp, ratioPMaxFW, ratioPMax, mc_jt, n_th_jt,
             x_th_cap_j, x_el_cap_j, pot_j, lt_j, el_surcharge, ir,
-            alpha_j, load_cap_hs, unload_cap_hs, n_hs, loss_hs,
-            IK_hs, cap_hs, c_ramp_chp, c_ramp_waste, alpha_hs,
+            alpha_j, load_cap_hs, unload_cap_hs, n_hs, 
+            IK_hs, cap_hs, alpha_hs,
             rf_j, rf_tot, OP_var_j, temperature, thresh,
             sale_electricity_price_t, OP_fix_hs, all_heat_geneartors,
-            mr_j,j_chp_se,j_chp_bp,em_j,cap_losse_hs,P_max_el_chp]
+            mr_j,j_chp_se,j_chp_bp,em_j,cap_losse_hs,P_max_el_chp,c_ramp_j]
 
     keys = ['j', 'j_hp', 'j_pth', 'j_st', 'j_waste', 'j_chp', 'j_bp', 'j_wh',
             'j_gt', 'j_hs', 'demand_th_t', 'max_demad', 'radiation_t', 'IK_j',
             'OP_fix_j', 'n_el_j', 'electricity_price_jt', 'P_min_el_chp',
             'Q_min_th_chp', 'ratioPMaxFW', 'ratioPMax', 'mc_jt', 'n_th_jt',
             'x_th_cap_j', 'x_el_cap_j', 'pot_j', 'lt_j', 'el_surcharge', 'ir',
-            'alpha_j', 'load_cap_hs', 'unload_cap_hs', 'n_hs', 'loss_hs',
-            'IK_hs', 'cap_hs', 'c_ramp_chp', 'c_ramp_waste', 'alpha_hs',
+            'alpha_j', 'load_cap_hs', 'unload_cap_hs', 'n_hs',
+            'IK_hs', 'cap_hs','alpha_hs',
             'rf_j', 'rf_tot', 'OP_var_j', 'temperature_t', 'thresh',
             'sale_electricity_price_jt', 'OP_fix_hs', 'all_heat_geneartors',
-            'mr_j' , 'j_chp_se' , 'j_chp_bp','em_j','cap_losse_hs',"P_max_el_chp"]
+            'mr_j' , 'j_chp_se' , 'j_chp_bp','em_j','cap_losse_hs',"P_max_el_chp","c_ramp_j"]
 
     return dict(zip(keys,args))

@@ -478,7 +478,8 @@ input_list_gui= ['name',
  'OPEX var (EUR/MWh)',
  'life time',
  'renewable factor',
- 'must run [0-1]']
+ 'must run [0-1]',
+ "Ramping Costs [EUR/MWh]"]
 
 input_list = input_list_gui + ['type']#, 'input']
 
@@ -1779,7 +1780,7 @@ def modify_doc(doc):
     select_tec2 = Select(value="",disabled=True)
 
     cop_label = TextInput(placeholder="-", title="COP",disabled= True)
-    flow_temp = Select(title="Inlet Temperature")
+    flow_temp = Select(title="Flow Temperature")
     return_temp = Select(title="Return Temperature")
     energy_carrier_select = Select(options = energy_carrier_options, 
                                    title="Energy Carrier",value = energy_carrier_options[0])
@@ -1798,10 +1799,12 @@ def modify_doc(doc):
     installed_cap = Slider(start=0, end=int(float(pmax.value))+1, value=0, step=1, title="Installed Capacity")
 
     name_label = TextInput(placeholder="-", title="Name",disabled=False)
-
+    
+    c_ramp_label = TextInput(placeholder="0", title="Ramping Costs [EUR/MWh]",disabled=False)
+    
     widgets_list= [name_label,installed_cap, n_th_label, n_el_label,
             ik_label, opex_fix_label, opex_var_label,lt_label,
-            renewable_factor, must_run_box,select_tec]#,energy_carrier_select]
+            renewable_factor, must_run_box,c_ramp_label,select_tec,]#,energy_carrier_select]
             
 
     widgets_dict = dict(zip(input_list,widgets_list))
@@ -1809,7 +1812,7 @@ def modify_doc(doc):
     hg_widget_list = [select_tec,select_tec2, installed_cap, n_th_label, n_el_label,
             ik_label, opex_fix_label, opex_var_label,lt_label,
             renewable_factor, must_run_box,energy_carrier_select,name_label,
-            ok_button,cancel_button
+            ok_button,cancel_button,c_ramp_label
             ]
 # =============================================================================
 #  Widget Layout for adding Technologies
@@ -1821,7 +1824,8 @@ def modify_doc(doc):
     finance_param_layout = column(children=[row(children=[ik_label,lt_label]),
                                             row(children=[opex_fix_label,
                                                           opex_var_label])])
-    model_param_layout = widgetbox(must_run_box,renewable_factor,installed_cap)
+    model_param_layout = row([column([must_run_box,c_ramp_label]),
+                              column([renewable_factor,installed_cap])])
 
     cop_panel = Panel(child=cop_layout, title="Coefficient of Performance, COP")
     tec_param_panel = Panel(child=tec_param_layout, title="Technical Parameters")
@@ -1994,15 +1998,14 @@ def modify_doc(doc):
     capacity_hs = TextInput(placeholder="-", title="Storage Capacity [MWh]")
     losses_hs =  Slider(start=0, end=100, value=1, step=1, title="Hourly Stoarge Losses [%]")
     unloding_power = TextInput(placeholder="-", title="maximum unloading power  [MW]")
-    uloading_efficiency = Slider(start=0, end=1, value=.980, step=.001, title="unloading efficiency")
     loading_power = TextInput(placeholder="-", title="maximum loading power  [MW]")
-    loading_efficiency = Slider(start=0, end=1, value=.980, step=.001, title="loading efficiency")
+    loading_efficiency = Slider(start=0, end=1, value=.980, step=.001, title="loading/unloading efficiency")
     inv_cost_hs = TextInput(placeholder="-", title="Invesment costs for additional storage capacity  [€/MWh]")
     opex_fix_hs = TextInput(placeholder="-", title="OPEX fix [€/MWh]")
     lt_hs = TextInput(placeholder="-", title="Life Time [a]")
     
     widget_hs = [name_hs, capacity_hs, losses_hs, unloding_power,
-                 loading_power, loading_efficiency, uloading_efficiency, 
+                 loading_power, loading_efficiency, 
                  inv_cost_hs, opex_fix_hs, lt_hs]
     widgets_dict_hs = dict(zip((list(heat_storage_list_mapper)),widget_hs))
     
@@ -2013,8 +2016,7 @@ def modify_doc(doc):
     tec_param_layout_hs = column(children=[row(children=[name_hs,capacity_hs]),
                                             row(children=[loading_power,
                                                           unloding_power]),
-                                           row(children=[loading_efficiency,
-                                                          uloading_efficiency])])
+                                           row(children=[loading_efficiency])])
     finance_param_layout_hs = column(children=[inv_cost_hs,opex_fix_hs,lt_hs])
     model_param_layout_hs = widgetbox(losses_hs)
     

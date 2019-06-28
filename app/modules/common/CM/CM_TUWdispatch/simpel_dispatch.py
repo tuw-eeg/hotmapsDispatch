@@ -63,15 +63,15 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
 #    m.el_surcharge = pe.Param(m.j,initialize=val[27])  # Taxes for electricity price
     m.ir = pe.Param(initialize=val["ir"])
     m.alpha_j = pe.Param(m.j,initialize=val["alpha_j"])
-
+    m.c_ramp_j = pe.Param(m.j,initialize =val["c_ramp_j"] )
+    
     m.load_cap_hs  = pe.Param(m.j_hs,initialize=val["load_cap_hs"])
     m.unload_cap_hs  = pe.Param(m.j_hs,initialize=val["unload_cap_hs"])
     m.n_hs = pe.Param(m.j_hs,initialize=val["n_hs"])
-    m.loss_hs = pe.Param(m.j_hs,initialize=val["loss_hs"])
     m.IK_hs = pe.Param(m.j_hs,initialize=val["IK_hs"])
     m.cap_hs = pe.Param(m.j_hs,initialize=val["cap_hs"])
-    m.c_ramp_chp = pe.Param(initialize=val["c_ramp_chp"])
-    m.c_ramp_waste = pe.Param(initialize=val["c_ramp_waste"])
+    
+
     m.alpha_hs = pe.Param(m.j_hs,initialize=val["alpha_hs"])
 
     m.rf_j = pe.Param(m.j,initialize=val["rf_j"])
@@ -97,8 +97,8 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.Cap_hs = pe.Var(m.j_hs,within=pe.NonNegativeReals)
     m.store_level_hs_t = pe.Var(m.j_hs,m.t,within=pe.NonNegativeReals)
 
-    m.ramp_j_chp_t = pe.Var(m.j_chp, m.t,within=pe.NonNegativeReals)
-    m.ramp_j_waste_t = pe.Var(m.j_waste, m.t,within=pe.NonNegativeReals)
+    m.ramp_jt = pe.Var(m.j, m.t,within=pe.NonNegativeReals)
+
 
     #%% Nebenbedingungen
 
@@ -255,19 +255,13 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
 
     m.unload_hs_t_restriction = pe.Constraint(m.j_hs,m.t,[True,False],rule=unload_hs_t_restriction_rule)
     #%
-    def ramp_j_chp_t_rule (m,j,t):
+    def ramp_cost_jt_rule (m,j,t):
         if t==1:
-            return m.ramp_j_chp_t[j,t] == 0
+            return m.ramp_jt[j,t] == 0
         else:
-            return m.ramp_j_chp_t[j,t] >= m.x_th_jt[j,t] - m.x_th_jt[j,t-1]
-    m.ramping_j_chp_t = pe.Constraint(m.j_chp,m.t,rule=ramp_j_chp_t_rule)
+            return m.ramp_jt[j,t] >= m.x_th_jt[j,t] - m.x_th_jt[j,t-1]
+    m.ramp_cost_jt = pe.Constraint(m.j,m.t,rule=ramp_cost_jt_rule)
 
-    def ramp_j_waste_t_rule (m,j,t):
-        if t==1:
-            return m.ramp_j_waste_t[j,t] == 0
-        else:
-            return m.ramp_j_waste_t[j,t] >= m.x_th_jt[j,t] - m.x_th_jt[j,t-1]
-    m.ramping_j_waste_t = pe.Constraint(m.j_waste,m.t,rule=ramp_j_waste_t_rule)
 
     def renewable_factor_j_rule (m):
         if (sum(m.rf_j[j] for j in m.j) == 0):
@@ -294,7 +288,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
 #        c_var_chp = sum([m.mc_jt[j,t] * m.x_th_jt[j,t] - m.sale_electricity_price_jt[j,t] * m.x_el_jt[j,t] for j in m.j_chp for t in m.t])
         c_var = c_var
         c_peak_el = m.P_el_max*10000
-        c_ramp = sum ([m.ramp_j_waste_t[j,t] * m.c_ramp_waste for j in m.j_waste for t in m.t]) + sum ([m.ramp_j_chp_t[j,t] * m.c_ramp_chp for j in m.j_chp for t in m.t])
+        c_ramp = sum ([m.ramp_jt[j,t] * m.c_ramp_j[j] for j in m.j for t in m.t])
         c_tot = c_inv + c_var + c_op_fix + c_op_var + c_peak_el + c_ramp
 
         rev_gen_electricity = sum([m.x_el_jt[j,t]*(m.sale_electricity_price_jt[j,t]) for j in m.j for t in m.t])

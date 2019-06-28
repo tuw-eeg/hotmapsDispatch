@@ -22,14 +22,9 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
 #            os.mkdir(path2solution)
         print("Saving Solver Output ....")
 
-
-        c_ramp={}
-        rev_tot={}
-
         c_inv_stock = {j:instance.x_th_cap_j[j] * instance.IK_j[j] * instance.alpha_j[j] for j in instance.j}
-        c_ramp = {j:sum(instance.ramp_j_waste_t[j,t]() * instance.c_ramp_waste for t in instance.t) for j in instance.j_waste}
-        for j in instance.j_chp:
-            c_ramp[j] = sum(instance.ramp_j_chp_t[j,t]() * instance.c_ramp_chp for t in instance.t)
+        c_ramp = {j:sum( instance.ramp_jt[j,t]() * instance.c_ramp_j[j] for t in instance.t) for j in instance.j}
+        print("Here")
         rev_tot = {j:sum(instance.x_el_jt[j,t]()*instance.sale_electricity_price_jt[j,t] for t in instance.t) for j in instance.j}
 
         c_tot_inv = instance.cost() + sum ([c_inv_stock[j]  for j in instance.j])
@@ -91,7 +86,7 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         solution["Marginal Costs"] = [np.mean([instance.mc_jt[j,t] for t in instance.t]) - instance.n_el_j[j]/np.mean([instance.n_th_jt[j,t] for t in instance.t]) *np.mean([instance.sale_electricity_price_jt[j,t] for t in instance.t]) if j in instance.j_chp else np.mean([instance.mc_jt[j,t] for t in instance.t]) for j in instance.j]
         for i,val in enumerate(instance.j):
             if val in instance.j_chp:
-                solution["Marginal Costs"][i] = solution["Marginal Costs"][i] - instance.n_el_j[val]/np.mean([instance.n_th_jt[val,t] for t in instance.t])*np.mean([instance.sale_electricity_price_jt[j,t] for t in instance.t])
+                solution["Marginal Costs"][i] = solution["Marginal Costs"][i] - instance.n_el_j[val]/np.mean([instance.n_th_jt[val,t] for t in instance.t])*np.mean([instance.sale_electricity_price_jt[val,t] for t in instance.t])
         solution["State of Charge"] = {hs:[instance.store_level_hs_t[hs,t]() for t in instance.t] for hs in instance.j_hs}
 
         solution["HS-Capacities"] = {hs:instance.Cap_hs[hs]()+instance.cap_hs[hs] if instance.Cap_hs[hs]() != None else instance.cap_hs[hs] for hs in instance.j_hs }
