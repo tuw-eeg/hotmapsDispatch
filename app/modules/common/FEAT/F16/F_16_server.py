@@ -211,11 +211,10 @@ def genearte_selection(dic,dict_key_map):
     return select,source,fig
 # ===========================================================================
 def generate_tables(columns,name="",):
-    if name == "":
-        data = pd.read_excel(path_parameter,skiprows=[0])[columns]
-        data["type"] = data.index
-    else:
-        data = pd.read_excel(path_parameter,name,skiprows=[0])[columns]
+    if name == "": 
+        data = pd.read_excel(path_parameter,skiprows=[0]).drop(["input"],axis=1) 
+    else: 
+        data = pd.read_excel(path_parameter,name,skiprows=[0]) 
     if name in ["","Heat Storage"]:
         data = data.drop(data.index)
 
@@ -224,7 +223,7 @@ def generate_tables(columns,name="",):
     source = ColumnDataSource(data)
     #,width=1550,height=700
     table = DataTable(source=source,columns=col,width=1550,
-                           editable=True,height=250)
+                           editable=True,height=350)
     return table
 # ===========================================================================
 def modification_tools(**kwargs):
@@ -481,7 +480,7 @@ input_list_gui= ['name',
  'renewable factor',
  'must run [0-1]']
 
-input_list = input_list_gui + ['type', 'input']
+input_list = input_list_gui + ['type']#, 'input']
 
 input_price_list = ["energy carrier","prices(EUR/MWh)","emission factor [tCO2/MWh]"]
 
@@ -515,16 +514,21 @@ tec_mapper = {}
 for sheet in pd.ExcelFile(path_parameter).sheet_names:
     if sheet in sheets:
         continue
-    tec_mapper[sheet] = pd.read_excel(path_parameter,sheet).columns[0]
-    heat_pumps[sheet] = pd.read_excel(path_parameter,sheet,skiprows=[0]).fillna(0).set_index("COP")
-    flow_temp_dic[sheet] = heat_pumps[sheet].columns.values.tolist()
-    return_temp_dic[sheet] = heat_pumps[sheet].index.values.tolist()
+    typ,name = [x.strip() for x in pd.read_excel(path_parameter,sheet).columns[0].split("#")]
+    tec_mapper[typ] = [name] + tec_mapper.get(typ,[name])
+    if typ == "heat pump":
+        heat_pumps[name] = pd.read_excel(path_parameter,sheet,skiprows=[0]).fillna(0).set_index("COP")
+        flow_temp_dic[name] = heat_pumps[name].columns.values.tolist()
+        return_temp_dic[name] = heat_pumps[name].index.values.tolist()
 
 select_tec_mapper = pd.read_excel(path_parameter,sheets[-1],index_col=1).to_dict()["Technologies"]
 select_tec_options_model = list(select_tec_mapper.values())
 select_tec_options = list(select_tec_mapper.keys())
-tec_mapper_inv = invert_dict(tec_mapper)
-select_tec2_options= {key:df["name"].tolist() for key,df in grp_data_tec} 
+
+select_tec2_options= {key:df["name"].tolist() for key,df in grp_data_tec}
+_typ= "heat pump"
+for _x in tec_mapper[_typ] :
+    assert _x in select_tec2_options[_typ], f"Default data has changed, missing fincancal data for <{_typ}-{_x}>"
 energy_carrier_options = pd.read_excel(path_parameter,sheets[1],skiprows=[0])[input_price_list[0]].values.tolist()
 select_hs_options = pd.read_excel(path_parameter,sheets[3],skiprows=[0])["name"].values.tolist()
 
@@ -580,7 +584,7 @@ def modify_doc(doc):
 # =============================================================================
 #   MAIN GUI Elements
 # =============================================================================
-    data_table = generate_tables(input_list)
+    data_table = generate_tables(input_list_gui)
     data_table_prices = generate_tables(input_price_list,sheets[1])
     data_table_data = generate_tables(parameter_list,sheets[2])
     data_table_heat_storage = generate_tables(list(heat_storage_list_mapper),sheets[3])
@@ -1640,7 +1644,6 @@ def modify_doc(doc):
 # =============================================================================
     def reset_callback():
         div_spinner.text = load_text
-        print(scenario_mapper)
         output.tabs = []
         div_spinner.text = ""
 #        grid.children = [Div()] # XXX
@@ -1798,8 +1801,8 @@ def modify_doc(doc):
 
     widgets_list= [name_label,installed_cap, n_th_label, n_el_label,
             ik_label, opex_fix_label, opex_var_label,lt_label,
-            renewable_factor, must_run_box,select_tec,energy_carrier_select
-            ]
+            renewable_factor, must_run_box,select_tec]#,energy_carrier_select]
+            
 
     widgets_dict = dict(zip(input_list,widgets_list))
     cop_widget_list = [return_temp, flow_temp, cop_label]
@@ -1843,7 +1846,7 @@ def modify_doc(doc):
         output.tabs = []
         select_tec.value = select_tec.options[0]
         installed_cap.end=int(float(pmax.value))+1
-        energy_carrier_select.options =  data_table_prices.source.data["energy carrier"]
+        energy_carrier_select.options =  list(data_table_prices.source.data["energy carrier"])
         div_spinner.text = ""
 # =============================================================================
     def cancel():
@@ -1867,7 +1870,7 @@ def modify_doc(doc):
         new_data={}
         for x in input_list:
             if x == "name":
-                try:
+                try: #XXX: why try and catch ?
                     new_data[x] = new_name(str(name_label.value),data_table.source.data["name"].tolist())
                     carrier_dict[new_name(str(name_label.value),data_table.source.data["name"].tolist())] = energy_carrier_select.value
                 except:
@@ -1875,9 +1878,11 @@ def modify_doc(doc):
                     carrier_dict[new_name(str(name_label.value),data_table.source.data["name"])] = energy_carrier_select.value
             elif  x == 'must run [0-1]':
                 new_data[x] = str(int(widgets_dict[x].active))
+            elif x == "type": 
+                new_data[x] = str(select_tec_mapper[widgets_dict[x].value])
             else:
                 new_data[x] = str(widgets_dict[x].value)
-        new_data["type"] = select_tec_mapper[select_tec.value]
+
         df2 = df2.append(new_data,ignore_index=True)
         df2 = df2.apply(pd.to_numeric, errors='ignore')
         df2["index"] = df2.index
@@ -1889,27 +1894,43 @@ def modify_doc(doc):
     def add_heat_pump():
         disable_widgets(cop_widget_list,False)
         cop_label.disabled = True
-        flow_temp.options = flow_temp_dic[tec_mapper_inv[select_tec2.value]]
-        flow_temp.value = flow_temp_dic[tec_mapper_inv[select_tec2.value]][0] # Caution: this calls the cop_callback, thus need of try block
-        return_temp.options = return_temp_dic[tec_mapper_inv[select_tec2.value]]
-        return_temp.value = return_temp_dic[tec_mapper_inv[select_tec2.value]][0] # Caution: this calls the cop_callback,
-        cop_label.value = str(heat_pumps[tec_mapper_inv[select_tec2.value]].loc[return_temp.value,flow_temp.value])
+        flow_temp.options = flow_temp_dic[select_tec2.value]
+        flow_temp.value = flow_temp_dic[select_tec2.value][0] # Caution: this calls the cop_callback, thus need of try block
+        return_temp.options = return_temp_dic[select_tec2.value]
+        return_temp.value = return_temp_dic[select_tec2.value][0] # Caution: this calls the cop_callback,
+        cop_label.value = str(heat_pumps[select_tec2.value].loc[return_temp.value,flow_temp.value])
         n_th_label.value = cop_label.value
         n_th_label.disabled = True
 #        tabs_geneator.tabs = layout1
 # =============================================================================
     def add_tec(name,old,new):
         div_spinner.text = load_text
+        
         n_th_label.disabled = False
         disable_widgets(cop_widget_list,True)
-                
+        
+        select_tec2.title= "Select a "+str(select_tec.value)+":"
+        select_tec2.options = select_tec2_options[select_tec_mapper[select_tec.value]]
+        select_tec2.value = select_tec2.options[0]
+        
+        if select_tec_mapper[select_tec.value] == "heat pump": 
+            disable_widgets(cop_widget_list,False)   
+            cop_label.disabled = True
+            
+        div_spinner.text = ""
+# =============================================================================
+    def auto_load(name,old,new):
+        div_spinner.text = load_text            
         try:
             search = grp_data_tec.get_group((select_tec_mapper[select_tec.value])).set_index("name",drop=False)
+            energy_carrier_select.value = search.loc[select_tec2.value,"input"] #TODO:Remove this by adding widget in inpuit list (else-Zweig) and therefor remove global variable energy_carrier_dict
             for x in input_list:
                 if x == 'must run [0-1]':  
-                    widgets_dict[x] = bool(int(search.loc[select_tec2.value,x]))
-                elif x == 'installed capacity (MW_th)':
-                    widgets_dict[x] = float(search.loc[select_tec2.value,x])
+                    widgets_dict[x].active = bool(int(search.loc[select_tec2.value,x]))
+                elif x in ['installed capacity (MW_th)','renewable factor']:
+                    widgets_dict[x].value = float(search.loc[select_tec2.value,x])
+                elif x in ['type']:
+                    continue
                 else:
                     widgets_dict[x].value = str(search.loc[select_tec2.value,x])
                             
@@ -1918,39 +1939,18 @@ def modify_doc(doc):
             search = pd.DataFrame()
             for x in input_list:
                 if x == 'must run [0-1]':  
-                    widgets_dict[x] = False
-                elif x == 'installed capacity (MW_th)':
-                    widgets_dict[x] = 0
+                    widgets_dict[x].active = False
+                elif x in ['installed capacity (MW_th)','renewable factor']:
+                    widgets_dict[x].value = 0
+                elif x in ['type']:
+                    continue
                 else:
                     widgets_dict[x].value = ""
         
-#        if select_tec.value == "heat pump": 
-#            disable_widgets(cop_widget_list,False)   
-#            cop_label.disabled = True
-
-
-        div_spinner.text = ""
-# =============================================================================
-    def auto_load(name,old,new):
-        if widgets_dict["name"][0].value not in widgets_dict["name"][1].value:
-            name_label.value =  widgets_dict["name"][0].value
-        else:
-            name_label.value =  widgets_dict["name"][1].value
-
-        if select_tec.value == "heat pump":
+        if select_tec_mapper[select_tec.value]  == "heat pump":
             add_heat_pump()
-        else:
-            energy_carrier_select.value = str(data_tec[data_tec["name"] == select_tec2.value]["input"].values[0])
-            n_el_label.value =   str(data_tec[data_tec["name"] == select_tec2.value]["efficiency el"].values[0])
-            n_th_label.value =   str(data_tec[data_tec["name"] == select_tec2.value]["efficiency th"].values[0])
-
-            opex_fix_label.value = str(data_tec[data_tec["name"] == select_tec2.value]["OPEX fix (EUR/MWa)"].values[0])
-            opex_var_label.value = str(data_tec[data_tec["name"] == select_tec2.value]["OPEX var (EUR/MWh)"].values[0])
-
-            lt_label.value = str(data_tec[data_tec["name"] == select_tec2.value]["life time"].values[0])
-            ik_label.value = str(data_tec[data_tec["name"] == select_tec2.value]["investment costs (EUR/MW_th)"].values[0])
-            disable_widgets(cop_widget_list,True)
-            
+        
+        div_spinner.text = ""
 # =============================================================================
     def update_slider(name,old,new):
         try:
@@ -1960,7 +1960,7 @@ def modify_doc(doc):
 # =============================================================================
     def cop_callback(name,old,new):
         try: # because of empty fields at the start no COP can be found
-            cop_label.value = str(heat_pumps[tec_mapper_inv[select_tec2.value]].loc[return_temp.value,flow_temp.value])
+            cop_label.value = str(heat_pumps[select_tec2.value].loc[return_temp.value,flow_temp.value])
             n_th_label.value = cop_label.value
             n_th_label.disabled = True
         except:
@@ -2403,7 +2403,7 @@ def modify_doc(doc):
 # =============================================================================
        
     def add_new_scenario(sc_name,sub_sc_name="default_sub"):
-        heat_generator_table[sc_name] = { sub_sc_name : pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore').fillna(0)}
+        heat_generator_table[sc_name] = { sub_sc_name : pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore').fillna(0)}
         heat_storage_table[sc_name] = { sub_sc_name : pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)}
         paramters_table[sc_name] = { sub_sc_name : pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore').fillna(0)}
         price_emmission_factor_table[sc_name] = { sub_sc_name : pd.DataFrame(data_table_prices.source.data)[input_price_list].apply(pd.to_numeric, errors='ignore').fillna(0)}
@@ -2567,7 +2567,7 @@ def modify_doc(doc):
 # =============================================================================
             
     def add_sub_scenarios(sc_name,sub_sc_name):
-        heat_generator_table[sc_name][sub_sc_name] = pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore').fillna(0)
+        heat_generator_table[sc_name][sub_sc_name] = pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore').fillna(0)
         heat_storage_table[sc_name][sub_sc_name] = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)
         carrier_table[sc_name][sub_sc_name] = pd.DataFrame(carrier_dict,index=[0]).T.to_dict()[0]
         paramters_table[sc_name][sub_sc_name] = pd.DataFrame(data_table_data.source.data)[parameter_list].apply(pd.to_numeric, errors='ignore').fillna(0)
@@ -2636,7 +2636,7 @@ def modify_doc(doc):
             sub_sc_name_new = sub_sc_name_old
             
         if sc_param == scenario_paramters[0]:
-            heat_generator_table[sc_name][sub_sc_name_new] = pd.DataFrame(data_table.source.data)[input_list+["type"]].apply(pd.to_numeric, errors='ignore').fillna(0)
+            heat_generator_table[sc_name][sub_sc_name_new] = pd.DataFrame(data_table.source.data)[input_list].apply(pd.to_numeric, errors='ignore').fillna(0)
             heat_storage_table[sc_name][sub_sc_name_new] = pd.DataFrame(data_table_heat_storage.source.data)[list(heat_storage_list_mapper)].apply(pd.to_numeric, errors='ignore').fillna(0)
             carrier_table[sc_name][sub_sc_name_new] = pd.DataFrame(carrier_dict,index=[0]).T.to_dict()[0]
         elif sc_param == scenario_paramters[1]:
