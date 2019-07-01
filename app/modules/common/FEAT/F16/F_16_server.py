@@ -2810,13 +2810,10 @@ def modify_doc(doc):
     return doc
 #%% PYTHON MAIN
 if __name__ == '__main__':
-
-    
-    allow_websocket_origin=None
-    f_allow_websocket_origin = os.path.join(root_dir, 'allow_websocket_origin.txt')
-    if os.path.exists(f_allow_websocket_origin):
-        with open(f_allow_websocket_origin) as fd:
-            allow_websocket_origin = [line.strip() for line in fd.readlines()]
+    # config.json- file content sturcture:
+    # {"allow_websocket_origin": "dispatch.invert.at", "port": 5006}
+    with open(os.path.join(root_dir, 'config.json'), 'r') as fd:
+        config = json.load(fd)
             
     bokeh_app = Application(FunctionHandler(modify_doc))
     bokeh_app_2 = Application(DirectoryHandler(filename = path2data)) #FIXME: for downloading files
@@ -2829,23 +2826,24 @@ if __name__ == '__main__':
         # 4: starts 4 processes
         num_procs = 0
         server = Server({'/': bokeh_app, '/download':bokeh_app_2}, 
-                        num_procs=num_procs, 
-                        allow_websocket_origin=allow_websocket_origin)
+                        num_procs=num_procs,**config)
         server.start()
         server.io_loop.start()
 # =============================================================================
 #     
 # =============================================================================
     except:
+        del config['allow_websocket_origin']
         print("Start single Thread...")
         io_loop = IOLoop.current()
         server = Server({'/': bokeh_app, '/download':bokeh_app_2}, io_loop=io_loop, 
-                        allow_websocket_origin=allow_websocket_origin)
+                        **config)
         server.start() 
+        config['allow_websocket_origin'] = "localhost"
 # =============================================================================
 # 
 # =============================================================================
-    print('Open Dispath Application on http://localhost:5006/')
+    print(f"Open Dispath Application on {config['allow_websocket_origin']}:{config['port']}")
     
     #FIXME:  Error while starting server via sypder-ide
     try:
