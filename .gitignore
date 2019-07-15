@@ -8,3 +8,5 @@ solution.json
 gurobi.log
 
 app/modules/common/FEAT/F16/config\.json
+
+\.spyproject/

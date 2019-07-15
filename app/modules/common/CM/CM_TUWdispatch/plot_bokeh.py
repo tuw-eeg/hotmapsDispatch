@@ -922,7 +922,8 @@ def plot_solutions(show_plot=False, path2json=path2json,
                          "Anual Investment Cost (of existing power plants and heat storages)",
                          "Operational Cost:", "Fuel Costs:", "Revenue From Electricity:"]
         p8 = costBarStack_chart(dic,decision_vars,path2output,cmap)
-        decision_vars += ["Total CO2 Emission:","Full Load Hours:","LCOH:","Turn Over Rate:"] 
+        decision_vars += ["Total CO2 Emission:","Full Load Hours:",
+                          "Operating Hours:","LCOH:","Turn Over Rate:"] 
         p11 = plotExtra_table(decision_vars,dic,path2output)
         l2 = layout([[p8],[p11]])
         
