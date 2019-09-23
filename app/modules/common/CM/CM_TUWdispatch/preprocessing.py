@@ -22,7 +22,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
         selection_nonzero = np.nonzero(list(data["P_th_cap"].values()))[0].tolist()
         if not selection_nonzero:
             print("No Capacities installed !!!")
-            return "Error1"
+            return "Error1","No Capacities installed !!!" 
         tec = []
         for s in selection_nonzero:
             tec.append(data["tec"][s])
@@ -48,8 +48,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
 
     #%% Parameter - #TODO: depends on how the input data looks finally
     demand_th_t =           data["demand_th"]
-    max_demad =             max(data["demand_th"].values())
-
+    max_demad =             max(data["demand_th"].values())   
 
     radiation_t =           data["radiation"]
     IK_j =                  {key:data["IK"][key] for key in tec}
@@ -132,6 +131,8 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
     mr_j = {key:data["MR"][key] for key in tec}
     
     em_j = {j: data["em"][data["energy_carrier"][j]] for j in tec}
+
+    pco2 =   data["P_co2"]    
     
     args = [tec, j_hp, j_pth, j_st, j_waste, j_chp, j_bp, j_wh,
             j_gt, j_hs, demand_th_t, max_demad, radiation_t, IK_j,
@@ -142,7 +143,7 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
             IK_hs, cap_hs, alpha_hs,
             rf_j, rf_tot, OP_var_j, temperature, thresh,
             sale_electricity_price_t, OP_fix_hs, all_heat_geneartors,
-            mr_j,j_chp_se,j_chp_bp,em_j,cap_losse_hs,P_max_el_j,c_ramp_j]
+            mr_j,j_chp_se,j_chp_bp,em_j,cap_losse_hs,P_max_el_j,c_ramp_j,pco2]
 
     keys = ['j', 'j_hp', 'j_pth', 'j_st', 'j_waste', 'j_chp', 'j_bp', 'j_wh',
             'j_gt', 'j_hs', 'demand_th_t', 'max_demad', 'radiation_t', 'IK_j',
@@ -153,6 +154,6 @@ def preprocessing(data, demand_f = 1, inv_flag = 0,selection=[[],[]]):
             'IK_hs', 'cap_hs','alpha_hs',
             'rf_j', 'rf_tot', 'OP_var_j', 'temperature_t', 'thresh',
             'sale_electricity_price_jt', 'OP_fix_hs', 'all_heat_geneartors',
-            'mr_j' , 'j_chp_se' , 'j_chp_bp','em_j','cap_losse_hs',"P_max_el_j","c_ramp_j"]
+            'mr_j' , 'j_chp_se' , 'j_chp_bp','em_j','cap_losse_hs',"P_max_el_j","c_ramp_j","pco2"]
 
-    return dict(zip(keys,args))
+    return dict(zip(keys,args)),None

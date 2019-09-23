@@ -19,7 +19,7 @@ def main(data,inv_flag,selection,demand_f):
     instance,results = simpel_dispatch.run(data,inv_flag,selection,demand_f)
     
     if instance == "Error1" or instance == "Error2":
-        return instance,None,None
+        return instance,results,None 
     
     if instance == "Error3":
         return "Error3",None,None

@@ -126,7 +126,7 @@ Select = CustomSelect
 from AD.F16_input.main import extract,find_FiT
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
 import CM.CM_TUWdispatch.run_cm as dispatch
-from CM.CM_TUWdispatch.save_sol_to_json import json2xlsx
+from CM.CM_TUWdispatch.save_sol_to_json import json2xlsx,scenarioJson2xlsx 
 
 #%% Setting Global default paramters and default paths
 path_parameter = os.path.join(path, "AD", "F16_input", "DH_technology_cost.xlsx")
@@ -734,6 +734,8 @@ def modify_doc(doc):
             sc,sub_sc = zip(*no_cap)
             return f"""No Heat Generators available for for the scenarios {sc} in sub scenarios {sub_sc}"""
         elif no_cap != []:
+            if invest_button.active: 
+                return True 
             sc,sub_sc = zip(*no_cap)
             return f"""The installed capacities are not enough to cover the load for the scenarios {sc} in sub scenarios {sub_sc} """
         else: 
@@ -810,7 +812,15 @@ def modify_doc(doc):
 #        for k in list(_nth):
 #            _nth.pop(k,None)
         ## 
-        solutions,_message,_ = execute(data,False,[[],[]])
+        inv_flag = False 
+        sel1 = [] 
+        sel2 = [] 
+        if invest_button.active: 
+            inv_flag = True 
+            sel1 = list(range(heat_generator_table[sc][sub_sc].shape[0])) 
+            sel2 = list(range(heat_storage_table[sc][sub_sc].shape[0])) 
+             
+        solutions,_message,_ = execute(data,inv_flag,[sel1,sel2]) 
         ok = False
         output_data = None
         if solutions == "Error1":
@@ -938,153 +948,78 @@ def modify_doc(doc):
         for sc,sub_sc_list in scenario_mapper.items():
             indicator_dict[sc] = dict()
             for sub_sc in sub_sc_list:
-                indicator_dict[sc][sub_sc] = dict_of_solutions[sc][sub_sc][indicator]
+                indicator_dict[sc][sub_sc] = (dict_of_solutions[sc].get(sub_sc) or {}).get(indicator,0) 
         return indicator_dict
 # =============================================================================
-    def scenario_table(**kwargs):
-        """
-        solutions
-        output
-        """
-        decision_vars =      ["Anual Total Costs",
-                             "Anual Total Costs (with costs of existing power plants and heat storages)",
-                             "Electricity Production by CHP",
-                             "Thermal Production by CHP",
-                             "Mean Value Heat Price",
-                             "Mean Value Heat Price (with costs of existing power plants and heat storages)",
-                             "Median Value Heat Price",
-                             "Electrical Consumption of Heatpumps and Power to Heat devices",
-                             "Maximum Electrical Load of Heatpumps and Power to Heat devices",
-                             "Revenue From Electricity:",
-                             "Ramping Costs",
-                             "Operational Cost:",
-                             "Anual Investment Cost",
-                             "Anual Investment Cost (of existing power plants)",
-                             "Electrical Peak Load Costs",
-                             "Variable Cost CHP's",
-                             "Fuel Costs",
-                             "Total CO2 Emissions",
-                             "Renewable Share",
-                             ]
-        
-        vals = {sc+"#"+sub_sc: None for sc,sub_sc_list in scenario_mapper.items() for sub_sc in sub_sc_list}
-        vals2 = {sc+"#"+sub_sc: None for sc,sub_sc_list in scenario_mapper.items() for sub_sc in sub_sc_list}
-        for sc,sub_sc_list in scenario_mapper.items():
-            for sub_sc in sub_sc_list:
-                dic = kwargs["solutions"][sc][sub_sc]
-                if dic:
-                    val = []
-                    for decision_var in decision_vars:
-                        if type(dic[decision_var]) == dict:
-                            val.append(sum(dic[decision_var].values()))
-                        elif type(dic[decision_var]) == list:
-                            val.append(sum(dic[decision_var]))
-                        else:
-                            val.append(dic[decision_var])
-                    
-                    formatted_val = [f"{item:.3e}"for item in val]
-
-                    vals[sc+"#"+sub_sc]=formatted_val
-                    vals2[sc+"#"+sub_sc] = [round(x,3) for x in val]
-                else:
-                    del vals[sc+"#"+sub_sc]
-        
-        data = {**{"topic": decision_vars},**vals}
-                
-        source = ColumnDataSource(data)
-        cols = [TableColumn(field=key, title=key) for key in vals]
-        columns = [TableColumn(field="topic", title="Topic")] + cols
-                
-        data_table = DataTable(source=source, columns=columns, width=1000, height=1000)
-        # Save to excel 
-        writer = pd.ExcelWriter(os.path.join(kwargs["output"],"results.xlsx"),engine='xlsxwriter')
-        df = pd.DataFrame({**{"topic": decision_vars},**vals2}).set_index("topic")
-        tuples = [tuple(x.split("#")) for x in df.columns]
-        cols  = pd.MultiIndex.from_tuples(tuples, names=['Portfolio / Scenario', 'Sub Scenario'])
-        df.columns = cols
-        df.to_excel(writer, sheet_name="Results")
-        worksheet = writer.sheets["Results"]  
-        for idx, col in enumerate(df): 
-            series = df[col]
-            max_len = max((
-                series.astype(str).map(len).max(),  
-                len(str(series.name[-1] if type(series.name)!=str else series.name)) 
-                )) + 1  
-            worksheet.set_column(idx, idx, max_len)  
-
-# ============================================================================= 
-#  
-# ============================================================================= 
-        decision_vars2 = ["Full Load Hours", "Thermal Generation Mix"]
-        all_tecs = list(set([x for sc,sub_sc_list in scenario_mapper.items() for sub_sc in sub_sc_list for x in kwargs["solutions"][sc][sub_sc]["Technologies"]])) 
-        data={(dec_var,sc,sub_sc):[kwargs["solutions"][sc][sub_sc][dec_var].get(tec,"") for tec in all_tecs] for dec_var in decision_vars2 for sc,sub_sc_list in scenario_mapper.items() for sub_sc in sub_sc_list} 
-        data["Technologies"]=all_tecs 
-        df2 = pd.DataFrame(data).set_index("Technologies") 
-        tuples = [(dec_var,sc,sub_sc) for dec_var in decision_vars2 for sc,sub_sc_list in scenario_mapper.items() for sub_sc in sub_sc_list] 
-        cols  = pd.MultiIndex.from_tuples(tuples, names=['Topic','Portfolio / Scenario', 'Sub Scenario']) 
-        df2.columns = cols 
-        df2.to_excel(writer,sheet_name="More Results") 
-        worksheet = writer.sheets["More Results"]   
-        for idx, col in enumerate(df2):  
-            series = df2[col] 
-            max_len = max(( 
-                series.astype(str).map(len).max(),   
-                len(str(series.name[-1] if type(series.name)!=str else series.name))  
-                )) + 1   
-            worksheet.set_column(idx, idx, max_len) 
-            
-        writer.save()    
-        return widgetbox(data_table)
+    def gen_kwargs(model_key,title_tab,title_chart,ylabel): 
+        kwargs = dict(  model_key= model_key, 
+                        title = title_tab, 
+                        kwargs_scenario_charts1 = dict(  title = title_chart, 
+                                                         xlabel = "Scenarios", 
+                                                         ylabel = ylabel, 
+                                                         invert_category = False 
+                                                         ), 
+                        kwargs_scenario_charts2 = dict(  title = title_chart, 
+                                                         xlabel = "Sub Scenarios", 
+                                                         ylabel = ylabel, 
+                                                         invert_category = True 
+                                                         ) 
+                        ) 
+        return kwargs
+# =============================================================================
+    def createPanel(dict_of_solutions,**kwargs): 
+        indicator = get_indicator(kwargs["model_key"],dict_of_solutions) 
+        chart1 = scenario_chart(scenario_mapper,indicator,**kwargs["kwargs_scenario_charts1"]) 
+        panel1 = Panel(child=chart1, title=f'{kwargs["title"]} (Scenario VS Sub Scenario)') 
+        chart2 = scenario_chart(scenario_mapper,indicator,**kwargs["kwargs_scenario_charts2"]) 
+        panel2 = Panel(child=chart2, title=f'{kwargs["title"]} (Sub Scenario VS Scenario)') 
+        panel = [panel1,panel2] 
+        return panel 
 # =============================================================================
     def compare_plot(dict_of_solutions,path2output):
         print("creating comparison charts...")
-        print("loading indicators..")
-        lcoh = get_indicator("Mean Value Heat Price (with costs of existing power plants and heat storages)",dict_of_solutions)
-        renewable_share = get_indicator("Renewable Share",dict_of_solutions)
-        print("creating charts..")
-        lcoh_sc_vs_subSc = scenario_chart(scenario_mapper,
-                       lcoh,
-                       title="Levelized Cost of Heating",
-                       xlabel="Scenarios",
-                       ylabel="LCOH in EUR / MWh_th",
-                       invert_category=False)
+        list_of_tuples =  [("Mean Value Heat Price (with costs of existing power plants and heat storages)", 
+                             "LCOH", 
+                             "Levelized Cost of Heating", 
+                             "EUR / MWh_th"), 
+                            ("Anual Total Costs (with costs of existing power plants and heat storages)", 
+                             "Total Costs", 
+                             "Total Costs", 
+                             "EUR"), 
+                            ("Total Fuel Costs", 
+                             "Total Fuel Costs", 
+                             "Total Fuel Costs", 
+                             "EUR"), 
+                            ("Total CO2 Costs", 
+                             "Total CO2 Costs", 
+                             "Total CO2 Costs", 
+                             "EUR"), 
+                            ("Total Operational Costs", 
+                             "Total Operational Costs", 
+                             "Total Operational Costs (var+fix) w/o fuel cost)", 
+                             "EUR"), 
+                            ("Total Investment Costs", 
+                             "Total Investment Costs", 
+                             "Total Investment Costs", 
+                             "EUR"), 
+                            ("Total Electricty Consumption", 
+                             "Total Electricty Consumption", 
+                             "Total Electricty Consumption", 
+                             "MWh"), 
+                             ] 
+         
+        print("loading indicators and creating charts..") 
+        list_of_panels = [x for args in list_of_tuples for x in createPanel(dict_of_solutions,**gen_kwargs(*args)) ] 
+         
+        scenarioJson2xlsx(scenario_mapper,dict_of_solutions,os.path.join(path2output,"results.xlsx")) 
+ 
+        output_tabs = Tabs(tabs=list_of_panels) 
         
-        lcoh_subSc_vs_sc = scenario_chart(scenario_mapper,
-                       lcoh,
-                       title="Levelized Cost of Heating",
-                       xlabel="Sub Scenarios",
-                       ylabel="LCOH in EUR / MWh_th",
-                       invert_category=True)        
-        
-        renewable_share_sc_vs_subSc = scenario_chart(scenario_mapper,
-                       renewable_share,
-                       title="Renewable Share",
-                       xlabel="Scenarios",
-                       ylabel="Renewable Share in %",
-                       invert_category=False)
-        
-        renewable_share_subSc_vs_sc = scenario_chart(scenario_mapper,
-                       renewable_share,
-                       title="Renewable Share",
-                       xlabel="Sub Scenarios",
-                       ylabel="Renewable Share in %",
-                       invert_category=True) 
-        
-        table_scenario = scenario_table(solutions=dict_of_solutions,output=path2output)
-        
-        lcoh_sc_vs_subSc = Panel(child=lcoh_sc_vs_subSc, title="LCOH Scenarios VS Sub Scenarios")
-        lcoh_subSc_vs_sc = Panel(child=lcoh_subSc_vs_sc, title="LCOH Sub Scenarios VS  Scenarios")
-        renewable_share_sc_vs_subSc = Panel(child=renewable_share_sc_vs_subSc, title="Renewable Share VS Sub Scenarios")
-        renewable_share_subSc_vs_sc = Panel(child=renewable_share_subSc_vs_sc, title="Renewable Share VS  Scenarios")        
-        table_scenario = Panel(child=table_scenario, title="Results"
-                               )
-        output = [ lcoh_sc_vs_subSc, lcoh_subSc_vs_sc,renewable_share_sc_vs_subSc,renewable_share_subSc_vs_sc,table_scenario ]
-        output_tabs = Tabs(tabs=output)
         print("save chart...")
         output_file(os.path.join(path2output,"output_scenarios_compare.html"),title="Compare Scenarios")
         save(output_tabs)
         print("creating comparison charts done")
-        return output
+        return list_of_panels
 
     def create_cmap_for_all_scenarios():
         hgs = dict()
@@ -1288,8 +1223,8 @@ def modify_doc(doc):
                 inv_flag = False
                 if invest_button.active:
                     inv_flag = True
-                    selection0 = data_table.source.selected["1d"]["indices"] #XXX: 0.12.10
-                    selection1 = data_table_heat_storage.source.selected["1d"]["indices"] #XXX: 0.12.10
+                    selection0 = list(sorted(data_table.source.selected["1d"]["indices"])) #XXX: 0.12.10 
+                    selection1 = list(sorted(data_table_heat_storage.source.selected["1d"]["indices"])) #XXX: 0.12.10   
     #                selection0 = data_table.source.selected.indices #XXX:  > 0.12.10
     #                selection1 = data_table_heat_storage.source.selected.indices #XXX:  > 0.12.10
                     selection = [selection0,selection1]
@@ -1327,7 +1262,7 @@ def modify_doc(doc):
                         print("Error @ Ploting  !!!")
                         div_spinner.text = notify("Error: @ Ploting !!!","red") 
                     else:
-                        output.tabs = output_tabs #TODO: render only when a toggle button is active
+#                        output.tabs = output_tabs #TODO: render only when a toggle button is active
                         print("Ploting done")
                         print("Download output_graphics started...")
                         time_id = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
@@ -1335,7 +1270,8 @@ def modify_doc(doc):
                         path_download_html = os.path.join(create_folder(time_id),filename)
                         output_file(path_download_html,title="Dispatch output", mode='inline')
 #                        save(output) #XXX: not working , dont know why, need to create new objecs !!
-                        save(Tabs(tabs=plot_solutions(solution=solutions)))
+                        save(Tabs(tabs=output_tabs))
+#                        save(Tabs(tabs=plot_solutions(solution=solutions)))
                         path_download_html_ = os.path.join("download","static",time_id,filename)
     #                    trigger_download(time_id,filename)
                         print("Graphics Download done")
@@ -1497,7 +1433,14 @@ def modify_doc(doc):
                     for _,dictt in scenario_dict.items():
                         dictt["tools"]["sc_select"].options = list(scenario_mapper)
                         dictt["tools"]["sc_select"].value = sc_name
-                    
+
+                    # set carrier_table to selected portfolio 
+                    pop_table(carrier_dict) 
+                    sc = scenario_dict[scenario_paramters[0]]["tools"]["sc_select"].value 
+                    sub_sc = scenario_dict[scenario_paramters[0]]["tools"]["sub_sc_select"].value 
+                    for ix,val in carrier_table[sc_name][sub_sc_name].items(): 
+                        carrier_dict[ix] = val 
+                        
                     div_spinner.text = notify(f"""Scenario Upload Done""", "green") 
                                 
                     #os.remove(zip_file_path)
@@ -1574,6 +1517,11 @@ def modify_doc(doc):
                         profile = profile.tolist() 
                         external_data[i][j] = profile
                         
+                        # Reset external_data so that this data is used and not that from the last run   
+                        for _j in list(external_data[i]): 
+                            if _j != j: 
+                                print(_j) 
+                                external_data[i].pop(_j)                         
                 div_spinner.text = notify("Upload Done","green")
             else:
                 print("Not a valid file to upload")
@@ -2810,11 +2758,12 @@ def modify_doc(doc):
     return doc
 #%% PYTHON MAIN
 if __name__ == '__main__':
-    # config.json- file content sturcture:
-    # {"allow_websocket_origin": "dispatch.invert.at", "port": 5006}
+#    config.json- file content sturcture:
+#    config = {"allow_websocket_origin": "dispatch.invert.at", "port": 5006}  
+    
     with open(os.path.join(root_dir, 'config.json'), 'r') as fd:
         config = json.load(fd)
-            
+          
     bokeh_app = Application(FunctionHandler(modify_doc))
     bokeh_app_2 = Application(DirectoryHandler(filename = path2data)) #FIXME: for downloading files
     

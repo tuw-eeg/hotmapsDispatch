@@ -23,10 +23,12 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     #%% Creation of a  Model
     m = pe.AbstractModel()
     #%% Sets - TODO: depends on how the input data looks finally
-    val = preprocessing(data,demand_f,inv_flag,selection)
-    
-    if val == "Error1" or val == "Error2":
-        return (val,None)
+    val,message = preprocessing(data,demand_f,inv_flag,selection) 
+     
+    if val == "Error1": 
+        return (val,message) 
+    elif val == "Error2": 
+        return (val,message) 
 
     m.t = pe.RangeSet(1,8760)
     m.j = pe.Set(initialize = val["j"])
@@ -43,7 +45,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     #%% Parameter - TODO: depends on how the input data looks finally
     m.demand_th_t = pe.Param(m.t,initialize = val["demand_th_t"])
     max_demad = val["max_demad"]
-    
+    m.pco2 = pe.Param(initialize = val["pco2"]) 
     m.radiation_t = pe.Param(m.t,initialize=val["radiation_t"])
     m.IK_j = pe.Param(m.j,initialize=val["IK_j"])
     m.OP_fix_j = pe.Param(m.j,initialize=val["OP_fix_j"])
@@ -145,7 +147,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     #% The solar gains depend on the installed capacity and the solar radiation
     #% 1000 represent the radiation at wich the solar plant has maximal power 
     def solar_restriction_jt_rule(m,j,t):
-        rule = m.x_th_jt[j,t] <=  m.Cap_j[j]*m.radiation_t[t]/1000
+        rule = m.x_th_jt[j,t] <=  m.Cap_j[j]*m.radiation_t[t]/max(val["radiation_t"])
         return rule
     m.solar_restriction_jt = pe.Constraint(m.j_st,m.t,rule=solar_restriction_jt_rule)
 

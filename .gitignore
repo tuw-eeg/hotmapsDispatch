@@ -10,3 +10,5 @@ gurobi.log
 app/modules/common/FEAT/F16/config\.json
 
 \.spyproject/
+
+app/modules/common/FEAT/F16/activate.bat

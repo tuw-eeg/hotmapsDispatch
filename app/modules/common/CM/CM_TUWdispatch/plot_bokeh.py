@@ -512,11 +512,12 @@ def costBarStack_chart(dic,decison_vars,path2output,cmap):
     data = {x: [dic["Anual Investment Cost:"][x]+dic["Anual Investment Cost (of existing power plants and heat storages)"][x],
                 dic["Operational Cost:"][x],
                  dic["Fuel Costs:"][x],
+                 dic["CO2 Costs:"][x],
                  -dic["Revenue From Electricity:"][x]] for x in dic["Technologies:"]}
     bars = decison_vars.copy()
     bars.pop(1)
     data["bars"] = bars
-
+    
     p = figure(x_range=bars, plot_height=400, plot_width=900,
             tools = "pan,wheel_zoom,box_zoom,reset,save")
     p.xgrid.visible = False
@@ -535,7 +536,7 @@ def costBarStack_chart(dic,decison_vars,path2output,cmap):
     new_legend = p.legend[0]
     p.legend[0].plot = None
     p.add_layout(new_legend, 'right')
-
+    
     return p
 
 #%%
@@ -920,7 +921,7 @@ def plot_solutions(show_plot=False, path2json=path2json,
 
         decision_vars = ["Anual Investment Cost:",
                          "Anual Investment Cost (of existing power plants and heat storages)",
-                         "Operational Cost:", "Fuel Costs:", "Revenue From Electricity:"]
+                         "Operational Cost:", "Fuel Costs:", "CO2 Costs:","Revenue From Electricity:"]
         p8 = costBarStack_chart(dic,decision_vars,path2output,cmap)
         decision_vars += ["Total CO2 Emission:","Full Load Hours:",
                           "Operating Hours:","LCOH:","Turn Over Rate:"] 
