@@ -14,3 +14,5 @@ app/modules/common/FEAT/F16/config\.json
 app/modules/common/FEAT/F16/activate.bat
 
 app/modules/common/FEAT/F16/.ipynb_checkpoints/
+
+.ipynb_checkpoints/
