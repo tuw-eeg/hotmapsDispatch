@@ -1,0 +1,22 @@
+name: hotmapsDispatch
+channels:
+  - conda-forge
+  - defaults
+  - anaconda
+  - bokeh
+dependencies:
+  - python=3.6
+  - bokeh=0.12.10
+  - numpy
+  - pandas
+  - openpyxl
+  - xlrd   
+  - matplotlib
+  - pyomo
+  - tornado=4
+  - xlsxwriter
+  - nodejs
+
+  
+ # open conda prompt here and type the following comand:
+ # conda env create -f environment.yml
