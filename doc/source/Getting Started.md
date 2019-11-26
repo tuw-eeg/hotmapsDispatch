@@ -5,9 +5,6 @@ Hotmaps-Dispatch-Application as quickly as possible
 
 Workflow
 --------
-1.  Visit the Website ([www.dispatch.invert.at](http://dispatch.invert.at)) and
-    log in with your user data
-2.  [Web User Interface](#the-web-user-interface) loads
 3.  Select a heat demand profile in the [Heat Demand – Tab](#heat-demand-tab) or
     upload your own profile via the [Load Individual Data
     -Tab](#load-individual-data-tab)
@@ -131,7 +128,7 @@ in the long description of the download powerplant parameters -Button.
 | *CHP-SE*                          | Steam Extraction CHP                                                |                                                                           |
 | *boiler*                          | heat boiler                                                         |                                                                           |
 | *heat pump*                       | heat pump                                                           | For temperatures < 0°C the heat pump doesn’t work                        |
-| *Solar Thermal*                   | Solar thermal plant                                                 | At 1000 W/m² the solar power plant gives the maximum output |
+| *Solar Thermal*                   | Solar thermal plant                                                 |  |
 | *Waste treatment*                 | waste incineration plants                                           |                                                                           |
 | *Waste Heat\**                    | Power plants that work with the unused heat from other power plants |                                                                           |
 | *Geo Thermal\**                   | Geo thermal power plant                                             |                                                                           |
