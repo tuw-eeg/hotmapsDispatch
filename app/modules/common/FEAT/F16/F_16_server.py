@@ -28,7 +28,7 @@ from bokeh.layouts import widgetbox,row,column,layout
 from bokeh.models import ColumnDataSource,TableColumn,DataTable,CustomJS,TextInput, Slider,NumberFormatter
 from bokeh.server.server import Server
 from bokeh.models.widgets import Panel, Tabs, Button,Div,Toggle,Select,CheckboxGroup
-import os,io,base64,pickle,datetime,json#,shutil
+import os,io,base64,pickle,datetime,json,random#,shutil
 from bokeh.plotting import figure,output_file,save
 from bokeh.models import PanTool,WheelZoomTool,BoxZoomTool,ResetTool,SaveTool,HoverTool
 from functools import partial
@@ -2760,17 +2760,18 @@ def modify_doc(doc):
     
     
     return doc
-#%% PYTHON MAIN
-if __name__ == '__main__':
-#    config.json- file content sturcture:
-#    config = {"allow_websocket_origin": "dispatch.invert.at", "port": 5006}  
-    
-    with open(os.path.join(root_dir, 'config.json'), 'r') as fd:
-        config = json.load(fd)
-          
+#%% Main Function
+def main():
+    # config.json- file content sturcture:
+    # {"allow_websocket_origin": "dispatch.invert.at", "port": 5006}
+    from bokeh.util.browser import view
+    try:
+        with open(os.path.join(root_dir, 'config.json'), 'r') as fd:
+            config = json.load(fd)
+    except:
+        config = {"allow_websocket_origin": "localhost", "port": int("".join([str(random.randint(1,10)) for _ in range(4)]))} 
     bokeh_app = Application(FunctionHandler(modify_doc))
-    bokeh_app_2 = Application(DirectoryHandler(filename = path2data)) #FIXME: for downloading files
-    
+    bokeh_app_2 = Application(DirectoryHandler(filename = path2data)) #FIXME: for downloading files  
 # =============================================================================
 #     tornado multi process  #FIXME: only for Linux
 # =============================================================================
@@ -2796,11 +2797,21 @@ if __name__ == '__main__':
 # =============================================================================
 # 
 # =============================================================================
-    print(f"Open Dispath Application on {config['allow_websocket_origin']}:{config['port']}")
+    url = f"http://{config['allow_websocket_origin']}:{config['port']}"
+    print(f"Open Dispath Application on {url}")
     
     #FIXME:  Error while starting server via sypder-ide
     try:
+        server.io_loop.add_callback(view, f"{url}")
         io_loop.start()
     except:
         pass
-
+#%% PYTHON MAIN
+if __name__ == '__main__':
+    flag = True
+    while flag:
+        try:
+            main()
+            flag = False
+        except:
+            pass
