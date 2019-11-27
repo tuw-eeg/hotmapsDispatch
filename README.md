@@ -20,7 +20,7 @@
 * [What's new](#whats-new)
 * [Citing Calliope](#citing-calliope)
 * [License](#license)
-* [Remove/Uninstall](#remove/uninstall)
+* [Remove/Uninstall](#removeuninstall)
 * [Attribution](#Attribution)
 ---
 
