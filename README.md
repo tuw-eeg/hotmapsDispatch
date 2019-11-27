@@ -42,6 +42,8 @@ A model can be fully defined by the web user interaface, with financal and techn
     a. `conda env create -f environment.yml` 
     
     b. `conda activate hotmapsDispatch`
+    
+    d. `cd app/modules/common/FEAT/F16`
 
     c. ``python F16_server.py``
 
