@@ -20,6 +20,7 @@
 * [What's new](#whats-new)
 * [Citing Calliope](#citing-calliope)
 * [License](#license)
+* [Remove/Uninstall](#remove/uninstall)
 * [Attribution](#Attribution)
 ---
 
@@ -122,6 +123,13 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+
+## Remove/Uninstall
+
+open the conda prompt and enter following comand:
+
+`conda remove --name hotmapsDispatch --all `
 
 
 ## Attribution
