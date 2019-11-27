@@ -43,9 +43,9 @@ A model can be fully defined by the web user interaface, with financal and techn
     
     b. `conda activate hotmapsDispatch`
     
-    d. `cd app/modules/common/FEAT/F16`
+    c. `cd app/modules/common/FEAT/F16`
 
-    c. ``python F16_server.py``
+    d. ``python F16_server.py``
 
 After that your default browser should open and the web user interface will show up
 
