@@ -517,7 +517,7 @@ def costBarStack_chart(dic,decison_vars,path2output,cmap):
     bars = decison_vars.copy()
     bars.pop(1)
     data["bars"] = bars
-    
+
     p = figure(x_range=bars, plot_height=400, plot_width=900,
             tools = "pan,wheel_zoom,box_zoom,reset,save")
     p.xgrid.visible = False
@@ -536,7 +536,7 @@ def costBarStack_chart(dic,decison_vars,path2output,cmap):
     new_legend = p.legend[0]
     p.legend[0].plot = None
     p.add_layout(new_legend, 'right')
-    
+
     return p
 
 #%%
@@ -712,7 +712,15 @@ def co2_barplot(decision_vars,dic,cmap):
 #%%
 def cmapping(tec,path2cmap=-1):
     l = len(tec)
-    cmap = {j:Category20[3][i] if l<3 else Category20[l][i] for i,j in enumerate(tec)} 
+    if l<=10: 
+        if l<3: 
+            cmap = {j: Category10[3][i] for i,j in enumerate(tec)}  
+    elif l>20: 
+        map_index = dict(zip(range(l),list(range(20))*(l-20)))  
+        cmap = {j:Category20[20][map_index[i]] for i,j in enumerate(tec)} 
+    else: 
+        cmap = {j:Category20[20][i]for i,j in enumerate(tec)} 
+ 
     if path2cmap == -1:
         return cmap
     elif os.path.isfile(path2cmap):
@@ -923,8 +931,8 @@ def plot_solutions(show_plot=False, path2json=path2json,
                          "Anual Investment Cost (of existing power plants and heat storages)",
                          "Operational Cost:", "Fuel Costs:", "CO2 Costs:","Revenue From Electricity:"]
         p8 = costBarStack_chart(dic,decision_vars,path2output,cmap)
-        decision_vars += ["Total CO2 Emission:","Full Load Hours:",
-                          "Operating Hours:","LCOH:","Turn Over Rate:"] 
+        decision_vars += ["Total CO2 Emission:","Full Load Hours:", 
+                          "Operating Hours:","LCOH:","Turn Over Rate:"]  
         p11 = plotExtra_table(decision_vars,dic,path2output)
         l2 = layout([[p8],[p11]])
         
@@ -943,8 +951,9 @@ def plot_solutions(show_plot=False, path2json=path2json,
         tabs = tab_panes(path2output,**kwargs)
         
         if solution == -1:
-            output_file(os.path.join(path2output,"output.html"),title="Dispatch output")
-            save(tabs)
+            if show_plot != True:
+                output_file(os.path.join(path2output,"output.html"),title="Dispatch output")
+                save(tabs)
             
         if show_plot:
             show(tabs)
