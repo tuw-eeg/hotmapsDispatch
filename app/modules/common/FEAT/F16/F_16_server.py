@@ -1626,7 +1626,10 @@ def modify_doc(doc):
 # =============================================================================
     def ivest_callback(active):
         if active:
-            div_spinner.text = notify("""Mark Technologies by pressing "CTRL" +  "left mouse", Rows are marked yellow ""","red")
+            if scenario_button.active: 
+                div_spinner.text = notify("""All defined Technologies are used for investment mode ""","orange") 
+            else: 
+                div_spinner.text = notify("""Mark Technologies by pressing "CTRL" +  "left mouse", Rows are marked yellow ""","red") 
         else:
             div_spinner.text = ""
 # =============================================================================
