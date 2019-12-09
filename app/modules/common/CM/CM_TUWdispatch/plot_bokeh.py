@@ -24,21 +24,7 @@ import sys
 from bokeh.palettes import Category10,Category20,Spectral
 
 #%% Color mapping
-def color_mapping(i,j):
-    if i<=10:
-        if i<3:
-            i=3
-        return Category10[i][j]
-    else:
-        return Category20[i][j]
-#%% Color mapping2
-def color_mapping2(i,j):
-    if i<=11:
-        if i<3:
-            i=3
-        return Spectral[i][j]
-    else:
-        return color_mapping(i,j)
+
 #%%
 path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.
                                                        abspath(__file__))))
@@ -48,33 +34,6 @@ if path not in sys.path:
 #%%
 from CM.CM_TUWdispatch.eng_format import EngNumber#,EngUnit
 
-#%%
-def get_cmap(n, name='tab20'):
-    '''Returns a function that maps each index in 0, 1, ..., n-1 to a distinct
-    RGB color; the keyword argument name must be a standard mpl colormap name.'''
-    return plt.cm.get_cmap(name, n)
-#%%
-def colormapping(tec):
-    """
-    This function returns a dictionary whoes keys are the name of the tec-list
-    and its entries are colors specified in HEX format
-    Default colors are from matplotlibs "tab20" colormaps.
-
-    Parameters:
-        tec:    list
-                list entries are keys of colormap
-    Returns:
-        colormap:   dict
-                    This will be the dictionary each tec entry is associated
-                    with a HEX-color
-    Example:
-        colormapping( ["a",1,"b",2] )
-        returns:
-            {1: '#d62728', 2: '#9edae5', 'a': '#1f77b4', 'b': '#f7b6d2'}
-    """
-    colors = get_cmap(len(tec))
-    color_map = {val:to_hex(colors(i)) for i,val in enumerate(tec)}
-    return color_map
 #%%
 def matrix(dic,decison_var,legend,t):
     """
@@ -711,18 +670,17 @@ def co2_barplot(decision_vars,dic,cmap):
         return layout([p,widgetbox(data_table)])
 #%%
 def cmapping(tec,path2cmap=-1):
-    l = len(tec)
-    if l<=10: 
-        if l<3: 
-            cmap = {j: Category10[3][i] for i,j in enumerate(tec)}  
-    elif l>20: 
-        map_index = dict(zip(range(l),list(range(20))*(l-20)))  
-        cmap = {j:Category20[20][map_index[i]] for i,j in enumerate(tec)} 
-    else: 
-        cmap = {j:Category20[20][i]for i,j in enumerate(tec)} 
- 
-    if path2cmap == -1:
-        return cmap
+    if path2cmap == -1: 
+        l = len(tec)                
+        if l>20: 
+            map_index = dict(zip(range(l),list(range(20))*(l-20)))  
+            return {j:Category20[20][map_index[i]] for i,j in enumerate(tec)} 
+        elif l<3:
+            return {j: Category10[3][i] for i,j in enumerate(tec)}
+        else:
+            return {j:Category20[20][i]for i,j in enumerate(tec)} 
+    
+            
     elif os.path.isfile(path2cmap):
         with open(path2cmap,"rb") as file:
             cmap = pickle.load(file)
