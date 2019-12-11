@@ -33,8 +33,8 @@ The primary focus is flexible model creation with/and without the web user inter
 A model can be fully defined by the web user interaface, with financal and technical details on technologies, demand,electricity,temperature and radiation profiles. You can also define and upload your own data. The Hotmaps Disptach Model takes these inputs and constructs an optimization problem, solves it, and reports back the results. The results are saved as HTML (for visialisation), JSON and EXCEL Files and can be further analyzed.
 
 ## How to install
----
-## How to install 1 (easy)
+
+### How to install 1 (easy)
 1. install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
 
 2. open the conda prompt and type following comands 
@@ -51,7 +51,7 @@ A model can be fully defined by the web user interaface, with financal and techn
     
 After that your default browser should open and the web user interface will show up    
 
-## How to install 2 (advanced)
+### How to install 2 (advanced)
 1. install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
 
 2. Download this [repository](https://github.com/tuw-eeg/hotmapsDispatch/archive/dev.zip) and save and unzip the content into your desired loacation
@@ -68,21 +68,26 @@ After that your default browser should open and the web user interface will show
 
 After that your default browser should open and the web user interface will show up
 
-## Quick start 
-
+### Hot to install 3 (easy)
 > **Not implemented todo**
 
 The Hotmaps Dispatch Model can run on Windows, macOS and Linux. 
 
 Installing it is quickest with the `conda` package manager by running a single command: `conda create -c conda-forge -n  python=3.6 hotmapsDispatch`  
 
-
-See the documentation for more [information on installing](https://hotmapsdispatch.readthedocs.io/en/latest/).
+## Quick start 
+ 
+See the documentation for more [information on installing](#how-to-install).
 
 and also some example are [included]()
 
 The [Getting Started Guide](https://hotmapsdispatch.readthedocs.io/en/latest/) is a good place to start and to get a feeling how the model works.
 
+After installation open the conda prompt and activate your environment `conda activate hotmapsDispatch`
+
+Then you can start the application by typing `hotmapsDispatch_console`. This will open your default browser and also show you progress messages in the prompt
+
+If you type only `hotmapsDispatch` no prompt messages will be shown and you have to close the process after fininshing, since closing the tab will not shut down the process 
 
 ## Documentation
 
