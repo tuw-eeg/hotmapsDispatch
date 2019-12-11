@@ -13,7 +13,7 @@
 ## Content
 
 * [About](#about)
-* [How to intall](#How-to-install)
+* [How to install](#how-to-install)
 * [Quick start](#quick-start)
 * [Documentation](#documentation)
 * [Contributing](#contributing)
@@ -21,7 +21,7 @@
 * [Citing](#citing)
 * [License](#license)
 * [Remove/Uninstall](#removeuninstall)
-* [Attribution](#Attribution)
+* [Attribution](#attribution)
 ---
 
 ## About
@@ -32,8 +32,26 @@ The primary focus is flexible model creation with/and without the web user inter
 
 A model can be fully defined by the web user interaface, with financal and technical details on technologies, demand,electricity,temperature and radiation profiles. You can also define and upload your own data. The Hotmaps Disptach Model takes these inputs and constructs an optimization problem, solves it, and reports back the results. The results are saved as HTML (for visialisation), JSON and EXCEL Files and can be further analyzed.
 
-
 ## How to install
+---
+## How to install 1 (easy)
+1. install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
+
+2. open the conda prompt and type following comands 
+
+    a. `conda create -n hotmapsDispatch python=3.6` 
+    
+    b. `conda activate hotmapsDispatch`
+    
+    c. `conda install nodejs`
+    
+    c. `pip install hotmapsDispatch`
+    
+    d. `hotmapsDispatch_console`
+    
+After that your default browser should open and the web user interface will show up    
+
+## How to install 2 (advanced)
 1. install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
 
 2. Download this [repository](https://github.com/tuw-eeg/hotmapsDispatch/archive/dev.zip) and save and unzip the content into your desired loacation
