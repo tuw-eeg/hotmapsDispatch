@@ -18,7 +18,7 @@
 * [Documentation](#documentation)
 * [Contributing](#contributing)
 * [What's new](#whats-new)
-* [Citing Calliope](#citing-calliope)
+* [Citing](#citing)
 * [License](#license)
 * [Remove/Uninstall](#removeuninstall)
 * [Attribution](#Attribution)
