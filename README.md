@@ -109,7 +109,7 @@ Copyright 2019 HotMaps Disptach contributors:
 * Michael Hartner
 * Richard Büchele
 * David Schmidinger
-* Michael Gummhalter
+* Michael Gumhalter
 * Jeton Hasani
 
 Licensed under the Apache License, Version 2.0 (the "License"); you
