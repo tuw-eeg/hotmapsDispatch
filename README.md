@@ -68,7 +68,7 @@ After that your default browser should open and the web user interface will show
 
 After that your default browser should open and the web user interface will show up
 
-### Hot to install 3 (easy)
+### How to install 3 (easy)
 > **Not implemented todo**
 
 The Hotmaps Dispatch Model can run on Windows, macOS and Linux. 
