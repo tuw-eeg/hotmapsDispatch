@@ -1,0 +1,9 @@
+# This file specifies rules for what to include and exclude:
+# files inside your package that are not source code files
+# i.e. data files, binaries, documentation, onfiguration files etc.
+include \app\modules\common\AD\F16_input\static\background.png
+include \app\modules\common\AD\F16_input\*.dat
+include \app\modules\common\AD\F16_input\DH_technology_cost.xlsx
+inlcude \app\modules\common\FEAT\F16\*.js
+inlcude \app\modules\common\FEAT\F16\*.html
+inlcude \app\modules\common\FEAT\F16\*.js

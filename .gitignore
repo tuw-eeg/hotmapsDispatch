@@ -19,4 +19,8 @@ app/modules/common/AD/F16_input/static/**/*.html
 app/modules/common/AD/F16_input/static/**/*.json
 app/modules/common/AD/F16_input/static/**/*.xlsx
 app/modules/common/AD/F16_input/static/**/*.zip
-app/modules/common/FEAT/F16/.ipynb_checkpoints/
+app/modules/common/FEAT/F16/.ipynb_checkpoints/
+
+dist/
+build/
+hotmapsDispatch.egg-info/

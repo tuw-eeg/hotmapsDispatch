@@ -18,6 +18,7 @@ assert pyomo.environ.SolverFactory("gurobi").available(), "No Gurobi Solver Foun
 
 #%% import modules
 matplotlib.use('agg',warn=False)
+
 from tornado.ioloop import IOLoop
 import pandas as pd
 import numpy as np
@@ -38,6 +39,7 @@ root_dir = os.path.dirname(os.path.abspath(__file__))
 
 if path not in sys.path:
     sys.path.append(path)
+
 #%%  for bokeh 0.12.10 extent functionality for setting the active tab  and  Implement disabled
 #XXX: for bokeh 0.12.10
 # =============================================================================
@@ -127,7 +129,7 @@ from AD.F16_input.main import extract,find_FiT
 from CM.CM_TUWdispatch.plot_bokeh import plot_solutions
 import CM.CM_TUWdispatch.run_cm as dispatch
 from CM.CM_TUWdispatch.save_sol_to_json import json2xlsx,scenarioJson2xlsx 
-
+from FEAT.F16.imageHTML import header_html
 #%% Setting Global default paramters and default paths
 path_parameter = os.path.join(path, "AD", "F16_input", "DH_technology_cost.xlsx")
 path2data = os.path.join(path, "AD", "F16_input")
@@ -2729,7 +2731,6 @@ def modify_doc(doc):
 # =============================================================================
 #   Set Global Layout
 # =============================================================================
-    from imageHTML import header_html
     header = widgetbox(Div(text= header_html))
     grid.tabs = [Panel(child=hg_layout, title="Add Heat Generators"),
                  Panel(child=hs_layout, title="Add Heat Storages")]
