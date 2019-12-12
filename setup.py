@@ -19,7 +19,7 @@ setup(
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/tuw-eeg/hotmapsDispatch/tree/dev",
-    author="Michal Hartner, Richard Büchele, David Schmidinger, Michael Gumhalter, Jeton Hasani",
+    author="Michael Hartner, Richard Büchele, David Schmidinger, Michael Gumhalter, Jeton Hasani",
     author_email="hasani@eeg.tuwien.ac.at",
     license="Apache 2.0",
     classifiers=[
