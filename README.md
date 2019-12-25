@@ -76,18 +76,17 @@ The Hotmaps Dispatch Model can run on Windows, macOS and Linux.
 Installing it is quickest with the `conda` package manager by running a single command: `conda create -c conda-forge -n  python=3.6 hotmapsDispatch`  
 
 ## Quick start 
- 
-See the documentation for more [information on installing](#how-to-install).
-
-and also some example are [included]()
-
-The [Getting Started Guide](https://hotmapsdispatch.readthedocs.io/en/latest/) is a good place to start and to get a feeling how the model works.
-
 After installation open the conda prompt and activate your environment `conda activate hotmapsDispatch`
 
 Then you can start the application by typing `hotmapsDispatch_console`. This will open your default browser and also show you progress messages in the prompt
 
 If you type only `hotmapsDispatch` no prompt messages will be shown and you have to close the process after fininshing, since closing the tab will not shut down the process 
+> **Not implemented todo**
+See the documentation for more [information on installing](#how-to-install).
+
+and also some example are [included]()
+
+The [Getting Started Guide](https://hotmapsdispatch.readthedocs.io/en/latest/) is a good place to start and to get a feeling how the model works.
 
 ## Documentation
 
