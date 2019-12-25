@@ -80,8 +80,10 @@ After installation open the conda prompt and activate your environment `conda ac
 
 Then you can start the application by typing `hotmapsDispatch_console`. This will open your default browser and also show you progress messages in the prompt
 
-If you type only `hotmapsDispatch` no prompt messages will be shown and you have to close the process after fininshing, since closing the tab will not shut down the process 
+If you type only `hotmapsDispatch` no prompt messages will be shown and you have to close the process after fininshing, since closing the tab will not shut down the process
+
 > **Not implemented todo**
+
 See the documentation for more [information on installing](#how-to-install).
 
 and also some example are [included]()
