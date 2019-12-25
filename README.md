@@ -35,7 +35,7 @@ A model can be fully defined by the web user interaface, with financal and techn
 ## How to install
 
 ### How to install 1 (easy)
-1. install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
+1. install [miniconda](https://docs.conda.io/en/latest/miniconda.html) with Pyton3.7
 
 2. open the conda prompt and type following comands 
 
