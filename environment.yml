@@ -16,6 +16,8 @@ dependencies:
   - tornado=4
   - xlsxwriter
   - nodejs
+  - altair
+  - colorcet
 
   
  # open conda prompt here and type the following comand:
