@@ -19,7 +19,7 @@ from CM.CM_TUWdispatch.preprocessing import preprocessing
 #import logging
 #logging.getLogger('pyomo.core').setLevel(logging.ERROR)
 
-def run(data,inv_flag,selection=[[],[]],demand_f=1):
+def run(data,inv_flag,selection=[[],[]],demand_f=1,solver="gurobi"):
     #%% Creation of a  Model
     m = pe.AbstractModel()
     #%% Sets - TODO: depends on how the input data looks finally
@@ -306,7 +306,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     print("*****************\ntime to create model: " + str(datetime.now()-solv_start)+"\n*****************")
     solv_start = datetime.now()
     print("*****************\nSolving...\n*****************")
-    opt = pe.SolverFactory("gurobi")
+    opt = pe.SolverFactory(solver)
 #    opt.options['MIPGap'] = 0.5
 #    opt.options['Threads'] = 4
     #TODO

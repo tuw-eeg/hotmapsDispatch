@@ -14,9 +14,9 @@ import CM.CM_TUWdispatch.simpel_dispatch as simpel_dispatch
 from CM.CM_TUWdispatch.save_sol_to_json import save_sol_to_json
 
         
-def main(data,inv_flag,selection,demand_f):
+def main(data,inv_flag,selection,demand_f,solver):
     
-    instance,results = simpel_dispatch.run(data,inv_flag,selection,demand_f)
+    instance,results = simpel_dispatch.run(data,inv_flag,selection,demand_f,solver)
     
     if instance == "Error1" or instance == "Error2":
         return instance,results,None 

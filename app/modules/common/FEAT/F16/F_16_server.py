@@ -5,20 +5,24 @@ Created on Fri Mar  9 15:30:16 2018
 @author: root
 """
 #%% Check if modules are installed
-
-import bokeh,tornado,xlsxwriter, openpyxl, pyomo.environ, matplotlib, xlrd, numpy, pandas, sys,subprocess
-
-assert not subprocess.call(["node", "-v"]), "Please install nodejs (type: <conda install -c bokeh nodejs>)"
-#XXX: Downgrade back bokeh version "0.12.10"
-assert bokeh.__version__ == '0.12.10', f"Your current bokeh version ist not compatible (Your Version:{bokeh.__version__})\nPlease install version 0.12.10 (type < pip install bokeh==0.12.10 >)"
-#XXX: Downgrade to torndado 4.5.3
-assert tornado.version == '4.5.3',f"Your current tornado version ist not compatible (Your Version:{tornado.version})\nPlease install version 4.5.3 (type < pip install tornado==4.5.3 >)"
-
-assert pyomo.environ.SolverFactory("gurobi").available(), "No Gurobi Solver Found, Please check your System Path Variable or purchase the GUROBI Solver"
-
+def check_modules(solver):
+    print("Check if needed modules are installed...")
+    import bokeh,tornado,xlsxwriter, openpyxl, pyomo.environ, matplotlib, xlrd, numpy, pandas, sys,subprocess,argparse
+    
+    assert not subprocess.call(["node", "-v"]), "Please install nodejs (type: <conda install -c bokeh nodejs>)"
+    #XXX: Downgrade back bokeh version "0.12.10"
+    assert bokeh.__version__ == '0.12.10', f"Your current bokeh version ist not compatible (Your Version:{bokeh.__version__})\nPlease install version 0.12.10 (type < pip install bokeh==0.12.10 >)"
+    #XXX: Downgrade to torndado 4.5.3
+    assert tornado.version == '4.5.3',f"Your current tornado version ist not compatible (Your Version:{tornado.version})\nPlease install version 4.5.3 (type < pip install tornado==4.5.3 >)"
+    _solver = pyomo.environ.SolverFactory(solver)
+    assert _solver.available(), f"No {solver.upper()} Solver Found, Please check your System Path Variable or download the {solver} Solver"
+    if solver == "gurobi":
+        assert _solver.license_is_valid(), f"Your {solver.upper()} License is not valid or is expired, Please puchase a {solver} License"
+    matplotlib.use('agg',warn=False)
+    print("Check passed !")
+    return True
 #%% import modules
-matplotlib.use('agg',warn=False)
-
+import sys,argparse
 from tornado.ioloop import IOLoop
 import pandas as pd
 import numpy as np
@@ -26,7 +30,7 @@ from zipfile import ZipFile
 from bokeh.application.handlers import FunctionHandler,DirectoryHandler
 from bokeh.application import Application
 from bokeh.layouts import widgetbox,row,column,layout
-from bokeh.models import ColumnDataSource,TableColumn,DataTable,CustomJS,TextInput, Slider,NumberFormatter
+from bokeh.models import ColumnDataSource,TableColumn,DataTable,CustomJS,TextInput, Slider
 from bokeh.server.server import Server
 from bokeh.models.widgets import Panel, Tabs, Button,Div,Toggle,Select,CheckboxGroup
 import os,io,base64,pickle,datetime,json,random#,shutil
@@ -147,8 +151,8 @@ path_snackbar_html = os.path.join(root_dir, "snackbar.html")
 # =============================================================================
 # RUN MODEL
 # =============================================================================
-def execute(data,inv_flag,selection=[[],[]],demand_f=1):
-    val = dispatch.main(data,inv_flag,selection,demand_f)
+def execute(data,inv_flag,selection=[[],[]],demand_f=1,solver="gurobi"):
+    val = dispatch.main(data,inv_flag,selection,demand_f,solver)
     return val
 #%% Global Functions
 # =============================================================================
@@ -543,7 +547,7 @@ select_hs_options = pd.read_excel(path_parameter,sheets[3],skiprows=[0])["name"]
 # =============================================================================
 # Function Handler
 # =============================================================================
-def modify_doc(doc):
+def modify_doc(doc,solver):
 #%% Main Functionality:  Widgets, callbacks, layouts etc.
     # Load External Data from .dat files
     price_name_map,price_name_map_inv,prices = load_extern_data("price")
@@ -822,7 +826,7 @@ def modify_doc(doc):
             sel1 = list(range(heat_generator_table[sc][sub_sc].shape[0])) 
             sel2 = list(range(heat_storage_table[sc][sub_sc].shape[0])) 
              
-        solutions,_message,_ = execute(data,inv_flag,[sel1,sel2]) 
+        solutions,_message,_ = execute(data,inv_flag,[sel1,sel2],solver=solver) 
         ok = False
         output_data = None
         if solutions == "Error1":
@@ -1243,7 +1247,7 @@ def modify_doc(doc):
                     if sum(_mask) > 0:
                         div_spinner.text = notify(f"""<p>Error: Steam Extraction CHP`s are not allowed in investment mode<p><p>Please remove the Steam Extraction CHP`s from your selection: {_chp_se} <p>""","red","Error: Steam Extraction CHP`s are not allowed in investment mode","red") 
                         return                        
-                solutions,_message,_ = execute(data,inv_flag,selection)
+                solutions,_message,_ = execute(data,inv_flag,selection,solver=solver)
     
                 print('calculation done')
                 print ("Ploting started..")
@@ -2765,7 +2769,7 @@ def modify_doc(doc):
     
     return doc
 #%% Main Function
-def main():
+def main(solver):
     # config.json- file content sturcture:
     # {"allow_websocket_origin": "dispatch.invert.at", "port": 5006}
     from bokeh.util.browser import view
@@ -2774,7 +2778,7 @@ def main():
             config = json.load(fd)
     except:
         config = {"allow_websocket_origin": "localhost", "port": int("".join([str(random.randint(1,10)) for _ in range(4)]))} 
-    bokeh_app = Application(FunctionHandler(modify_doc))
+    bokeh_app = Application(FunctionHandler(partial(modify_doc,solver=solver)))
     bokeh_app_2 = Application(DirectoryHandler(filename = path2data)) #FIXME: for downloading files  
 # =============================================================================
 #     tornado multi process  #FIXME: only for Linux
@@ -2812,10 +2816,15 @@ def main():
         pass
 #%% PYTHON MAIN
 if __name__ == '__main__':
-    flag = True
+    parser = argparse.ArgumentParser(description='Run the HotMaps Dispatch Server')
+    parser.add_argument('--solver', type=str,default="gurobi",help='specify which solver to use (i.e.: gurobi,glpk...')
+    args = parser.parse_args()
+    print(f"Start HotMaps Dispatch Server using {args.solver.upper()}")
+    solver=args.solver
+    flag = check_modules(solver)
     while flag:
         try:
-            main()
+            main(solver)
             flag = False
         except:
             pass
