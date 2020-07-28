@@ -504,10 +504,10 @@ lab = dict(offset="Offset",constant="Set To Constant",
            mean="Use mean value",total="Sum",scale="Scale")
 # Set Names of the tabs for the external data
 widgets_keys = ["Radiation","Temperature","Electricity price",
-                "Sale Electricity price","Heat Demand"]
+                "Sale Electricity price","Flow Temperature","Return Temperature","Heat Demand",]
 # Specify model names for the external data
-model_keys = ["radiation","temp","electricity","sale_electricity",
-                      "demand_th"]
+model_keys = ["radiation","temp","electricity","sale_electricity","flow_temp",
+              "return_temp","demand_th",]
 # string for "Heat Demand"
 _hd = widgets_keys[-1]
 # string for "electricity prices"
@@ -554,6 +554,8 @@ def modify_doc(doc,solver):
     load_name_map,load_name_map_inv,load_profiles = load_extern_data("load")
     radiation_name_map, radiation_name_map_inv,radiation = load_extern_data("radiation")
     temperature_name_map, temperature_name_map_inv, temperature = load_extern_data("temperature")
+    flow_temperature_name_map, flow_temperature_name_map_inv, flow_temperature = load_extern_data("flow_temperature")
+    return_temperature_name_map, return_temperature_name_map_inv, return_temperature = load_extern_data("return_temperature")
     # Database for the external data manipulation,
     widgets_data = [ dict(data=radiation,
                           dic=radiation_name_map,
@@ -575,6 +577,16 @@ def modify_doc(doc,solver):
                           dic_inv = invert_dict(price_name_map),
                           labels=dict(),
                           unit="€/MWh"),
+                    dict(data=flow_temperature,
+                          dic=flow_temperature_name_map,
+                          dic_inv = invert_dict(flow_temperature_name_map),
+                          labels=lab,
+                          unit="°C"),
+                    dict(data=return_temperature,
+                          dic=return_temperature_name_map,
+                          dic_inv = invert_dict(return_temperature_name_map),
+                          labels=lab,
+                          unit="°C"),
                     dict(data=load_profiles,
                           dic=load_name_map,
                           dic_inv = invert_dict(load_name_map),
