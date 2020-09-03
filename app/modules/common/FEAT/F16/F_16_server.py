@@ -505,10 +505,10 @@ lab = dict(offset="Offset",constant="Set To Constant",
 # Set Names of the tabs for the external data
 widgets_keys = ["Radiation","Temperature","Electricity price",
                 "Sale Electricity price","Flow Temperature","Return Temperature",
-                "River Temperature","Heat Demand",]
+                "River Temperature","Waste Water Temperature","Heat Demand",]
 # Specify model names for the external data
 model_keys = ["radiation","temp","electricity","sale_electricity","flow_temp",
-              "return_temp","river_temp","demand_th",]
+              "return_temp","river_temp","waste_water_temp","demand_th",]
 # string for "Heat Demand"
 _hd = widgets_keys[-1]
 # string for "electricity prices"
@@ -558,6 +558,8 @@ def modify_doc(doc,solver):
     flow_temperature_name_map, flow_temperature_name_map_inv, flow_temperature = load_extern_data("flow_temperature")
     return_temperature_name_map, return_temperature_name_map_inv, return_temperature = load_extern_data("return_temperature")
     river_temperature_name_map, river_temperature_name_map_inv, river_temperature = load_extern_data("river_temperature")
+    waste_water_temperature_name_map, waste_water_temperature_name_map_inv, waste_water_temperature = load_extern_data("wastewater_temperature")
+
     # Database for the external data manipulation,
     widgets_data = [ dict(data=radiation,
                           dic=radiation_name_map,
@@ -592,6 +594,11 @@ def modify_doc(doc,solver):
                     dict(data=river_temperature,
                           dic=river_temperature_name_map,
                           dic_inv = invert_dict(river_temperature_name_map),
+                          labels=lab,
+                          unit="°C"),                    
+                    dict(data=waste_water_temperature,
+                          dic=waste_water_temperature_name_map,
+                          dic_inv = invert_dict(waste_water_temperature_name_map),
                           labels=lab,
                           unit="°C"),
                     dict(data=load_profiles,
