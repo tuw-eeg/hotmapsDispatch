@@ -7,12 +7,12 @@ channels:
 dependencies:
   - python=3.6
   - bokeh=0.12.10
-  - numpy
-  - pandas
+  - numpy=1.16.2
+  - pandas=0.24.2
   - openpyxl
   - xlrd   
   - matplotlib
-  - pyomo
+  - pyomo=5.6.1
   - tornado=4
   - xlsxwriter
   - nodejs
