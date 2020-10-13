@@ -34,7 +34,8 @@ A model can be fully defined by the web user interaface, with financal and techn
 
 ## How to install
 
-> ### **Before you continue, please install the [GUROBI Solver](https://www.gurobi.com/downloads/gurobi-optimizer-eula/)**
+> ### **Before you continue, please install the [GUROBI Solver](https://www.gurobi.com/downloads/gurobi-optimizer-eula/) or the free [GLPK Solver](http://winglpk.sourceforge.net/)**
+
 
 ### How to install 1 (easy)
 
