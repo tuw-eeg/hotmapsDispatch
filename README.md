@@ -66,9 +66,7 @@ After that your default browser should open and the web user interface will show
     
     b. `conda activate hotmapsDispatch`
     
-    c. `cd app/modules/common/FEAT/F16`
-
-    d. ``python F16_server.py``
+    c. `python -m app ` for the GUROBI solver  or if you want to use the GLPK solver `python -m app --s glpk` 
 
 After that your default browser should open and the web user interface will show up
 
