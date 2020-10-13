@@ -18,6 +18,7 @@ dependencies:
   - nodejs
   - altair
   - colorcet
+  - glpk
 
   
  # open conda prompt here and type the following comand:
