@@ -19,7 +19,7 @@ dependencies:
   - altair
   - colorcet
   - glpk
-
+  - altair_saver
   
  # open conda prompt here and type the following comand:
  # conda env create -f environment.yml
