@@ -34,11 +34,12 @@ A model can be fully defined by the web user interaface, with financal and techn
 
 ## How to install
 
-> ### **Before you continue, please install the [GUROBI Solver](https://www.gurobi.com/downloads/gurobi-optimizer-eula/)**
+> ### **Before you continue, please install the [GUROBI Solver](https://www.gurobi.com/downloads/gurobi-optimizer-eula/) or the free [GLPK Solver](http://winglpk.sourceforge.net/)**
+
 
 ### How to install 1 (easy)
 
-1. install [miniconda](https://docs.conda.io/en/latest/miniconda.html) with Pyton3.7
+1. install [miniconda](https://docs.conda.io/en/latest/miniconda.html) with Pyton3.*
 
 2. open the conda prompt and type following comands 
 
@@ -65,9 +66,7 @@ After that your default browser should open and the web user interface will show
     
     b. `conda activate hotmapsDispatch`
     
-    c. `cd app/modules/common/FEAT/F16`
-
-    d. ``python F16_server.py``
+    c. `python -m app ` for the GUROBI solver  or if you want to use the GLPK solver `python -m app --s glpk` 
 
 After that your default browser should open and the web user interface will show up
 
