@@ -37,25 +37,7 @@ A model can be fully defined by the web user interaface, with financal and techn
 > ### **Before you continue, please install the [GUROBI Solver](https://www.gurobi.com/downloads/gurobi-optimizer-eula/) or the free [GLPK Solver](http://winglpk.sourceforge.net/)**
 
 
-### How to install 1 (easy)
-
-1. install [miniconda](https://docs.conda.io/en/latest/miniconda.html) with Pyton3.*
-
-2. open the conda prompt and type following comands 
-
-    a. `conda create -n hotmapsDispatch python=3.6` 
-    
-    b. `conda activate hotmapsDispatch`
-    
-    c. `conda install nodejs`
-    
-    c. `pip install hotmapsDispatch`
-    
-    d. `hotmapsDispatch_console`
-    
-After that your default browser should open and the web user interface will show up    
-
-### How to install 2 (advanced)
+### How to install
 1. install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
 
 2. Download this [repository](https://github.com/tuw-eeg/hotmapsDispatch/archive/dev.zip) and save and unzip the content into your desired loacation
@@ -70,19 +52,7 @@ After that your default browser should open and the web user interface will show
 
 After that your default browser should open and the web user interface will show up
 
-### How to install 3 (easy)
-> **Not implemented todo**
 
-The Hotmaps Dispatch Model can run on Windows, macOS and Linux. 
-
-Installing it is quickest with the `conda` package manager by running a single command: `conda create -c conda-forge -n  python=3.6 hotmapsDispatch`  
-
-## Quick start 
-After installation open the conda prompt and activate your environment `conda activate hotmapsDispatch`
-
-Then you can start the application by typing `hotmapsDispatch_console`. This will open your default browser and also show you progress messages in the prompt
-
-If you type only `hotmapsDispatch` no prompt messages will be shown and you have to close the process after fininshing, since closing the tab will not shut down the process
 
 > **Not implemented todo**
 
