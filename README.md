@@ -14,7 +14,6 @@
 
 * [About](#about)
 * [How to install](#how-to-install)
-* [Quick start](#quick-start)
 * [Documentation](#documentation)
 * [Contributing](#contributing)
 * [What's new](#whats-new)
