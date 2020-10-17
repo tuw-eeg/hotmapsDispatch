@@ -40,7 +40,7 @@ A model can be fully defined by the web user interaface, with financal and techn
 ### How to install
 1. install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
 
-2. Download this [repository](https://github.com/tuw-eeg/hotmapsDispatch/archive/dev.zip) and save and unzip the content into your desired loacation
+2. Download this [repository](https://github.com/tuw-eeg/hotmapsDispatch/archive/master.zip) and save and unzip the content into your desired loacation
 
 2. open the conda prompt in that location and type following comands 
 
