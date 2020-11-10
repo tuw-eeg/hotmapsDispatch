@@ -14,6 +14,7 @@
 
 * [About](#about)
 * [How to install](#how-to-install)
+* [Quick Start](#quick-start)
 * [Documentation](#documentation)
 * [Contributing](#contributing)
 * [What's new](#whats-new)
@@ -36,7 +37,7 @@ A model can be fully defined by the web user interaface, with financal and techn
 > ### **Before you continue, please install the [GUROBI Solver](https://www.gurobi.com/downloads/gurobi-optimizer-eula/) or the free [GLPK Solver](http://winglpk.sourceforge.net/)**
 
 
-### How to install
+### How to install 
 1. install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
 
 2. Download this [repository](https://github.com/tuw-eeg/hotmapsDispatch/archive/master.zip) and save and unzip the content into your desired loacation
@@ -52,6 +53,12 @@ A model can be fully defined by the web user interaface, with financal and techn
 After that your default browser should open and the web user interface will show up
 
 
+### Quick Start
+To Start the tool after installation open the conda prompt and type following commands:
+1. activate your environment with `conda activate hotmapsDispatch`
+2. navigate to the location you unzip the tool by typing `cd path2folder` (Note: Replace "path2folder" with the path of the location where you unzip the tool)
+3. type `python -m app ` for the GUROBI solver  or if you want to use the GLPK solver `python -m app --s glpk`
+After that your default browser should open and the web user interface will show up
 
 > **Not implemented todo**
 
