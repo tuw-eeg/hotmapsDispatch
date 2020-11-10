@@ -8,7 +8,7 @@ Some resources to start
 
 * [Join us on Gitter to chat!](https://gitter.im/tuw-eeg/hotmapsDispatch)
 * Look at our [milestones](https://github.com/tuw-eeg/hotmapsDispatch/milestones) and [projects](https://github.com/tuw-eeg/hotmapsDispatch/projects) on GitHub for an idea on where development is headed
-* Look at [open issues tagged with "help"](https://github.com/tuw-eeg/hotmapsDisptach/issues?q=is%3Aissue+is%3Aopen+label%3A%22help%22) and ["good first issue"](https://github.com/calliope-project/calliope/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+* Look at [open issues tagged with "help"](https://github.com/tuw-eeg/hotmapsDisptach/issues?q=is%3Aissue+is%3Aopen+label%3A%22help%22) and ["good first issue"]()
 * Look at the [development guide in our documentation](http://readthedocs.io)
 
 ## Licensing
@@ -40,7 +40,7 @@ To contribute changes:
 5. Push the branch to GitHub (``git push origin new-fix-or-feature``)
 6. On GitHub, create a new [pull request](https://github.com/tuw-eeg/hotmapsDispatch/pull/new/master) from the feature branch
 
-Our [development guide](http://calliope.readthedocs.io/en/latest/user/develop.html) gives a more detailed description of each step, if you're new to working with GitHub.
+Our [development guide]() gives a more detailed description of each step, if you're new to working with GitHub.
 
 ### Pull requests
 
