@@ -18,7 +18,6 @@ def check_modules(solver):
     assert _solver.available(), f"No {solver.upper()} Solver Found, Please check your System Path Variable or download the {solver} Solver"
     if solver == "gurobi":
         assert _solver.license_is_valid(), f"Your {solver.upper()} License is not valid or is expired, Please puchase a {solver} License"
-    matplotlib.use('agg',warn=False)
     print("Check passed !")
     return True
 #%% import modules
