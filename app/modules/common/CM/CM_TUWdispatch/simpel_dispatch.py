@@ -147,7 +147,7 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1,solver="gurobi"):
     #% The solar gains depend on the installed capacity and the solar radiation
     #% 1000 represent the radiation at wich the solar plant has maximal power 
     def solar_restriction_jt_rule(m,j,t):
-        rule = m.x_th_jt[j,t] <=  m.Cap_j[j]*m.radiation_t[t]/max(val["radiation_t"])
+        rule = m.x_th_jt[j,t] <=  m.Cap_j[j]*m.radiation_t[t]/max(val["radiation_t"].values())
         return rule
     m.solar_restriction_jt = pe.Constraint(m.j_st,m.t,rule=solar_restriction_jt_rule)
 
