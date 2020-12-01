@@ -24,3 +24,5 @@ app/modules/common/FEAT/F16/.ipynb_checkpoints/
 dist/
 build/
 hotmapsDispatch.egg-info/
+
+.vscode/
