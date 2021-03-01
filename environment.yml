@@ -10,7 +10,7 @@ dependencies:
   - numpy
   - pandas
   - openpyxl
-  - xlrd   
+  - xlrd=1.2.0  
   - matplotlib
   - pyomo
   - tornado=4
@@ -18,7 +18,6 @@ dependencies:
   - nodejs
   - altair
   - colorcet
-  - xlrd=1.2.0
   - altair_saver
   
  # open conda prompt here and type the following comand:
