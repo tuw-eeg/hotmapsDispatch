@@ -10,7 +10,7 @@ dependencies:
   - numpy
   - pandas
   - openpyxl
-  - xlrd   
+  - xlrd=1.2.0   
   - matplotlib
   - pyomo
   - tornado=4
