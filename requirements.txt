@@ -4,7 +4,7 @@ cycler==0.10.0
 et-xmlfile==1.0.1
 gurobipy==8.0.1
 jdcal==1.4
-Jinja2==2.10
+Jinja2==2.10.1
 kiwisolver==1.0.1
 MarkupSafe==1.0
 matplotlib==2.2.2
