@@ -19,6 +19,8 @@ dependencies:
   - altair
   - colorcet
   - altair_saver
+  - glpk
   
  # open conda prompt here and type the following comand:
  # conda env create -f environment.yml
+ # conda activate hotmapsDispatch
