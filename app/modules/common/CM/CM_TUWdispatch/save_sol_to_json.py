@@ -200,7 +200,7 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         try:    
             solution["Heat Storage Technologies"] = list(instance.j_hs.data())
         except:
-            solution["Heat Storage Technologies"] = list(instance.j_hs.value())          
+            solution["Heat Storage Technologies"] = list(instance.j_hs.value)          
         solution["Unloading Heat Storage over year"] =  {hs:sum(solution["Unloading Heat Storage"][hs]) for hs in instance.j_hs}
         solution["Revenue from Heat Storages"]  = {hs:0 for hs in instance.j_hs}
         solution["Operational Cost of Heat Storages"]= {hs:solution["HS-Capacities"][hs] * instance.OP_fix_hs[hs] for hs in instance.j_hs }
