@@ -2,7 +2,6 @@ name: hotmapsDispatch
 channels:
   - conda-forge
   - defaults
-  - anaconda
   - bokeh
 dependencies:
   - python=3.6
