@@ -1,8 +1,6 @@
 name: hotmapsDispatch
 channels:
   - conda-forge
-  - defaults
-  - bokeh
 dependencies:
   - python=3.6
   - bokeh=0.12.10
@@ -11,7 +9,7 @@ dependencies:
   - openpyxl
   - xlrd=1.2.0   
   - matplotlib
-  - pyomo
+  - pyomo=5.7
   - tornado=4
   - xlsxwriter
   - nodejs
