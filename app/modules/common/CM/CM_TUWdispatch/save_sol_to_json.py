@@ -196,8 +196,11 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         for hs,array in {hs:np.array([instance.x_load_hs_t[hs,t]() for t in instance.t]) for hs in instance.j_hs}.items():
             solution["Loading Heat Storage"][hs] = np.where(array>0,array,0).tolist()
             solution["Unloading Heat Storage"][hs] = abs(np.where(array<0,array,0)).tolist()
-            
-        solution["Heat Storage Technologies"] = list(instance.j_hs.value)
+        # since pyomo 5.7 deprecated .value() attribute
+        try:    
+            solution["Heat Storage Technologies"] = list(instance.j_hs.data())
+        except:
+            solution["Heat Storage Technologies"] = list(instance.j_hs.value())          
         solution["Unloading Heat Storage over year"] =  {hs:sum(solution["Unloading Heat Storage"][hs]) for hs in instance.j_hs}
         solution["Revenue from Heat Storages"]  = {hs:0 for hs in instance.j_hs}
         solution["Operational Cost of Heat Storages"]= {hs:solution["HS-Capacities"][hs] * instance.OP_fix_hs[hs] for hs in instance.j_hs }
@@ -236,7 +239,12 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
                 **solution["Specific Capital Costs of installed Heat Storages"]}
         solution["Fuel Costs:"] = {**solution["Fuel Costs"],
                 **solution["Fuel Costs Heat Storages"]}
-        solution["all_heat_geneartors"] = list(instance.all_heat_geneartors.value)
+        # since pyomo 5.7 deprecated .value() attribute
+        try:    
+            solution["all_heat_geneartors"] = list(instance.all_heat_geneartors.data())
+        except:
+            solution["all_heat_geneartors"] = list(instance.all_heat_geneartors.value)
+        
         # CO2 Emissions
         solution["Total CO2 Emission"]= {j:1e3*solution["Thermal Generation Mix"][j]*instance.em_j[j]/np.mean([instance.n_th_jt[j,t] for t in instance.t]) for j in instance.j} 
         solution["CO2 Emission Heat"] = {j: solution["Total CO2 Emission"][j]*np.mean([instance.n_th_jt[j,t] for t in instance.t])/(np.mean([instance.n_th_jt[j,t] for t in instance.t])+instance.n_el_j[j]) for j in instance.j} 
