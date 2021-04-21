@@ -2013,7 +2013,7 @@ def modify_doc(doc,solver):
     tabs_geneator_hs = Tabs(tabs=[] ,width = 800)
     name_hs = TextInput(placeholder="-", title="name")
     capacity_hs = TextInput(placeholder="-", title="Storage Capacity [MWh]")
-    losses_hs =  Slider(start=0, end=100, value=1, step=1, title="Hourly Stoarge Losses [%]")
+    losses_hs =  Slider(start=0, end=2, value=.0001, step=.0001, title="Hourly Stoarge Losses [%]")
     unloding_power = TextInput(placeholder="-", title="maximum unloading power  [MW]")
     loading_power = TextInput(placeholder="-", title="maximum loading power  [MW]")
     loading_efficiency = Slider(start=0, end=1, value=.980, step=.001, title="loading/unloading efficiency")
