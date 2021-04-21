@@ -7,7 +7,7 @@ dependencies:
   - numpy
   - pandas
   - openpyxl
-  - xlrd=1.2.0  
+  - xlrd=1.2.0   
   - matplotlib
   - pyomo=5.7
   - tornado=4
@@ -15,8 +15,8 @@ dependencies:
   - nodejs
   - altair
   - colorcet
-  - altair_saver
   - glpk
+  - altair_saver
   
  # open conda prompt here and type the following comand:
  # conda env create -f environment.yml

@@ -503,7 +503,7 @@ input_list_hs = list(heat_storage_list_mapper)
 lab = dict(offset="Offset",constant="Set To Constant",
            mean="Use mean value",total="Sum",scale="Scale")
 # Set Names of the tabs for the external data
-widgets_keys = ["Radiation","Temperature","Electricity price",
+widgets_keys = ["Radiation","Ambient Temperature","Electricity price",
                 "Sale Electricity price","Flow Temperature","Return Temperature",
                 "River Temperature","Waste Water Temperature","Heat Demand",]
 # Specify model names for the external data
