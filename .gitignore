@@ -1,0 +1,38 @@
+venv
+__pycache__
+htpasswd
+allow_websocket_origin.txt
+Output_Graphics
+Solution
+solution.json
+gurobi.log
+
+app/modules/common/FEAT/F16/config\.json
+
+\.spyproject/
+
+app/modules/common/AD/F16_input/load data to db/Backup/
+
+app/modules/common/AD/F16_input/load data to db/
+
+app/modules/common/FEAT/F16/.ipynb_checkpoints/
+
+app/modules/common/FEAT/F16/config\.json
+
+\.spyproject/
+
+app/modules/common/AD/F16_input/load data to db/Backup/
+
+app/modules/common/AD/F16_input/load data to db/
+
+app/modules/common/AD/F16_input/static/*.html
+app/modules/common/AD/F16_input/static/*.xlsx
+app/modules/common/AD/F16_input/static/*.zip
+
+
+
+.ipynb_checkpoints/
+
+.vscode/
+
+doc_jb/_build/

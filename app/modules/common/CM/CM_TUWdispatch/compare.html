@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+.accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+  transition: 0.4s;
+}
+
+.active, .accordion:hover {
+  background-color: #ccc; 
+}
+
+.panel {
+  padding: 0 18px;
+  display: none;
+  background-color: white;
+  overflow: hidden;
+}
+</style>
+
+<style>
+* {box-sizing: border-box}
+
+/* Set height of body and the document to 100% */
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: Arial;
+}
+
+/* Style tab links */
+.tablink {
+  background-color: #555;
+  color: white;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  font-size: 17px;
+  width: 10%;
+}
+
+.tablink:hover {
+  background-color: #777;
+}
+
+/* Style the tab content (and add height:100% for full page content) */
+.tabcontent {
+  color: none;
+  display: none;
+  padding: 100px 20px;
+  height: 100%;
+  
+}
+</style>
+</head>
+<body>
+
+<h2>Scenario Outputs </h2>
+<p>The output is divided in four sections</p>
+<ol type="1">
+  <li>Section1: summarized or overall results</li>
+  <li>Section2: distribution of the summarized/overall results</li>
+  <li>Section3: detailed results on technology level</li>
+  <li>Section4: distribution of the detailed results at technology level </li>
+</ol>
+<button class="accordion">Section 1</button>
+<div class="panel">
+  <button class="tablink" onclick="openPage('tot_lcoh1',this,'#1f77b4')" id="defaultOpen1">LCOH</button>
+  <button class="tablink" onclick="openPage('tot_cost1',this,'#ff7f0e')" >Total Costs</button>
+  <button class="tablink" onclick="openPage('tot_rev1',this,'#2ca02c')">Total Revenue</button>
+  <button class="tablink" onclick="openPage('tot_ue1',this,'#d62728')">Usefull energy</button>
+  <button class="tablink" onclick="openPage('tot_fe1',this,'#9467bd')">Final Energy</button>
+  <button class="tablink" onclick="openPage('tot_co21',this,'#8c564b')">CO2 Emission</button>
+  <button class="tablink" onclick="openPage('tot_cost_mix1',this,'#e377c2')">Cost Mix</button>
+  <!-- <button class="tablink" onclick="openPage('capacities1',this,'#7f7f7f')">Installed Capacites</button> -->
+  <!-- <button class="tablink" onclick="openPage('full_load_hours1',this,'#bcbd22')">Full Load Hours</button> -->
+
+<div id="tot_lcoh1" class="tabcontent">
+  ###tot_lcoh1
+</div>
+
+<div id="tot_cost1" class="tabcontent">
+	###tot_cost1
+</div>
+
+<div id="tot_rev1" class="tabcontent">
+###tot_rev1
+</div>
+
+<div id="tot_ue1" class="tabcontent">
+###tot_ue1
+</div>
+
+<div id="tot_fe1" class="tabcontent">
+###tot_fe1
+</div>
+
+<div id="tot_co21" class="tabcontent">
+###tot_co21
+</div>
+
+<div id="tot_cost_mix1" class="tabcontent">
+###tot_cost_mix1
+</div>
+<!--
+<div id="capacities1" class="tabcontent">
+###capacities1
+</div>
+
+<div id="full_load_hours1" class="tabcontent">
+###full_load_hours1
+-->
+
+</div>
+
+</div>
+
+<button class="accordion">Section 2</button>
+<div class="panel">
+  <button class="tablink" onclick="openPage('tot_lcoh4',this,'#1f77b4')" id="defaultOpen1">LCOH</button>
+  <button class="tablink" onclick="openPage('tot_cost4',this,'#ff7f0e')" >Total Costs</button>
+  <button class="tablink" onclick="openPage('tot_rev4',this,'#2ca02c')">Total Revenue</button>
+  <button class="tablink" onclick="openPage('tot_ue4',this,'#d62728')">Usefull energy</button>
+  <button class="tablink" onclick="openPage('tot_fe4',this,'#9467bd')">Final Energy</button>
+  <button class="tablink" onclick="openPage('tot_co24',this,'#8c564b')">CO2 Emission</button>
+   <!-- <button class="tablink" onclick="openPage('tot_cost_mix4',this,'#e377c2')">Cost Mix</button> -->
+  <!-- <button class="tablink" onclick="openPage('capacities1',this,'#7f7f7f')">Installed Capacites</button> -->
+  <!-- <button class="tablink" onclick="openPage('full_load_hours1',this,'#bcbd22')">Full Load Hours</button> -->
+
+<div id="tot_lcoh4" class="tabcontent">
+  ###tot_lcoh4
+</div>
+
+<div id="tot_cost4" class="tabcontent">
+	###tot_cost4
+</div>
+
+<div id="tot_rev4" class="tabcontent">
+###tot_rev4
+</div>
+
+<div id="tot_ue4" class="tabcontent">
+###tot_ue4
+</div>
+
+<div id="tot_fe4" class="tabcontent">
+###tot_fe4
+</div>
+
+<div id="tot_co24" class="tabcontent">
+###tot_co24
+</div>
+<!--
+<div id="tot_cost_mix4" class="tabcontent">
+###tot_cost_mix4
+</div>
+-->
+<!--
+<div id="capacities4" class="tabcontent">
+###capacities4
+</div>
+
+<div id="full_load_hours1" class="tabcontent">
+###full_load_hours4
+-->
+
+</div>
+
+</div>
+
+
+<button class="accordion">Section 3</button>
+<div class="panel">
+  <button class="tablink" onclick="openPage('tot_lcoh2',this,'#1f77b4')" id="defaultOpen2">LCOH</button>
+  <button class="tablink" onclick="openPage('tot_cost2',this,'#ff7f0e')" >Total Costs</button>
+  <button class="tablink" onclick="openPage('tot_rev2',this,'#2ca02c')">Total Revenue</button>
+  <button class="tablink" onclick="openPage('tot_ue2',this,'#d62728')">Usefull energy</button>
+  <button class="tablink" onclick="openPage('tot_fe2',this,'#9467bd')">Final Energy</button>
+  <button class="tablink" onclick="openPage('tot_co22',this,'#8c564b')">CO2 Emission</button>
+  <button class="tablink" onclick="openPage('tot_cost_mix2',this,'#e377c2')">Cost Mix</button>
+  <button class="tablink" onclick="openPage('capacities2',this,'#7f7f7f')">Installed Capacites</button>
+  <button class="tablink" onclick="openPage('full_load_hours2',this,'#bcbd22')">Full Load Hours</button>
+  <button class="tablink" onclick="openPage('efficience1',this,'#E4AE38')">efficience</button>
+  <button class="tablink" onclick="openPage('fembyec1',this,'#2FA1DA')">Final Energy By Energy Carrier</button>
+  <button class="tablink" onclick="openPage('co2embec1',this,'#FB4F2F')">CO2 Emission By Energy Carrier</button>
+
+<div id="tot_lcoh2" class="tabcontent">
+  ###tot_lcoh2
+</div>
+
+<div id="tot_cost2" class="tabcontent">
+	###tot_cost2
+</div>
+
+<div id="tot_rev2" class="tabcontent">
+###tot_rev2
+</div>
+
+<div id="tot_ue2" class="tabcontent">
+###tot_ue2
+</div>
+
+<div id="tot_fe2" class="tabcontent">
+###tot_fe2
+</div>
+
+<div id="tot_co22" class="tabcontent">
+###tot_co22
+</div>
+
+<div id="tot_cost_mix2" class="tabcontent">
+###tot_cost_mix2
+</div>
+
+<div id="capacities2" class="tabcontent">
+###capacities2
+</div>
+
+<div id="full_load_hours2" class="tabcontent">
+###full_load_hours2
+</div>
+
+<div id="efficience1" class="tabcontent">
+###efficience1
+</div>
+
+<div id="fembyec1" class="tabcontent">
+###fembyec1
+</div>
+
+<div id="co2embec1" class="tabcontent">
+###co2embec1
+</div>
+
+</div>
+
+<button class="accordion">Section 4</button>
+<div class="panel">
+ <button class="tablink" onclick="openPage('tot_lcoh3',this,'#1f77b4')" id="defaultOpen3">LCOH</button>
+  <button class="tablink" onclick="openPage('tot_cost3',this,'#ff7f0e')" >Total Costs</button>
+  <button class="tablink" onclick="openPage('tot_rev3',this,'#2ca02c')">Total Revenue</button>
+  <button class="tablink" onclick="openPage('tot_ue3',this,'#d62728')">Usefull energy</button>
+  <button class="tablink" onclick="openPage('tot_fe3',this,'#9467bd')">Final Energy</button>
+  <button class="tablink" onclick="openPage('tot_co23',this,'#8c564b')">CO2 Emission</button>
+  <!-- <button class="tablink" onclick="openPage('tot_cost_mix3',this,'#e377c2')">Cost Mix</button> -->
+  <button class="tablink" onclick="openPage('capacities3',this,'#7f7f7f')">Installed Capacites</button>
+  <button class="tablink" onclick="openPage('full_load_hours3',this,'#bcbd22')">Full Load Hours</button>
+   <button class="tablink" onclick="openPage('efficience2',this,'#E4AE38')">efficience</button>
+   <button class="tablink" onclick="openPage('fembyec2',this,'#2FA1DA')">Final Energy By Energy Carrier</button>
+   <button class="tablink" onclick="openPage('co2embec2',this,'#FB4F2F')">CO2 Emission By Energy Carrier</button>
+ 
+<div id="tot_lcoh3" class="tabcontent">
+  ###tot_lcoh3
+</div>
+
+<div id="tot_cost3" class="tabcontent">
+	###tot_cost3
+</div>
+
+<div id="tot_rev3" class="tabcontent">
+###tot_rev3
+</div>
+
+<div id="tot_ue3" class="tabcontent">
+###tot_ue3
+</div>
+
+<div id="tot_fe3" class="tabcontent">
+###tot_fe3
+</div>
+
+<div id="tot_co23" class="tabcontent">
+###tot_co23
+</div>
+<!--
+<div id="tot_cost_mix3" class="tabcontent">
+###tot_cost_mix3
+</div>
+-->
+<div id="capacities3" class="tabcontent">
+###capacities3
+</div>
+
+<div id="full_load_hours3" class="tabcontent">
+###full_load_hours3
+</div>
+
+<div id="efficience2" class="tabcontent">
+###efficience2
+</div>
+
+<div id="fembyec2" class="tabcontent">
+###fembyec2
+</div>
+
+<div id="co2embec2" class="tabcontent">
+###co2embec2
+  </div>
+</div>
+</div>
+
+
+<script>
+function openPage(pageName,elmnt,color) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablink");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].style.backgroundColor = "";
+  }
+  document.getElementById(pageName).style.display = "block";
+  elmnt.style.backgroundColor = color;
+}
+
+// Get the element with id="defaultOpen" and click on it
+document.getElementById("defaultOpen1").click();
+document.getElementById("defaultOpen2").click();
+document.getElementById("defaultOpen3").click();
+</script>
+<script>
+var acc = document.getElementsByClassName("accordion");
+var i;
+
+for (i = 0; i < acc.length; i++) {
+  acc[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var panel = this.nextElementSibling;
+    if (panel.style.display === "block") {
+      panel.style.display = "none";
+    } else {
+      panel.style.display = "block";
+    }
+  });
+}
+</script>
+
+
+
+
+</body>
+</html>
