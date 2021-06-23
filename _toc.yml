@@ -1,0 +1,40 @@
+# Table of content
+# Learn more at https://jupyterbook.org/customize/toc.html
+#
+
+- file: Hotmaps Dispatch - Description
+
+- part: First Steps
+  numbered: true
+  chapters:
+  - file: Installation
+  - file: The Web User Interface
+  
+- part: User Guide
+  numbered: true
+  chapters:
+  - file: Get started
+  - file: Inputs
+  - file: Outputs
+  - file: Scenario Mode
+  - file: Investment Mode
+  - file: Scenario Generation
+  - file: Example Projects
+  - file: Modeling Tricks
+    
+- part: Mathematical Description
+  numbered: true
+  chapters:
+  - file: Model Description
+  - file: Objective Function
+  - file: Constraints
+    
+- part: Developers Guide
+  numbered: true
+  chapters:
+  - file: Adding and Connection of new features into the model
+  - file: Adding new output indicators
+  - file: Adding new charts
+  - file: Dispatch-API
+  - file: Scenario Generator-API
+    

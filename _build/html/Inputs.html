@@ -1,0 +1,1082 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2. Inputs &#8212; HotmapsDispatch - Model Description</title>
+    
+  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.37f24b989f4638ff9c27c22dc7559d4f.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="3. Outputs" href="Outputs.html" />
+    <link rel="prev" title="1. Get started" href="Get%20started.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="index.html">
+  
+  <img src="_static/Hotmaps_Logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">HotmapsDispatch - Model Description</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Hotmaps%20Dispatch%20-%20Description.html">
+   Hotmaps Dispatch - Description
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  First Steps
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Installation.html">
+   1. Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="The%20Web%20User%20Interface.html">
+   2. The Web User Interface
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Get%20started.html">
+   1. Get started
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   2. Inputs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Outputs.html">
+   3. Outputs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Scenario%20Mode.html">
+   4. Scenario Mode
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Investment%20Mode.html">
+   5. Investment Mode
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Scenario%20Generation.html">
+   6. Scenario Generation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Example%20Projects.html">
+   7. Example Projects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Modeling%20Tricks.html">
+   8. Modeling Tricks
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Mathematical Description
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Model%20Description.html">
+   1. Model Description
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Objective%20Function.html">
+   2. Objective Function
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Constraints.html">
+   3. Constraints
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Developers Guide
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Adding%20and%20Connection%20of%20new%20features%20into%20the%20model.html">
+   1. Adding and Connection of new features into the model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Adding%20new%20output%20indicators.html">
+   2. Adding new output indicators
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Adding%20new%20charts.html">
+   3. Adding new charts
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Dispatch-API.html">
+   4. Dispatch-API
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Scenario%20Generator-API.html">
+   5. Scenario Generator-API
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="_sources/Inputs.md"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.md</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/tuw-eeg/hotmapsDispatch"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/tuw-eeg/hotmapsDispatch/issues/new?title=Issue%20on%20page%20%2FInputs.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#data-section">
+   2.1. Data Section
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#heat-producers-and-heat-storage-tab">
+     2.1.1. Heat Producers and Heat Storage – Tab
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#parameter-tab">
+     2.1.2. Parameter - Tab
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#price-emission-factors-tab">
+     2.1.3. Price &amp; Emission factors - Tab
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#radiation-tab">
+     2.1.4. Radiation - Tab
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#temperature-tab">
+     2.1.5. Temperature - Tab
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#electricity-price-sale-electricity-price-tab">
+     2.1.6. Electricity price/ Sale Electricity price - Tab
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#heat-demand-tab">
+     2.1.7. Heat Demand - Tab
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#load-individual-data-tab">
+     2.1.8. Load Individual Data - Tab
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-to-add-inputs">
+   2.2. How to add inputs
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#predefined-script-files">
+     2.2.1. Predefined script files
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#steps-before-add-profile-function">
+     2.2.2. Steps before
+     <em>
+      add_profile
+     </em>
+     function
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-add-profile-function">
+     2.2.3. The
+     <em>
+      add_profile
+     </em>
+     function
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="inputs">
+<h1><span class="section-number">2. </span>Inputs<a class="headerlink" href="#inputs" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="data-section">
+<h2><span class="section-number">2.1. </span>Data Section<a class="headerlink" href="#data-section" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="heat-producers-and-heat-storage-tab">
+<span id="section-heatproducersandheatstorage"></span><h3><span class="section-number">2.1.1. </span>Heat Producers and Heat Storage – Tab<a class="headerlink" href="#heat-producers-and-heat-storage-tab" title="Permalink to this headline">¶</a></h3>
+<p>In this tab, the created or uploaded heat generator
+and heat storage data is shown in two tables (heat storage table and heat
+generator table).  <a class="reference internal" href="#heatandstoragetable-fig"><span class="std std-numref">Fig. 2.26</span></a> shows the initial page (no heat generators and no heat storages are defined).</p>
+<div class="figure align-default" id="heatandstoragetable-fig">
+<a class="reference internal image-reference" href="_images/HeatAndStorageTable.PNG"><img alt="_images/HeatAndStorageTable.PNG" src="_images/HeatAndStorageTable.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.26 </span><span class="caption-text">Heat Generator and Storage Table</span><a class="headerlink" href="#heatandstoragetable-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please notice that it is possible to edit the values in the tables.</p>
+</div>
+<p>By pressing the <strong><code class="docutils literal notranslate"><span class="pre">+</span></code></strong> button you will be able to add new heat generators or heat storages. This kind of adding tab pops up between the button section and the output section, see <a class="reference internal" href="#addheatgenerators-fig"><span class="std std-numref">Fig. 2.27</span></a> and <a class="reference internal" href="#addheatstorages-fig"><span class="std std-numref">Fig. 2.28</span></a>.</p>
+<div class="figure align-default" id="addheatgenerators-fig">
+<a class="reference internal image-reference" href="_images/AddHeatGenerators.PNG"><img alt="_images/AddHeatGenerators.PNG" src="_images/AddHeatGenerators.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.27 </span><span class="caption-text">Adding heat generators</span><a class="headerlink" href="#addheatgenerators-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="addheatstorages-fig">
+<a class="reference internal image-reference" href="_images/AddHeatStorages.PNG"><img alt="_images/AddHeatStorages.PNG" src="_images/AddHeatStorages.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.28 </span><span class="caption-text">Adding heat storages</span><a class="headerlink" href="#addheatstorages-fig" title="Permalink to this image">¶</a></p>
+</div>
+<ul class="simple">
+<li><p><strong>Heat Generator Table</strong></p></li>
+</ul>
+<div class="figure align-default" id="heatgeneratorsadded-fig">
+<a class="reference internal image-reference" href="_images/HeatGeneratorsAdded.PNG"><img alt="_images/HeatGeneratorsAdded.PNG" src="_images/HeatGeneratorsAdded.PNG" style="height: 130px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.29 </span><span class="caption-text">Added heat generators in heat generator table</span><a class="headerlink" href="#heatgeneratorsadded-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>Your added, by pressing the <strong><code class="docutils literal notranslate"><span class="pre">+</span></code></strong> button) or uploaded
+data of heat generators is shown here, like in <a class="reference internal" href="#heatgeneratorsadded-fig"><span class="std std-numref">Fig. 2.29</span></a>. You have the opportunity to change the values of the table below, but pay attention to the <strong>warning</strong> below!</p>
+<p>These parameters can also be changed via uploading. Therefore, you have
+to create an excel sheet with the structure as described in <a class="reference internal" href="The%20Web%20User%20Interface.html"><span class="doc">The Web User Interface</span></a> (subchapter <em>Button Section</em>). Then
+the parameters must be specified in the <em>Heat Generators worksheet</em>.</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>column name</p></th>
+<th class="head"><p>format</p></th>
+<th class="head"><p>unit</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>name</p></td>
+<td><p>String</p></td>
+<td><p>-</p></td>
+<td><p>Name of your power plant, you can give any name you want (don’t use the same names for different generators)</p></td>
+</tr>
+<tr class="row-odd"><td><p>installed capacity (MW_th)</p></td>
+<td><p>Number</p></td>
+<td><p>MW</p></td>
+<td><p>Here you can specify the power you want to install</p></td>
+</tr>
+<tr class="row-even"><td><p>efficiency  (th)</p></td>
+<td><p>Number</p></td>
+<td><p>-</p></td>
+<td><p>Here you can specify the thermal efficiency of the heat generator</p></td>
+</tr>
+<tr class="row-odd"><td><p>efficiency  (el)</p></td>
+<td><p>Number</p></td>
+<td><p>-</p></td>
+<td><p>Here you can specify the electrical efficiency of the heat generator</p></td>
+</tr>
+<tr class="row-even"><td><p>investment costs (EUR/MW_th)</p></td>
+<td><p>Number</p></td>
+<td><p>€/MW</p></td>
+<td><p>Here you can set the specific investment cost (especially if you try to do <a class="reference internal" href="Investment%20Mode.html"><span class="doc">Investment Mode</span></a>), this parameter can be crucial)</p></td>
+</tr>
+<tr class="row-odd"><td><p>OPEX fix (EUR/MWa)</p></td>
+<td><p>Number</p></td>
+<td><p>€/MWa</p></td>
+<td><p>Here you can specify fixed operational expenditures</p></td>
+</tr>
+<tr class="row-even"><td><p>OPEX var (EUR/MWh)</p></td>
+<td><p>Number</p></td>
+<td><p>€/MWh</p></td>
+<td><p>Here you can specify variable operational expenditures</p></td>
+</tr>
+<tr class="row-odd"><td><p>life time</p></td>
+<td><p>Number</p></td>
+<td><p>a</p></td>
+<td><p>Here you can set the life time of your generator (in the model this is used for the annuity factor)</p></td>
+</tr>
+<tr class="row-even"><td><p>renewable factor</p></td>
+<td><p>Number (real number between 0 and 1)</p></td>
+<td><p>-</p></td>
+<td><p>Here you can set the renewable share of your generator, e.g. if your generator is *0%*renewable, then you set <em>0</em>; if your generator is <em>50%</em> renewable, then you have to set this value to <em>0.5</em>. The application tries then to meet the minimum renewable share (specified in <a class="reference internal" href="#section-parameter"><span class="std std-ref">Parameter - Tab</span></a>) for the generation mix. <em><strong>Caution:</strong></em> <em>the problem might become infeasible, e.g. if you defined a minimum share of 50% but you haven’t defined enough generators with a renewable factor higher than 0.5, the constraint for a minimum share of 50% cannot be met</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>must run [0-1]</p></td>
+<td><p>Number (real number between 0 and 1)</p></td>
+<td><p>-</p></td>
+<td><p>Here you can force a heat generator to run all the time with <em>x%</em> of its installed capacity. If you want to realize a base load you can use this as a parameter, e.g. if you want that your heat generator run with <em>50%</em> of its capacity all the time, you have to set this value to <em>0.5</em>. <em><strong>Caution:</strong></em> <em>Due to other constraints, the problem might become infeasible, e.g. the heat pump doesn’t run at temperatures lower than 0°C. That means, if you force a heat pump to run all the time with x% of its capacity the other constraint cannot be met and therefore the problem becomes infeasible.</em></p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>In this table, it is not possible to change the heat generator
+types or energy carrier. The type is either defined
+by the type column in the <em>Heat Generator worksheet</em> when uploading power plant parameters or internally by adding from the
+user interface, see  <em>Add new Heat Generator Section</em> in this subchapter. The same applies for the energy carriers, they can only be adapted via uploading an excel file, <em>energy carrier worksheet</em>, or via the internal <em>adding
+section</em>.</p>
+</div>
+<ul class="simple">
+<li><p><strong>Heat Storage Table</strong></p></li>
+</ul>
+<div class="figure align-default" id="heatstoragesadded-fig">
+<a class="reference internal image-reference" href="_images/HeatStoragesAdded.PNG"><img alt="_images/HeatStoragesAdded.PNG" src="_images/HeatStoragesAdded.PNG" style="height: 130px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.30 </span><span class="caption-text">Added heat storages in heat storage table</span><a class="headerlink" href="#heatstoragesadded-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>You have the opportunity to change the values of the table below, but also pay attention to the <strong>warning</strong> after the table!</p>
+<p>These parameters can also be changed via uploading. Therefore, you have
+to create an excel sheet with the structure as described in <a class="reference internal" href="The%20Web%20User%20Interface.html"><span class="doc">The Web User Interface</span></a> (subchapter <em>Button Section</em>). Then the parameters must be specified in the <em>Heat Storage worksheet</em>.</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>column name</strong></p></th>
+<th class="head"><p><strong>format</strong></p></th>
+<th class="head"><p>unit</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>name</p></td>
+<td><p>String</p></td>
+<td><p>-</p></td>
+<td><p>Name of your heat storage, you can give any name you want (don’t use the same names for different storages)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Storage Capacity [MWh]</p></td>
+<td><p>Number</p></td>
+<td><p>MWh</p></td>
+<td><p>Here you can specify the capacity you want to install (if you use only <em>dispatch mode</em>, you can see in the <em>notification section</em>, how much MW you need to cover the peak load)</p></td>
+</tr>
+<tr class="row-even"><td><p>maximum unloading power [MW]</p></td>
+<td><p>Number</p></td>
+<td><p>MW</p></td>
+<td><p>Here you can specify the unloading power</p></td>
+</tr>
+<tr class="row-odd"><td><p>maximum loading power [MW]</p></td>
+<td><p>Number</p></td>
+<td><p>MW</p></td>
+<td><p>Here you can specify the loading power</p></td>
+</tr>
+<tr class="row-even"><td><p>loading efficiency</p></td>
+<td><p>Number (real number between 0 and 1)</p></td>
+<td><p>-</p></td>
+<td><p>Loading efficiency</p></td>
+</tr>
+<tr class="row-odd"><td><p>unloading efficiency</p></td>
+<td><p>Number (real number between 0 and 1)</p></td>
+<td><p>-</p></td>
+<td><p>Unloading efficiency</p></td>
+</tr>
+<tr class="row-even"><td><p>Investment costs for additional storage capacity [€/MWh]</p></td>
+<td><p>Number</p></td>
+<td><p>€/MWh</p></td>
+<td><p>Here you can set the specific investment costs (especially if you try to do  <a class="reference internal" href="Investment%20Mode.html"><span class="doc">Investment Mode</span></a>, this parameter can be crucial)</p></td>
+</tr>
+<tr class="row-odd"><td><p>OPEX fix [€/MWha]</p></td>
+<td><p>Number</p></td>
+<td><p>€/MWha</p></td>
+<td><p>Here you can specify fixed operational expenditures</p></td>
+</tr>
+<tr class="row-even"><td><p>Life Time [a]</p></td>
+<td><p>Number</p></td>
+<td><p>a</p></td>
+<td><p>Here you can set the life time of your generator (in the model this is used for the annuity factor)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Please be aware that only one heat storage is available, e.g. if you don’t upload others, only this storage will be editable ! The <strong><code class="docutils literal notranslate"><span class="pre">+</span></code></strong> button for heat storages does nothing, the implementation is in progress and this feature will become available then.</p>
+</div>
+<ul class="simple">
+<li><p><strong><em>Add new Heat Generator</em> - section</strong></p></li>
+</ul>
+<div class="figure align-default" id="addheatgensection-fig">
+<a class="reference internal image-reference" href="_images/AddHeatGenSection.PNG"><img alt="_images/AddHeatGenSection.PNG" src="_images/AddHeatGenSection.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.31 </span><span class="caption-text">Section for heat generator adding</span><a class="headerlink" href="#addheatgensection-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>By pressing the <strong><code class="docutils literal notranslate"><span class="pre">+</span></code></strong> button in the <em>Heat Generators Table</em>  the
+section in <a class="reference internal" href="#addheatgensection-fig"><span class="std std-numref">Fig. 2.31</span></a> pops up (please be patient this will take some time). All heat generators have the three red marked tabs in common, only for heat pumps an extra tab is shown (Coefficient of Performance, COP; marked in a green box).</p>
+<p><a class="reference internal" href="#heatgenvariable-fig"><span class="std std-numref">Fig. 2.32</span></a> shows you all predefined heat generator types, that means by selection one of these, predefined values are loaded. You can see and edit the values in the <em>Technical Parameters tab</em> and in the <em>Finance Parameters tab</em>, but you can also change them later in the <em>Heat
+Generator table</em>, after pressing <code class="docutils literal notranslate"><span class="pre">✓</span> <span class="pre">ADD</span></code>. <a class="reference internal" href="#heatgenvariable-fig"><span class="std std-numref">Fig. 2.32</span></a> until  <a class="reference internal" href="#copparam-fig"><span class="std std-numref">Fig. 2.43</span></a> shows all possible selections and predefinitions you can make.</p>
+<div class="figure align-default" id="heatgenvariable-fig">
+<a class="reference internal image-reference" href="_images/HeatGenVariable.PNG"><img alt="_images/HeatGenVariable.PNG" src="_images/HeatGenVariable.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.32 </span><span class="caption-text">Available heat generators to choose</span><a class="headerlink" href="#heatgenvariable-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="boileravailable-fig">
+<a class="reference internal image-reference" href="_images/BoilerAvailable.PNG"><img alt="_images/BoilerAvailable.PNG" src="_images/BoilerAvailable.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.33 </span><span class="caption-text">Available types of boilers to choose</span><a class="headerlink" href="#boileravailable-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="heatpumpoptions-fig">
+<a class="reference internal image-reference" href="_images/HeatPumpOptions.PNG"><img alt="_images/HeatPumpOptions.PNG" src="_images/HeatPumpOptions.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.34 </span><span class="caption-text">Available types of heat pumps to choose</span><a class="headerlink" href="#heatpumpoptions-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="chpextoptions-fig">
+<a class="reference internal image-reference" href="_images/CHPextOptions.PNG"><img alt="_images/CHPextOptions.PNG" src="_images/CHPextOptions.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.35 </span><span class="caption-text">Available types of CHP-Steam Extraction types to choose</span><a class="headerlink" href="#chpextoptions-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="chpbackoptions-fig">
+<a class="reference internal image-reference" href="_images/CHPbackOptions.PNG"><img alt="_images/CHPbackOptions.PNG" src="_images/CHPbackOptions.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.36 </span><span class="caption-text">Available types of CHP-Back Pressure types to choose</span><a class="headerlink" href="#chpbackoptions-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="heatgentechnicalparam-fig">
+<a class="reference internal image-reference" href="_images/HeatGenTechnicalParam.PNG"><img alt="_images/HeatGenTechnicalParam.PNG" src="_images/HeatGenTechnicalParam.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.37 </span><span class="caption-text">Available types of technical parameters for heat generators to choose</span><a class="headerlink" href="#heatgentechnicalparam-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>In  <a class="reference internal" href="#heatgentechnicalparam-fig"><span class="std std-numref">Fig. 2.37</span></a> you can select the energy carrier with which the heat generator is fired.
+You can define a name and set the thermal and electrical efficiency. For heat
+pumps the input for <em>Thermal Efficiency</em> is disabled, because it is defined via
+the <em>Coefficient of Performance, COP</em> tab. Each heat
+generator has predefined values that are shown here. You can and
+should change them.</p>
+<div class="figure align-default" id="heatstortechnicalparam-fig">
+<a class="reference internal image-reference" href="_images/HeatStorTechnicalParam.PNG"><img alt="_images/HeatStorTechnicalParam.PNG" src="_images/HeatStorTechnicalParam.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.38 </span><span class="caption-text">Available types of technical parameters for heat storages to choose</span><a class="headerlink" href="#heatstortechnicalparam-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>In  <a class="reference internal" href="#heatstortechnicalparam-fig"><span class="std std-numref">Fig. 2.38</span></a> you can define the technical parameters for your heat storage</p>
+<div class="figure align-default" id="heatgenfinanceparam-fig">
+<a class="reference internal image-reference" href="_images/HeatGenFinanceParam.PNG"><img alt="_images/HeatGenFinanceParam.PNG" src="_images/HeatGenFinanceParam.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.39 </span><span class="caption-text">Available types of <em>Finance Parameters</em> for heat generators to choose</span><a class="headerlink" href="#heatgenfinanceparam-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p><a class="reference internal" href="#heatgenfinanceparam-fig"><span class="std std-numref">Fig. 2.39</span></a>shows  you which predefined values of financial parameters for
+selected heat generator you can modify or in general see.</p>
+<div class="figure align-default" id="heatstorfinanceparam-fig">
+<a class="reference internal image-reference" href="_images/HeatStorFinanceParam.PNG"><img alt="_images/HeatStorFinanceParam.PNG" src="_images/HeatStorFinanceParam.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.40 </span><span class="caption-text">Available types of <em>Finance Parameters</em> for heat storages to choose</span><a class="headerlink" href="#heatstorfinanceparam-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>In  <a class="reference internal" href="#heatstorfinanceparam-fig"><span class="std std-numref">Fig. 2.40</span></a> you can set the financel paramters for your heat storage.</p>
+<div class="figure align-default" id="heatgenmodelparam-fig">
+<a class="reference internal image-reference" href="_images/HeatGenModelParam.PNG"><img alt="_images/HeatGenModelParam.PNG" src="_images/HeatGenModelParam.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.41 </span><span class="caption-text">Defining model parameters for heat generators</span><a class="headerlink" href="#heatgenmodelparam-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>In this tab, shown in  <a class="reference internal" href="#heatgenmodelparam-fig"><span class="std std-numref">Fig. 2.41</span></a>, you can set the orange toggle button Must Run. That mean that this
+heat generator <strong>must run all the time with 100%</strong> of its capacity.
+With one slider, you can set a <em>Renewable Factor</em> (values from 0 to 1) and with the other you can set the <em>Installed
+Capacity</em> of your heat generator (values from 0 to
+Pmax, the <em>Peak
+Load</em> of the selected Heat Profile). Beside that, you can define other parameters like <em>Maximum Available Potential [MWh]</em>, <em>Maximum Output Power [MW]</em> or the <em>Excess Heat Source Price [€/MWh]</em>.</p>
+<div class="figure align-default" id="heatstormodelparam-fig">
+<a class="reference internal image-reference" href="_images/HeatStorModelParam.PNG"><img alt="_images/HeatStorModelParam.PNG" src="_images/HeatStorModelParam.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.42 </span><span class="caption-text">Defining model parameters for heat stortages</span><a class="headerlink" href="#heatstormodelparam-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>In <a class="reference internal" href="#heatstormodelparam-fig"><span class="std std-numref">Fig. 2.42</span></a>, you can set heat storage losses.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Please specify losses, because if losses are zero, it can happen that the storage is loading and unloading at the same time!</p>
+</div>
+<div class="figure align-default" id="copparam-fig">
+<a class="reference internal image-reference" href="_images/COPparam.PNG"><img alt="_images/COPparam.PNG" src="_images/COPparam.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.43 </span><span class="caption-text">Defining COP (only for heat pumps!)</span><a class="headerlink" href="#copparam-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only heat pumps have this additional tab!</p>
+</div>
+<p>Here you can select an* Inlet and Return Temperature* and, based on that selection, a COP is defined. In the <em>Technical Parameters tab</em> the COP value is inserted into the
+<em>thermal efficiency input widget</em> (the widget itself is disabled, meaning you
+cannot edit the value here, but you can change it later in the <em>heat generators
+table</em>).</p>
+</div>
+<div class="section" id="parameter-tab">
+<span id="section-parameter"></span><h3><span class="section-number">2.1.2. </span>Parameter - Tab<a class="headerlink" href="#parameter-tab" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="parameterstab-fig">
+<a class="reference internal image-reference" href="_images/ParametersTab.PNG"><img alt="_images/ParametersTab.PNG" src="_images/ParametersTab.PNG" style="height: 80px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.44 </span><span class="caption-text">Available parameter values to modify</span><a class="headerlink" href="#parameterstab-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>Parameters in the table below, or also shown in <a class="reference internal" href="#parameterstab-fig"><span class="std std-numref">Fig. 2.44</span></a>, can also be changed via uploading. Therefore, you have
+to create an excel sheet with the structure as described in <a class="reference internal" href="The%20Web%20User%20Interface.html"><span class="doc">The Web User Interface</span></a> (subchapter <em>Button Section</em>). Then the parameters must be specified in the <em>Data worksheet</em>.</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>column name</p></th>
+<th class="head"><p>format</p></th>
+<th class="head"><p>unit</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>CO2 Price [€/<span class="math notranslate nohighlight">\(t_{C0_2}\)</span>]</p></td>
+<td><p>Number</p></td>
+<td><p>€/<span class="math notranslate nohighlight">\(t_{C0_2}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(CO_2\)</span> -Certificate Price (used for the short run marginal costs)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Interest Rate [0-1]</p></td>
+<td><p>Number (real number between 0 and 1)</p></td>
+<td><p>-</p></td>
+<td><p>interest rate (for <em>investment planning</em>)</p></td>
+</tr>
+<tr class="row-even"><td><p>Minimum Renewable Factor [0-1]</p></td>
+<td><p>Number (real number between 0 and 1)</p></td>
+<td><p>-</p></td>
+<td><p>minimum renewable share that the thermal generation should have</p></td>
+</tr>
+<tr class="row-odd"><td><p>Total Demand[ MWh]</p></td>
+<td><p>Number</p></td>
+<td><p>MWh</p></td>
+<td><p>Heat Consumption of one year; this will change the peak load (can be seen in the <em>notification section</em>). This cell and the <em>Set Total Demamd (MWh)</em> input widget in the <em>Heat Demand Tab</em> are coupled, this means changing one value of them changes also the other</p></td>
+</tr>
+</tbody>
+</table>
+<p>(section: PriceAndEmissionFactors)=</p>
+</div>
+<div class="section" id="price-emission-factors-tab">
+<h3><span class="section-number">2.1.3. </span>Price &amp; Emission factors - Tab<a class="headerlink" href="#price-emission-factors-tab" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="pricesandemissfactorstab-fig">
+<a class="reference internal image-reference" href="_images/PricesAndEmissFactorsTab.PNG"><img alt="_images/PricesAndEmissFactorsTab.PNG" src="_images/PricesAndEmissFactorsTab.PNG" style="height: 250px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.45 </span><span class="caption-text">Available prices and emission factors to modify</span><a class="headerlink" href="#pricesandemissfactorstab-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>In general, you can set prices and emission factors for different energy
+carriers, like shown in <a class="reference internal" href="#pricesandemissfactorstab-fig"><span class="std std-numref">Fig. 2.45</span></a>. These prices are used to calculate the short run marginal costs.
+These parameters, as described in the table below, can also be changed via uploading. Therefor you have to create an excel sheet with the structure as described in <a class="reference internal" href="The%20Web%20User%20Interface.html"><span class="doc">The Web User Interface</span></a> (subchapter <em>Button Section</em>). Then
+the parameters must be specified in the <em>prices and emmision factors
+worksheet</em>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>With the uploading method, you can create your
+own energy carriers (max. 13). If you create new ones don’t forget to specify the new names to your heat generators in the <em>Energy Carrier worksheet</em>.</p>
+</div>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>column name</p></th>
+<th class="head"><p>format</p></th>
+<th class="head"><p>unit</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>energy carrier</p></td>
+<td><p>String</p></td>
+<td><p>-</p></td>
+<td><p>name of the energy carrier</p></td>
+</tr>
+<tr class="row-odd"><td><p>prices(€/MWh)</p></td>
+<td><p>Number</p></td>
+<td><p>€/MWh</p></td>
+<td><p>energy carrier price</p></td>
+</tr>
+<tr class="row-even"><td><p>emission factor [<span class="math notranslate nohighlight">\(t_{C0_2}\)</span>/MWh]</p></td>
+<td><p>Number</p></td>
+<td><p><span class="math notranslate nohighlight">\(t_{C0_2}\)</span>/MWh</p></td>
+<td><p><span class="math notranslate nohighlight">\(CO_2\)</span> -emission factor of the energy carrier</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="radiation-tab">
+<span id="section-radiation"></span><h3><span class="section-number">2.1.4. </span>Radiation - Tab<a class="headerlink" href="#radiation-tab" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="radiationtaballg-fig">
+<a class="reference internal image-reference" href="_images/RadiationTabAllg.PNG"><img alt="_images/RadiationTabAllg.PNG" src="_images/RadiationTabAllg.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.46 </span><span class="caption-text">Radiation tab</span><a class="headerlink" href="#radiationtaballg-fig" title="Permalink to this image">¶</a></p>
+</div>
+<ul class="simple">
+<li><p>In this tab, like shown in <a class="reference internal" href="#radiationtaballg-fig"><span class="std std-numref">Fig. 2.46</span></a>, you can select (<em>Country-Year</em> drop-down box) a predefined or a
+custom radiation profile with which you want to run the application.</p></li>
+<li><p>If you have created your own profile with the <em>Load Individual Data</em>
+tab the profile will show up in <em>Country-Year</em>
+drop-down box.</p></li>
+<li><p>The unit of the profile is <strong>W/m²</strong> and the model use this profile
+for the solar thermal power plants. If the radiation is larger than
+1000 W/m² the plant works with its peak capacities installed .</p></li>
+</ul>
+<p>You have the opportunity to make <em>*reversible</em> modifications on the profile:</p>
+<ul class="simple">
+<li><p>you can set an offset (every value of the profile will be added by the offset
+value)</p></li>
+<li><p>you can set the whole profile to a constant value</p></li>
+<li><p>you can scale the profile (multiplication by a factor)</p></li>
+<li><p>or you can use the mean value as constant profile</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>By reversible we mean e.g. if you check the <em>Use mean value</em> checkbox and uncheck
+again you will get your profile back (see <a class="reference internal" href="#radiationtab-fig"><span class="std std-numref">Fig. 2.47</span></a>), the same occurs if
+you set a constant value and then delete this value you will get the profile
+back, see in contrast the irreversible modification tool
+in the <a class="reference internal" href="#section-loadindividualdata"><span class="std std-ref">Load Individual Data - Tab</span></a>.</p>
+</div>
+<div class="figure align-default" id="radiationtab-fig">
+<a class="reference internal image-reference" href="_images/RadiationTab.PNG"><img alt="_images/RadiationTab.PNG" src="_images/RadiationTab.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.47 </span><span class="caption-text">Radiation tab and checkbox</span><a class="headerlink" href="#radiationtab-fig" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="temperature-tab">
+<span id="section-temperature"></span><h3><span class="section-number">2.1.5. </span>Temperature - Tab<a class="headerlink" href="#temperature-tab" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="temptab-fig">
+<a class="reference internal image-reference" href="_images/TempTab.PNG"><img alt="_images/TempTab.PNG" src="_images/TempTab.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.48 </span><span class="caption-text">Temperature tab</span><a class="headerlink" href="#temptab-fig" title="Permalink to this image">¶</a></p>
+</div>
+<ul class="simple">
+<li><p>In this tab, like shown in <a class="reference internal" href="#temptab-fig"><span class="std std-numref">Fig. 2.48</span></a>, you can select (<em>Country-Year</em> drop-down box) a predefined or a
+custom temperature profile with which you want to run the application.</p></li>
+<li><p>If you have created your own profile with the <em>Load Individual Data</em>
+tab the profile will show up in <em>Country-Year</em>
+drop-down box.</p></li>
+<li><p>The unit of the profile is <strong>°C</strong> and the model use this profile for the heat
+pumps. If the temperature is smaller than 0°C the heat pumps
+don’t work!</p></li>
+<li><p>You have the opportunity to make reversible modifications on the profile.</p></li>
+</ul>
+</div>
+<div class="section" id="electricity-price-sale-electricity-price-tab">
+<span id="section-saleelectricityprice"></span><h3><span class="section-number">2.1.6. </span>Electricity price/ Sale Electricity price - Tab<a class="headerlink" href="#electricity-price-sale-electricity-price-tab" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="elecpricetab-fig">
+<a class="reference internal image-reference" href="_images/ElecPriceTab.PNG"><img alt="_images/ElecPriceTab.PNG" src="_images/ElecPriceTab.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.49 </span><span class="caption-text">Process to assigning a sale-/or electricity price profile</span><a class="headerlink" href="#elecpricetab-fig" title="Permalink to this image">¶</a></p>
+</div>
+<ul class="simple">
+<li><p>In this tabs, e.g. the shown process in <a class="reference internal" href="#elecpricetab-fig"><span class="std std-numref">Fig. 2.49</span></a>, you can select (<em>Country-Year</em> drop-down box) a predefined or a
+custom sale-/electricity price profile and then assign it to a generator (<em>Add to</em>
+drop-down box) by pressing the ** <code class="docutils literal notranslate"><span class="pre">✓</span></code>**  button.</p></li>
+<li><p>If you have created your own profile with the <em>Load Individual Data
+tab</em>,  the profile will show up in <em>Country-Year</em>
+drop-down box .</p></li>
+<li><p>The unit of the profile is <strong>€/MWh</strong> and the model uses this for
+multiple purposes, e.g: if the energy carrier is electricity; this influences the short run marginal costs</p></li>
+<li><p>If your generator produces electricity, this affects the revenues</p></li>
+<li><p>Also, here you have the opportunity to make reversible modifications on the
+profile.</p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is important to press the <strong><code class="docutils literal notranslate"><span class="pre">✓</span></code></strong> button, because only so changes take effect!</p>
+</div>
+<p>E.g. let’s say we want to change the <strong>default</strong> electricity price (see ):</p>
+<ol class="simple">
+<li><p>Select a new profile with the <em>Country-Year</em> drop-down box</p></li>
+<li><p>Select <em>Default</em> in the <em>Add to</em> drop-down box</p></li>
+<li><p>Press the <strong><code class="docutils literal notranslate"><span class="pre">✓</span></code></strong>  button</p></li>
+<li><p>Information in the notification section will appear</p></li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This is the only way to assign a price profile, otherwise the initial profile or the last set profile is used!</p>
+</div>
+</div>
+<div class="section" id="heat-demand-tab">
+<span id="section-heatdemand"></span><h3><span class="section-number">2.1.7. </span>Heat Demand - Tab<a class="headerlink" href="#heat-demand-tab" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="heatdemandtab-fig">
+<a class="reference internal image-reference" href="_images/HeatDemandTab.PNG"><img alt="_images/HeatDemandTab.PNG" src="_images/HeatDemandTab.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.50 </span><span class="caption-text">Process to assigning a heat demand profile</span><a class="headerlink" href="#heatdemandtab-fig" title="Permalink to this image">¶</a></p>
+</div>
+<ul class="simple">
+<li><p>In this tab, shown in <a class="reference internal" href="#heatdemandtab-fig"><span class="std std-numref">Fig. 2.50</span></a>, you can select (<em>Country-Year</em> drop-down box) a predefined or a
+custom load profile with which you want to run the application.</p></li>
+<li><p>If you have created your own profile with the <em>Load Individual Data
+tab</em>,  the profile will show up in <em>Country-Year</em>
+drop-down box .</p></li>
+<li><p>The unit of the profile is <strong>MW</strong> and the model use this profile as the
+hourly heat demand curve.</p></li>
+</ul>
+<p>You have the opportunity to set the total heat consumption of one year. By this
+you set technically the sum of all values of the profile selected.</p>
+<p>This means, if the <em>Set Total Demand (MWh)</em> value changes, the plot will adapt so
+that the sum you specified is met, also the <em>Total Demand [MWh]</em> value in the
+<em>Parameters Tab</em> will change to the value specified (and vice
+versa). Additionally, in the <em>notification section</em> you can see how the peak load
+changes when you change the total heat consumption (see <a class="reference internal" href="#heatdemandtab-fig"><span class="std std-numref">Fig. 2.50</span></a>).</p>
+</div>
+<div class="section" id="load-individual-data-tab">
+<span id="section-loadindividualdata"></span><h3><span class="section-number">2.1.8. </span>Load Individual Data - Tab<a class="headerlink" href="#load-individual-data-tab" title="Permalink to this headline">¶</a></h3>
+<p><strong>Upload External Data – Button</strong></p>
+<div class="figure align-default" id="uploadextdata-fig">
+<a class="reference internal image-reference" href="_images/UploadExtData.PNG"><img alt="_images/UploadExtData.PNG" src="_images/UploadExtData.PNG" style="height: 150px;" /></a>
+</div>
+<p>Pressing this button, shown in  <code class="xref std std-numref docutils literal notranslate"><span class="pre">UploadExtData-fig</span></code>, will enable you to upload your own data. A pop up window will then open, where you can
+select your file with the desired values. Information regarding the progress are
+shown in the <em>notification section</em>.</p>
+<p>The file you upload must have following structure, for details see  <a class="reference internal" href="#section-addprofilefunction"><span class="std std-ref">The add_profile function</span></a>:</p>
+<ol class="simple">
+<li><p>It has to be either a <strong><code class="docutils literal notranslate"><span class="pre">.xlsx</span></code></strong> or a <strong><code class="docutils literal notranslate"><span class="pre">.csv</span></code></strong> data</p></li>
+<li><p>the files <strong>must</strong> have the <strong>structure</strong> : left:  <em><code class="docutils literal notranslate"><span class="pre">.xlsx</span></code></em>, right:    <em><code class="docutils literal notranslate"><span class="pre">.csv</span></code></em>)</p></li>
+<li><p>you have to specify <strong>8760 values</strong> and a <strong>header name</strong></p></li>
+<li><p>for <em><code class="docutils literal notranslate"><span class="pre">.xlsx</span></code></em> only the values of the <strong>first worksheet</strong> will be <strong>uploaded</strong></p></li>
+</ol>
+<p>An example of a successful upload can be seen in  <a class="reference internal" href="#loadprofileexample-fig"><span class="std std-numref">Fig. 2.51</span></a>.</p>
+<div class="figure align-default" id="loadprofileexample-fig">
+<a class="reference internal image-reference" href="_images/LoadProfileExample.PNG"><img alt="_images/LoadProfileExample.PNG" src="_images/LoadProfileExample.PNG" style="height: 400px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.51 </span><span class="caption-text">Example of loading profile</span><a class="headerlink" href="#loadprofileexample-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p><strong>Create Data – Tools</strong></p>
+<p>Here you can create random data. You can choose between three distributions (as displayed in <a class="reference internal" href="#distributions-fig"><span class="std std-numref">Fig. 2.52</span></a>):</p>
+<ol class="simple">
+<li><p><em>Dirichlet Distribution</em></p></li>
+<li><p><em>Normal Distribution</em></p></li>
+<li><p><em>Linear Distribution</em></p></li>
+</ol>
+<div class="figure align-default" id="distributions-fig">
+<a class="reference internal image-reference" href="_images/Distributions.PNG"><img alt="_images/Distributions.PNG" src="_images/Distributions.PNG" style="height: 100px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.52 </span><span class="caption-text">Possible distributions</span><a class="headerlink" href="#distributions-fig" title="Permalink to this image">¶</a></p>
+</div>
+<ul class="simple">
+<li><p><em>Dirichlet Distribution</em>:</p></li>
+</ul>
+<p>To use this distribution, you have to specify the <em>sum- input
+widget</em>. It gives you random numbers, so the sum you specify is met. An example
+with the sum of 10 is shown in  <a class="reference internal" href="#dirichletdistr-fig"><span class="std std-numref">Fig. 2.53</span></a>.</p>
+<div class="figure align-default" id="dirichletdistr-fig">
+<a class="reference internal image-reference" href="_images/DirichletDistr.PNG"><img alt="_images/DirichletDistr.PNG" src="_images/DirichletDistr.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.53 </span><span class="caption-text">Example of Dirichlet distribution</span><a class="headerlink" href="#dirichletdistr-fig" title="Permalink to this image">¶</a></p>
+</div>
+<ul class="simple">
+<li><p><em>Normal Distribution</em>:</p></li>
+</ul>
+<p>Another option to create random number is the <em>Gaussian-Normal-Distribution</em>. To
+use this, you have to specify a mean value <em><span class="math notranslate nohighlight">\(\sigma\)</span></em> and standard
+deviation from that value <em>my <span class="math notranslate nohighlight">\(\mu\)</span></em>. In   <a class="reference internal" href="#normaldistr-fig"><span class="std std-numref">Fig. 2.54</span></a>, a normal distribution with
+<span class="math notranslate nohighlight">\(\sigma = 100\)</span> and <span class="math notranslate nohighlight">\(\mu = 100\)</span> was used.</p>
+<div class="figure align-default" id="normaldistr-fig">
+<a class="reference internal image-reference" href="_images/NormalDistr.PNG"><img alt="_images/NormalDistr.PNG" src="_images/NormalDistr.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.54 </span><span class="caption-text">Example of Normal distribution</span><a class="headerlink" href="#normaldistr-fig" title="Permalink to this image">¶</a></p>
+</div>
+<ul class="simple">
+<li><p><em>Linear Distribution</em>:</p></li>
+</ul>
+<div class="figure align-default" id="lineardistr-fig">
+<a class="reference internal image-reference" href="_images/LinearDistr.PNG"><img alt="_images/LinearDistr.PNG" src="_images/LinearDistr.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.55 </span><span class="caption-text">Example of Linear distribution</span><a class="headerlink" href="#lineardistr-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>With this option you can create <strong>8760 numbers</strong> that are linear distributed beginning from <em>start</em> and ending with <em>stop</em>. An example with <em><span class="math notranslate nohighlight">\(start = -10\)</span></em> and <em><span class="math notranslate nohighlight">\(stop = 100\)</span></em> is shown in <a class="reference internal" href="#lineardistr-fig"><span class="std std-numref">Fig. 2.55</span></a> .</p>
+<p><strong>Table</strong></p>
+<p>The values of the uploaded data or the created distribution are shown here in
+tabular and graphical form. You can also change specific values inside the
+table, in that case the cell you are editing becomes <strong>yellow</strong> and the graph is
+blurred. After editing, press the <em>reset button</em> on the toolbar to remove the
+blur, see  <a class="reference internal" href="#tablearea-fig"><span class="std std-numref">Fig. 2.56</span></a>.</p>
+<div class="figure align-default" id="tablearea-fig">
+<a class="reference internal image-reference" href="_images/TableArea.PNG"><img alt="_images/TableArea.PNG" src="_images/TableArea.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.56 </span><span class="caption-text">Example of Linear distribution</span><a class="headerlink" href="#tablearea-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p><strong>Plot Area</strong></p>
+<p>Here a line plot of the values from the table is shown. With the toolbar at the
+right sight of the plot area you can inspect the data in more detail, see also  <a class="reference internal" href="#tablearea-fig"><span class="std std-numref">Fig. 2.56</span></a>.</p>
+<p><strong>Modification Tools</strong></p>
+<div class="figure align-default" id="modtools-fig">
+<a class="reference internal image-reference" href="_images/ModTools.PNG"><img alt="_images/ModTools.PNG" src="_images/ModTools.PNG" style="height: 250px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.57 </span><span class="caption-text">Different modification tools</span><a class="headerlink" href="#modtools-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>You have the opportunity to modify the data with these tools, e.g. set the sum
+of all values, set an offset, scale, etc (see <a class="reference internal" href="#modtools-fig"><span class="std std-numref">Fig. 2.57</span></a>).</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This permanently change the values in the table! It works with the direct values and therefore it is an <strong>irreversible process</strong>, e.g. if you check the use the mean value checkbox and then uncheck again, you will <strong>not get your
+profile back</strong>, see  <a class="reference internal" href="#modtoolexample-fig"><span class="std std-numref">Fig. 2.58</span></a>. You have to upload or create your data again!</p>
+</div>
+<div class="figure align-default" id="modtoolexample-fig">
+<a class="reference internal image-reference" href="_images/ModToolExample.PNG"><img alt="_images/ModToolExample.PNG" src="_images/ModToolExample.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.58 </span><span class="caption-text">Irreversible process of the modification tool</span><a class="headerlink" href="#modtoolexample-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p><strong>Saving Tools</strong></p>
+<div class="figure align-default" id="savingtools-fig">
+<a class="reference internal image-reference" href="_images/SavingTools.PNG"><img alt="_images/SavingTools.PNG" src="_images/SavingTools.PNG" style="height: 250px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.59 </span><span class="caption-text">Saving tools in general</span><a class="headerlink" href="#savingtools-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>After loading your custom data, or creating a distribution you can choose for
+which profile you want this dataset to be added. By pressing the <em>Save</em> button
+your data can be found at the selected profiles and can be used by selecting it
+with the name you specified, see <a class="reference internal" href="#savingtoolsaddfunction-fig"><span class="std std-numref">Fig. 2.60</span></a>.</p>
+<div class="figure align-default" id="savingtoolsaddfunction-fig">
+<a class="reference internal image-reference" href="_images/SavingToolsAddFunction.PNG"><img alt="_images/SavingToolsAddFunction.PNG" src="_images/SavingToolsAddFunction.PNG" style="height: 250px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.60 </span><span class="caption-text">Adding to an existing profile</span><a class="headerlink" href="#savingtoolsaddfunction-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The name of the data will always be terminated by the string <strong><code class="docutils literal notranslate"><span class="pre">_1</span></code></strong> after saving (e.g. if you specify individual as your name and saved it to <em>Radiation</em>, you will find your profile in the <em>Radiation Tab</em> by the name <strong><code class="docutils literal notranslate"><span class="pre">individual_1</span></code></strong>.</p>
+</div>
+<p>It is also possible to specify a time specific thermal efficiency for a heat
+generator (or COP for heat pumps).</p>
+<p>To use this feature, you have to select in the <em>Add To</em> drop-down button <em>n_th/COP</em>
+and then select the heat generator, <em>Add To Heatgenerator</em>, which you like to add
+your custom thermal efficiency. Then you press <em>Save</em> and you get an information
+in the <em>notification section</em>.  <a class="reference internal" href="#savingtoolsexample-fig"><span class="std std-numref">Fig. 2.61</span></a> shows an example.</p>
+<div class="figure align-default" id="savingtoolsexample-fig">
+<a class="reference internal image-reference" href="_images/SavingToolsExample.PNG"><img alt="_images/SavingToolsExample.PNG" src="_images/SavingToolsExample.PNG" style="height: 250px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.61 </span><span class="caption-text">Example of saving</span><a class="headerlink" href="#savingtoolsexample-fig" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-add-inputs">
+<h2><span class="section-number">2.2. </span>How to add inputs<a class="headerlink" href="#how-to-add-inputs" title="Permalink to this headline">¶</a></h2>
+<p>To be able to add new profiles, there are different script files where you can fill up the profiles.</p>
+<div class="section" id="predefined-script-files">
+<h3><span class="section-number">2.2.1. </span>Predefined script files<a class="headerlink" href="#predefined-script-files" title="Permalink to this headline">¶</a></h3>
+<p>There are several predefined script files which can be used to pick the wanted data out of any other sources and then automatically a corresponding dat_file will be created:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">electricity_price.py</span></code>: is used to generate prices by a fixed routine</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hotmapsloadprofiles.py</span></code>: all parameters can be chosen individually, only the parameter <em>nuts_code</em> is defined by the specified load profile, depending on the <em>NUTS2</em> region. Hotmaps profiles are generic profiles, hence you can define the ratio of room temeprature and hot water and the profile will be scaled individually, depending on the ratio. Additionally, with the parameter <em>savings</em>, you can adapt  savings through room temeprature</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">load_profiles.py</span></code>:</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">river_water_temperature.py</span></code>:</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">system_temperatures.py</span></code>:</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pvgis_rad_temp2dat.py</span></code>: pvgis data can be picked only by adding the geographical position and a name has to be chosen</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">monthly_data.py</span></code>: to convert automatically daily values into hourly values</p></li>
+</ul>
+<p>The main script file which can be used to add profiles in general is       	 <code class="docutils literal notranslate"><span class="pre">readWriteDatFiles.py</span></code>. Compared to other scripts, here you have to create a routine which gives you a fitting vector for adding profiles. The function which is used there is described in detail in <a class="reference internal" href="#section-addprofilefunction"><span class="std std-ref">The add_profile function</span></a>.</p>
+</div>
+<div class="section" id="steps-before-add-profile-function">
+<span id="section-stepsbeforeprofilefunction"></span><h3><span class="section-number">2.2.2. </span>Steps before <em>add_profile</em> function<a class="headerlink" href="#steps-before-add-profile-function" title="Permalink to this headline">¶</a></h3>
+<p>It is important, when using the 	  <code class="docutils literal notranslate"><span class="pre">readWriteDatFiles.py</span></code>, to create a routine which converts the data to an array with hourly values, therefore an array with the length of <em>8760</em>, as the data itself can be only daily or other non fitting units. This numpy array will be the input of the parameter <code class="docutils literal notranslate"><span class="pre">profile</span></code>  (see   <a class="reference internal" href="#section-addprofilefunction"><span class="std std-ref">The add_profile function</span></a> for detailed description of the parameters).</p>
+<p>First, you have to get the path from the source of your data (e.g.: path of excel file, pdf document or other). Together with this path, you can use the function <em>load_profile</em>, where you can get the data, but first with the type <em>pandas.series</em>. This type of array has to be converted be able to use the data. By adding <em>.values</em>, the array gets the necessary data type (<em>numpy.ndarray</em>).</p>
+</div>
+<div class="section" id="the-add-profile-function">
+<span id="section-addprofilefunction"></span><h3><span class="section-number">2.2.3. </span>The <em>add_profile</em> function<a class="headerlink" href="#the-add-profile-function" title="Permalink to this headline">¶</a></h3>
+<p>To add a profile through the function <em>add_profile</em>, go to	   <code class="docutils literal notranslate"><span class="pre">readWriteDatFiles.py</span></code> , like shown in  <a class="reference internal" href="#addprofile-fig"><span class="std std-numref">Fig. 2.62</span></a>.</p>
+<div class="figure align-default" id="addprofile-fig">
+<a class="reference internal image-reference" href="_images/addProfilesFunction.PNG"><img alt="_images/addProfilesFunction.PNG" src="_images/addProfilesFunction.PNG" style="height: 150px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.62 </span><span class="caption-text">The add_profile function</span><a class="headerlink" href="#addprofile-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>Parameters in <em>add_profile</em>, which have to be filled correctly:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">short</span></code>: Here should be the name of your profile, but only as a short version. This name then will represent your profile when you want to choose one for calculating.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: This is the ful name of your profile.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">year</span></code>: Choose the year where the profile is referred to.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">profile</span></code>: the correct array has to be here, which will be defined before the function (see <a class="reference internal" href="#section-stepsbeforeprofilefunction"><span class="std std-ref">Steps before add_profile function</span></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">string</span></code>: There you can only choose between the existing dat file types where you want to add your profile, like described in the <code class="docutils literal notranslate"><span class="pre">readWriteDatFiles.py</span></code> or in <a class="reference internal" href="#datfiles-fig"><span class="std std-numref">Fig. 2.63</span></a></p></li>
+</ul>
+<div class="figure align-default" id="datfiles-fig">
+<a class="reference internal image-reference" href="_images/datFiles.PNG"><img alt="_images/datFiles.PNG" src="_images/datFiles.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.63 </span><span class="caption-text">Options for current dat files</span><a class="headerlink" href="#datfiles-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you don’t choose a right category, then an error will occur that you only can choose between existing dat file types.</p>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">new</span></code>: Here you can choose between boolean parameters like TRUE or FALSE. Choose FALSE, if you have many dat-files, so that the function will not overwrite the dat-files before, otherwise, if you only want to create one dat-file, then choose TRUE. .</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The parameters <strong>string</strong> and <strong>year</strong> are used to name the profile type with a short name like <em>string#year</em>. This will be important when using scenario generation and naming in excel files as it gets a better overview, see <a class="reference internal" href="Scenario%20Generation.html"><span class="doc">Scenario Generation</span></a>.</p>
+</div>
+<p>Then run the code, if all parameters are set correctly, and by restarting the program the profile will be added in the chosen dat-file category, made by the parameter <code class="docutils literal notranslate"><span class="pre">string</span></code>.</p>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="Get%20started.html" title="previous page"><span class="section-number">1. </span>Get started</a>
+    <a class='right-next' id="next-link" href="Outputs.html" title="next page"><span class="section-number">3. </span>Outputs</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Daniela Havlicek, Jeton Hasani<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

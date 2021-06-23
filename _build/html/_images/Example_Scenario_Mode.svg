@@ -1,0 +1,946 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   width="1031"
+   height="1020"
+   xlink="http://www.w3.org/1999/xlink"
+   style="position:relative;overflow:hidden;"
+   viewBox="2651.047 1572.375 1031 1020"
+   id="svg326"
+   sodipodi:docname="Example_GUI.svg"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
+  <metadata
+     id="metadata330">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2498"
+     inkscape:window-height="1417"
+     id="namedview328"
+     showgrid="false"
+     inkscape:zoom="0.9254902"
+     inkscape:cx="837.81204"
+     inkscape:cy="603.83694"
+     inkscape:window-x="54"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g324" />
+  <defs
+     id="defs2" />
+  <g
+     id="g324">
+    <g
+       width="150"
+       height="75"
+       transform="scale(1,1) translate(2663.547,1987.375)"
+       id="g14">
+      <g
+         stroke="#B3D7EE"
+         stroke-opacity="1"
+         stroke-width="1"
+         stroke-dasharray="none"
+         width="150"
+         height="75"
+         transform="scale(1,1) translate(0,0)"
+         fill="#B3D7EE"
+         fill-opacity="1"
+         id="g6">
+        <rect
+           width="150"
+           height="75"
+           id="rect4" />
+      </g>
+      <g
+         width="143.33333333333334"
+         height="68.33333333333333"
+         transform="scale(1,1) translate(3.333,3.333)"
+         id="g12">
+        <text
+           width="143.33333333333334"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,26.52777830759684)"
+           xml:space="preserve"
+           id="text10"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="42.329"
+             text-anchor="start"
+             y="12.5"
+             textLength="54.816349029541016"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan8">Scenario</tspan></text>
+      </g>
+    </g>
+    <g
+       width="193.5"
+       height="690"
+       transform="scale(1,1) translate(2813.547,1679.875)"
+       id="g56">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g24">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,345 L0,345 M0,345 L0,345 M0,345 L0,345 M0,345 L193.5,0 M0,345 L193.5,287.5 M0,345 L193.5,690"
+           id="path16" />
+        <g
+           id="g22">
+          <g
+             stroke-dasharray="none"
+             id="g20">
+            <path
+               d="M-3,342L3,342L3,348L-3,348z"
+               stroke-width="0"
+               fill="none"
+               id="path18" />
+          </g>
+        </g>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="64.534"
+         height="17.278"
+         transform="scale(1,1) translate(64.483,163.861)"
+         id="g28">
+        <rect
+           width="64.534"
+           height="17.278"
+           id="rect26" />
+      </g>
+      <g
+         width="62.53390884399414"
+         height="345"
+         transform="scale(1,1) translate(65.483,164.861)"
+         id="g34">
+        <text
+           width="62.53390884399414"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text32"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="62.53390884399414"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan30">Portfolio a</tspan></text>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="64.534"
+         height="17.278"
+         transform="scale(1,1) translate(64.483,307.611)"
+         id="g38">
+        <rect
+           width="64.534"
+           height="17.278"
+           id="rect36" />
+      </g>
+      <g
+         width="62.53390884399414"
+         height="57.5"
+         transform="scale(1,1) translate(65.483,308.611)"
+         id="g44">
+        <text
+           width="62.53390884399414"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text42"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="62.53390884399414"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan40">Portfolio b</tspan></text>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="63.754"
+         height="17.278"
+         transform="scale(1,1) translate(64.873,508.861)"
+         id="g48">
+        <rect
+           width="63.754"
+           height="17.278"
+           id="rect46" />
+      </g>
+      <g
+         width="61.75401306152344"
+         height="345"
+         transform="scale(1,1) translate(65.873,509.861)"
+         id="g54">
+        <text
+           width="61.75401306152344"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text52"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="61.75401306152344"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan50">Portfolio c</tspan></text>
+      </g>
+    </g>
+    <g
+       width="150"
+       height="75"
+       transform="scale(1,1) translate(3007.047,1929.875)"
+       id="g68">
+      <g
+         stroke="#B3D7EE"
+         stroke-opacity="1"
+         stroke-width="1"
+         stroke-dasharray="none"
+         width="150"
+         height="75"
+         transform="scale(1,1) translate(0,0)"
+         fill="#B3D7EE"
+         fill-opacity="1"
+         id="g60">
+        <rect
+           width="150"
+           height="75"
+           id="rect58" />
+      </g>
+      <g
+         width="143.33333333333334"
+         height="68.33333333333333"
+         transform="scale(1,1) translate(3.333,3.333)"
+         id="g66">
+        <text
+           width="143.33333333333334"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,26.52777830759684)"
+           xml:space="preserve"
+           id="text64"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="29.973"
+             text-anchor="start"
+             y="12.5"
+             textLength="83.3875732421875"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan62">Sub Scenario</tspan></text>
+      </g>
+    </g>
+    <g
+       width="193.5"
+       height="230"
+       transform="scale(1,1) translate(3157.047,1852.375)"
+       id="g110">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g78">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,115 L0,115 M0,115 L0,115 M0,115 L0,115 M0,115 L193.5,0 M0,115 L193.5,115 M0,115 L193.5,230"
+           id="path70" />
+        <g
+           id="g76">
+          <g
+             stroke-dasharray="none"
+             id="g74">
+            <path
+               d="M-5,110L5,110L5,120L-5,120z"
+               stroke-width="0"
+               fill="none"
+               id="path72" />
+          </g>
+        </g>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="169.48"
+         height="17.278"
+         transform="scale(1,1) translate(12.01,48.861)"
+         id="g82">
+        <rect
+           width="169.48"
+           height="17.278"
+           id="rect80" />
+      </g>
+      <g
+         width="167.48043823242188"
+         height="115"
+         transform="scale(1,1) translate(13.01,49.861)"
+         id="g88">
+        <text
+           width="167.48043823242188"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text86"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="167.48043823242188"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan84">Energy Carrier Prices LOW</tspan></text>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="164.069"
+         height="17.278"
+         transform="scale(1,1) translate(14.716,106.361)"
+         id="g92">
+        <rect
+           width="164.069"
+           height="17.278"
+           id="rect90" />
+      </g>
+      <g
+         width="162.0686492919922"
+         height="15.277776718139648"
+         transform="scale(1,1) translate(15.716,107.361)"
+         id="g98">
+        <text
+           width="162.0686492919922"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text96"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="162.0686492919922"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan94">Energy Carrier Prices MID</tspan></text>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="173.332"
+         height="17.278"
+         transform="scale(1,1) translate(10.084,163.861)"
+         id="g102">
+        <rect
+           width="173.332"
+           height="17.278"
+           id="rect100" />
+      </g>
+      <g
+         width="171.33242797851562"
+         height="115"
+         transform="scale(1,1) translate(11.084,164.861)"
+         id="g108">
+        <text
+           width="171.33242797851562"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text106"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="171.33242797851562"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan104">Energy Carrier Prices HIGH</tspan></text>
+      </g>
+    </g>
+    <g
+       width="150"
+       height="75"
+       transform="scale(1,1) translate(3007.047,1642.375)"
+       id="g122">
+      <g
+         stroke="#B3D7EE"
+         stroke-opacity="1"
+         stroke-width="1"
+         stroke-dasharray="none"
+         width="150"
+         height="75"
+         transform="scale(1,1) translate(0,0)"
+         fill="#B3D7EE"
+         fill-opacity="1"
+         id="g114">
+        <rect
+           width="150"
+           height="75"
+           id="rect112" />
+      </g>
+      <g
+         width="143.33333333333334"
+         height="68.33333333333333"
+         transform="scale(1,1) translate(3.333,3.333)"
+         id="g120">
+        <text
+           width="143.33333333333334"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,26.52777830759684)"
+           xml:space="preserve"
+           id="text118"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="28.043"
+             text-anchor="start"
+             y="12.5"
+             textLength="83.3875732421875"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan116">Sub Scenario</tspan></text>
+      </g>
+    </g>
+    <g
+       width="193.5"
+       height="115"
+       transform="scale(1,1) translate(3157.047,1622.375)"
+       id="g154">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g132">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,57.5 L0,57.5 M0,57.5 L0,57.5 M0,57.5 L0,57.5 M0,57.5 L193.5,0 M0,57.5 L193.5,115"
+           id="path124" />
+        <g
+           id="g130">
+          <g
+             stroke-dasharray="none"
+             id="g128">
+            <path
+               d="M-5,52.5L5,52.5L5,62.5L-5,62.5z"
+               stroke-width="0"
+               fill="none"
+               id="path126" />
+          </g>
+        </g>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="104.641"
+         height="17.278"
+         transform="scale(1,1) translate(44.43,20.111)"
+         id="g136">
+        <rect
+           width="104.641"
+           height="17.278"
+           id="rect134" />
+      </g>
+      <g
+         width="102.64079284667969"
+         height="57.5"
+         transform="scale(1,1) translate(45.43,21.111)"
+         id="g142">
+        <text
+           width="102.64079284667969"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text140"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="102.64079284667969"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan138">CO2 Price HIGH</tspan></text>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="100.789"
+         height="17.278"
+         transform="scale(1,1) translate(46.356,77.611)"
+         id="g146">
+        <rect
+           width="100.789"
+           height="17.278"
+           id="rect144" />
+      </g>
+      <g
+         width="98.78878784179688"
+         height="57.5"
+         transform="scale(1,1) translate(47.356,78.611)"
+         id="g152">
+        <text
+           width="98.78878784179688"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text150"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="98.78878784179688"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan148">CO2 Price LOW</tspan></text>
+      </g>
+    </g>
+    <g
+       width="169"
+       height="0"
+       transform="scale(1,1) translate(3500.547,2197.375)"
+       id="g172">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g170">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,0"
+           id="path168" />
+      </g>
+    </g>
+    <g
+       width="150"
+       height="75"
+       transform="scale(1,1) translate(3007.047,2332.375)"
+       id="g184">
+      <g
+         stroke="#B3D7EE"
+         stroke-opacity="1"
+         stroke-width="1"
+         stroke-dasharray="none"
+         width="150"
+         height="75"
+         transform="scale(1,1) translate(0,0)"
+         fill="#B3D7EE"
+         fill-opacity="1"
+         id="g176">
+        <rect
+           width="150"
+           height="75"
+           id="rect174" />
+      </g>
+      <g
+         width="143.33333333333334"
+         height="68.33333333333333"
+         transform="scale(1,1) translate(3.333,3.333)"
+         id="g182">
+        <text
+           width="143.33333333333334"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,26.52777830759684)"
+           xml:space="preserve"
+           id="text180"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="29.973"
+             text-anchor="start"
+             y="12.5"
+             textLength="83.3875732421875"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan178">Sub Scenario</tspan></text>
+      </g>
+    </g>
+    <g
+       width="169"
+       height="0"
+       transform="scale(1,1) translate(3500.547,2082.375)"
+       id="g190">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g188">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,0"
+           id="path186" />
+      </g>
+    </g>
+    <g
+       width="169"
+       height="0"
+       transform="scale(1,1) translate(3500.547,2312.375)"
+       id="g222">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g220">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,0"
+           id="path218" />
+      </g>
+    </g>
+    <g
+       width="169"
+       height="0"
+       transform="scale(1,1) translate(3500.547,2427.375)"
+       id="g244">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g242">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,0"
+           id="path240" />
+      </g>
+    </g>
+    <g
+       width="169"
+       height="0"
+       transform="scale(1,1) translate(3500.547,2542.375)"
+       id="g260">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g258">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,0"
+           id="path256" />
+      </g>
+    </g>
+    <g
+       width="193.5"
+       height="345"
+       transform="scale(1,1) translate(3157.047,2197.375)"
+       id="g322">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g280">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,172.5 L0,172.5 M0,172.5 L0,172.5 M0,172.5 L0,172.5 M0,172.5 L193.5,0 M0,172.5 L193.5,115 M0,172.5 L193.5,230 M0,172.5 L193.5,345"
+           id="path272" />
+        <g
+           id="g278">
+          <g
+             stroke-dasharray="none"
+             id="g276">
+            <path
+               d="M-5,167.5L5,167.5L5,177.5L-5,177.5z"
+               stroke-width="0"
+               fill="none"
+               id="path274" />
+          </g>
+        </g>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="159.986"
+         height="17.278"
+         transform="scale(1,1) translate(16.757,77.611)"
+         id="g284">
+        <rect
+           width="159.986"
+           height="17.278"
+           id="rect282" />
+      </g>
+      <g
+         width="157.986083984375"
+         height="172.5"
+         transform="scale(1,1) translate(17.757,78.611)"
+         id="g290">
+        <text
+           width="157.986083984375"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text288"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="157.986083984375"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan286">System Teperatures LOW</tspan></text>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="168.463"
+         height="17.278"
+         transform="scale(1,1) translate(12.518,135.111)"
+         id="g294">
+        <rect
+           width="168.463"
+           height="17.278"
+           id="rect292" />
+      </g>
+      <g
+         width="166.4631805419922"
+         height="57.5"
+         transform="scale(1,1) translate(13.518,136.111)"
+         id="g300">
+        <text
+           width="166.4631805419922"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text298"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="166.4631805419922"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan296">System Temperature HIGH</tspan></text>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="113.172"
+         height="17.278"
+         transform="scale(1,1) translate(40.164,192.611)"
+         id="g304">
+        <rect
+           width="113.172"
+           height="17.278"
+           id="rect302" />
+      </g>
+      <g
+         width="111.1721420288086"
+         height="57.5"
+         transform="scale(1,1) translate(41.164,193.611)"
+         id="g310">
+        <text
+           width="111.1721420288086"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text308"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="111.1721420288086"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan306">Interest Rate 10%</tspan></text>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="105.448"
+         height="17.278"
+         transform="scale(1,1) translate(44.026,250.111)"
+         id="g314">
+        <rect
+           width="105.448"
+           height="17.278"
+           id="rect312" />
+      </g>
+      <g
+         width="103.44780731201172"
+         height="172.5"
+         transform="scale(1,1) translate(45.026,251.111)"
+         id="g320">
+        <text
+           width="103.44780731201172"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text318"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="103.44780731201172"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan316">Interest Rate 2%</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>

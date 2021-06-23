@@ -1,1 +1,8 @@
-Created on Mon Sep 11 14:34:49 2017
+# READ ME	
+
+This branch contains the documentation of the HotmapsDispatchModel 
+
+You can access the website via this link
+
+
+

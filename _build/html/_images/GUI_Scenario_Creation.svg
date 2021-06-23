@@ -1,0 +1,946 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   width="983"
+   height="1020"
+   xlink="http://www.w3.org/1999/xlink"
+   style="position:relative;overflow:hidden;"
+   viewBox="2651.047 1572.375 983 1020"
+   id="svg326"
+   sodipodi:docname="GUI_Scenario_Creation.svg"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
+  <metadata
+     id="metadata330">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2498"
+     inkscape:window-height="1417"
+     id="namedview328"
+     showgrid="false"
+     inkscape:zoom="0.9254902"
+     inkscape:cx="662.46366"
+     inkscape:cy="582.79742"
+     inkscape:window-x="54"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g324" />
+  <defs
+     id="defs2" />
+  <g
+     id="g324">
+    <g
+       width="150"
+       height="75"
+       transform="scale(1,1) translate(2663.547,1987.375)"
+       id="g14">
+      <g
+         stroke="#B3D7EE"
+         stroke-opacity="1"
+         stroke-width="1"
+         stroke-dasharray="none"
+         width="150"
+         height="75"
+         transform="scale(1,1) translate(0,0)"
+         fill="#B3D7EE"
+         fill-opacity="1"
+         id="g6">
+        <rect
+           width="150"
+           height="75"
+           id="rect4" />
+      </g>
+      <g
+         width="143.33333333333334"
+         height="68.33333333333333"
+         transform="scale(1,1) translate(3.333,3.333)"
+         id="g12">
+        <text
+           width="143.33333333333334"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,26.52777830759684)"
+           xml:space="preserve"
+           id="text10"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="42.329"
+             text-anchor="start"
+             y="12.5"
+             textLength="54.816349029541016"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan8">Scenario</tspan></text>
+      </g>
+    </g>
+    <g
+       width="169.5"
+       height="690"
+       transform="scale(1,1) translate(2813.547,1679.875)"
+       id="g56">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g24">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,345 L0,345 M0,345 L0,345 M0,345 L0,345 M0,345 L169.5,0 M0,345 L169.5,287.5 M0,345 L169.5,690"
+           id="path16" />
+        <g
+           id="g22">
+          <g
+             stroke-dasharray="none"
+             id="g20">
+            <path
+               d="M-3,342L3,342L3,348L-3,348z"
+               stroke-width="0"
+               fill="none"
+               id="path18" />
+          </g>
+        </g>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="68.399"
+         height="17.278"
+         transform="scale(1,1) translate(50.55,163.861)"
+         id="g28">
+        <rect
+           width="68.399"
+           height="17.278"
+           id="rect26" />
+      </g>
+      <g
+         width="66.39945983886719"
+         height="345"
+         transform="scale(1,1) translate(51.55,164.861)"
+         id="g34">
+        <text
+           width="66.39945983886719"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text32"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="66.39945983886719"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan30">Scenario 1</tspan></text>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="68.399"
+         height="17.278"
+         transform="scale(1,1) translate(50.55,307.611)"
+         id="g38">
+        <rect
+           width="68.399"
+           height="17.278"
+           id="rect36" />
+      </g>
+      <g
+         width="66.39945983886719"
+         height="57.5"
+         transform="scale(1,1) translate(51.55,308.611)"
+         id="g44">
+        <text
+           width="66.39945983886719"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text42"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="66.39945983886719"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan40">Scenario 2</tspan></text>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="68.399"
+         height="17.278"
+         transform="scale(1,1) translate(50.55,508.861)"
+         id="g48">
+        <rect
+           width="68.399"
+           height="17.278"
+           id="rect46" />
+      </g>
+      <g
+         width="66.39945983886719"
+         height="345"
+         transform="scale(1,1) translate(51.55,509.861)"
+         id="g54">
+        <text
+           width="66.39945983886719"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text52"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="66.39945983886719"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan50">Scenario 3</tspan></text>
+      </g>
+    </g>
+    <g
+       width="169.5"
+       height="230"
+       transform="scale(1,1) translate(3133.047,1852.375)"
+       id="g98">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g66">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,115 L0,115 M0,115 L0,115 M0,115 L0,115 M0,115 L169.5,0 M0,115 L169.5,115 M0,115 L169.5,230"
+           id="path58" />
+        <g
+           id="g64">
+          <g
+             stroke-dasharray="none"
+             id="g62">
+            <path
+               d="M-5,110L5,110L5,120L-5,120z"
+               stroke-width="0"
+               fill="none"
+               id="path60" />
+          </g>
+        </g>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="96.971"
+         height="17.278"
+         transform="scale(1,1) translate(36.265,48.861)"
+         id="g70">
+        <rect
+           width="96.971"
+           height="17.278"
+           id="rect68" />
+      </g>
+      <g
+         width="94.97068786621094"
+         height="115"
+         transform="scale(1,1) translate(37.265,49.861)"
+         id="g76">
+        <text
+           width="94.97068786621094"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text74"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="94.97068786621094"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan72">Sub Scenario a</tspan></text>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="96.971"
+         height="17.278"
+         transform="scale(1,1) translate(36.265,106.361)"
+         id="g80">
+        <rect
+           width="96.971"
+           height="17.278"
+           id="rect78" />
+      </g>
+      <g
+         width="94.97068786621094"
+         height="15.277776718139648"
+         transform="scale(1,1) translate(37.265,107.361)"
+         id="g86">
+        <text
+           width="94.97068786621094"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text84"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="94.97068786621094"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan82">Sub Scenario b</tspan></text>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="96.191"
+         height="17.278"
+         transform="scale(1,1) translate(36.655,163.861)"
+         id="g90">
+        <rect
+           width="96.191"
+           height="17.278"
+           id="rect88" />
+      </g>
+      <g
+         width="94.1907958984375"
+         height="115"
+         transform="scale(1,1) translate(37.655,164.861)"
+         id="g96">
+        <text
+           width="94.1907958984375"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text94"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="94.1907958984375"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan92">Sub Scenario c</tspan></text>
+      </g>
+    </g>
+    <g
+       width="150"
+       height="75"
+       transform="scale(1,1) translate(2983.047,1929.875)"
+       id="g110">
+      <g
+         stroke="#B3D7EE"
+         stroke-opacity="1"
+         stroke-width="1"
+         stroke-dasharray="none"
+         width="150"
+         height="75"
+         transform="scale(1,1) translate(0,0)"
+         fill="#B3D7EE"
+         fill-opacity="1"
+         id="g102">
+        <rect
+           width="150"
+           height="75"
+           id="rect100" />
+      </g>
+      <g
+         width="143.33333333333334"
+         height="68.33333333333333"
+         transform="scale(1,1) translate(3.333,3.333)"
+         id="g108">
+        <text
+           width="143.33333333333334"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,26.52777830759684)"
+           xml:space="preserve"
+           id="text106"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="29.973"
+             text-anchor="start"
+             y="12.5"
+             textLength="83.3875732421875"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan104">Sub Scenario</tspan></text>
+      </g>
+    </g>
+    <g
+       width="169.5"
+       height="115"
+       transform="scale(1,1) translate(3133.047,1622.375)"
+       id="g142">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g120">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,57.5 L0,57.5 M0,57.5 L0,57.5 M0,57.5 L0,57.5 M0,57.5 L169.5,0 M0,57.5 L169.5,115"
+           id="path112" />
+        <g
+           id="g118">
+          <g
+             stroke-dasharray="none"
+             id="g116">
+            <path
+               d="M-5,52.5L5,52.5L5,62.5L-5,62.5z"
+               stroke-width="0"
+               fill="none"
+               id="path114" />
+          </g>
+        </g>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="96.971"
+         height="17.278"
+         transform="scale(1,1) translate(36.265,20.111)"
+         id="g124">
+        <rect
+           width="96.971"
+           height="17.278"
+           id="rect122" />
+      </g>
+      <g
+         width="94.97068786621094"
+         height="57.5"
+         transform="scale(1,1) translate(37.265,21.111)"
+         id="g130">
+        <text
+           width="94.97068786621094"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text128"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="94.97068786621094"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan126">Sub Scenario 1</tspan></text>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="96.971"
+         height="17.278"
+         transform="scale(1,1) translate(36.265,77.611)"
+         id="g134">
+        <rect
+           width="96.971"
+           height="17.278"
+           id="rect132" />
+      </g>
+      <g
+         width="94.97068786621094"
+         height="57.5"
+         transform="scale(1,1) translate(37.265,78.611)"
+         id="g140">
+        <text
+           width="94.97068786621094"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text138"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="94.97068786621094"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan136">Sub Scenario 2</tspan></text>
+      </g>
+    </g>
+    <g
+       width="150"
+       height="75"
+       transform="scale(1,1) translate(2983.047,1642.375)"
+       id="g154">
+      <g
+         stroke="#B3D7EE"
+         stroke-opacity="1"
+         stroke-width="1"
+         stroke-dasharray="none"
+         width="150"
+         height="75"
+         transform="scale(1,1) translate(0,0)"
+         fill="#B3D7EE"
+         fill-opacity="1"
+         id="g146">
+        <rect
+           width="150"
+           height="75"
+           id="rect144" />
+      </g>
+      <g
+         width="143.33333333333334"
+         height="68.33333333333333"
+         transform="scale(1,1) translate(3.333,3.333)"
+         id="g152">
+        <text
+           width="143.33333333333334"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,26.52777830759684)"
+           xml:space="preserve"
+           id="text150"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="28.043"
+             text-anchor="start"
+             y="12.5"
+             textLength="83.3875732421875"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan148">Sub Scenario</tspan></text>
+      </g>
+    </g>
+    <g
+       width="169"
+       height="0"
+       transform="scale(1,1) translate(3452.547,2197.375)"
+       id="g172">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g170">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,0"
+           id="path168" />
+      </g>
+    </g>
+    <g
+       width="169.5"
+       height="345"
+       transform="scale(1,1) translate(3133.047,2197.375)"
+       id="g224">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g182">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,172.5 L0,172.5 M0,172.5 L0,172.5 M0,172.5 L0,172.5 M0,172.5 L169.5,0 M0,172.5 L169.5,115 M0,172.5 L169.5,230 M0,172.5 L169.5,345"
+           id="path174" />
+        <g
+           id="g180">
+          <g
+             stroke-dasharray="none"
+             id="g178">
+            <path
+               d="M-5,167.5L5,167.5L5,177.5L-5,177.5z"
+               stroke-width="0"
+               fill="none"
+               id="path176" />
+          </g>
+        </g>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="93.105"
+         height="17.278"
+         transform="scale(1,1) translate(38.197,77.611)"
+         id="g186">
+        <rect
+           width="93.105"
+           height="17.278"
+           id="rect184" />
+      </g>
+      <g
+         width="91.10513305664062"
+         height="172.5"
+         transform="scale(1,1) translate(39.197,78.611)"
+         id="g192">
+        <text
+           width="91.10513305664062"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text190"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="91.10513305664062"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan188">Sub Scenario I</tspan></text>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="96.964"
+         height="17.278"
+         transform="scale(1,1) translate(36.268,135.111)"
+         id="g196">
+        <rect
+           width="96.964"
+           height="17.278"
+           id="rect194" />
+      </g>
+      <g
+         width="94.96391296386719"
+         height="57.5"
+         transform="scale(1,1) translate(37.268,136.111)"
+         id="g202">
+        <text
+           width="94.96391296386719"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text200"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="94.96391296386719"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan198">Sub Scenario II</tspan></text>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="100.823"
+         height="17.278"
+         transform="scale(1,1) translate(34.339,192.611)"
+         id="g206">
+        <rect
+           width="100.823"
+           height="17.278"
+           id="rect204" />
+      </g>
+      <g
+         width="98.82269287109375"
+         height="57.5"
+         transform="scale(1,1) translate(35.339,193.611)"
+         id="g212">
+        <text
+           width="98.82269287109375"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text210"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="98.82269287109375"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan208">Sub Scenario III</tspan></text>
+      </g>
+      <g
+         stroke-width="0"
+         stroke-dasharray="none"
+         fill="#FFFFFF"
+         opacity="1"
+         width="101.094"
+         height="17.278"
+         transform="scale(1,1) translate(34.203,250.111)"
+         id="g216">
+        <rect
+           width="101.094"
+           height="17.278"
+           id="rect214" />
+      </g>
+      <g
+         width="99.09395599365234"
+         height="172.5"
+         transform="scale(1,1) translate(35.203,251.111)"
+         id="g222">
+        <text
+           width="99.09395599365234"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,0)"
+           xml:space="preserve"
+           id="text220"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="0"
+             text-anchor="start"
+             y="12.5"
+             textLength="99.09395599365234"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan218">Sub Scenario IV</tspan></text>
+      </g>
+    </g>
+    <g
+       width="150"
+       height="75"
+       transform="scale(1,1) translate(2983.047,2332.375)"
+       id="g236">
+      <g
+         stroke="#B3D7EE"
+         stroke-opacity="1"
+         stroke-width="1"
+         stroke-dasharray="none"
+         width="150"
+         height="75"
+         transform="scale(1,1) translate(0,0)"
+         fill="#B3D7EE"
+         fill-opacity="1"
+         id="g228">
+        <rect
+           width="150"
+           height="75"
+           id="rect226" />
+      </g>
+      <g
+         width="143.33333333333334"
+         height="68.33333333333333"
+         transform="scale(1,1) translate(3.333,3.333)"
+         id="g234">
+        <text
+           width="143.33333333333334"
+           height="15.277776718139648"
+           transform="scale(1,1) translate(0,26.52777830759684)"
+           xml:space="preserve"
+           id="text232"><tspan
+             xml:space="preserve"
+             text-rendering="optimizeSpeed"
+             font-size="13.88888888888889"
+             font-weight="normal"
+             font-style="normal"
+             text-decoration="none"
+             fill="#333333"
+             opacity="1"
+             x="29.973"
+             text-anchor="start"
+             y="12.5"
+             textLength="83.3875732421875"
+             style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif;"
+             id="tspan230">Sub Scenario</tspan></text>
+      </g>
+    </g>
+    <g
+       width="169"
+       height="0"
+       transform="scale(1,1) translate(3452.547,2082.375)"
+       id="g242">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g240">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,0"
+           id="path238" />
+      </g>
+    </g>
+    <g
+       width="169"
+       height="0"
+       transform="scale(1,1) translate(3452.547,2312.375)"
+       id="g274">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g272">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,0"
+           id="path270" />
+      </g>
+    </g>
+    <g
+       width="169"
+       height="0"
+       transform="scale(1,1) translate(3452.547,2427.375)"
+       id="g296">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g294">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,0"
+           id="path292" />
+      </g>
+    </g>
+    <g
+       width="169"
+       height="0"
+       transform="scale(1,1) translate(3452.547,2542.375)"
+       id="g312">
+      <g
+         fill="#545454"
+         stroke="#545454"
+         stroke-opacity="1"
+         transform="scale(1,1) translate(0,0)"
+         id="g310">
+        <path
+           fill="none"
+           stroke-width="1"
+           stroke-dasharray="none"
+           d="M0,0"
+           id="path308" />
+      </g>
+    </g>
+  </g>
+</svg>

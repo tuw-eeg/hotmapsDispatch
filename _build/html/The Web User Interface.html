@@ -1,0 +1,867 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2. The Web User Interface &#8212; HotmapsDispatch - Model Description</title>
+    
+  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.37f24b989f4638ff9c27c22dc7559d4f.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="1. Get started" href="Get%20started.html" />
+    <link rel="prev" title="1. Installation" href="Installation.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="index.html">
+  
+  <img src="_static/Hotmaps_Logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">HotmapsDispatch - Model Description</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Hotmaps%20Dispatch%20-%20Description.html">
+   Hotmaps Dispatch - Description
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  First Steps
+ </span>
+</p>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Installation.html">
+   1. Installation
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   2. The Web User Interface
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Get%20started.html">
+   1. Get started
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Inputs.html">
+   2. Inputs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Outputs.html">
+   3. Outputs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Scenario%20Mode.html">
+   4. Scenario Mode
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Investment%20Mode.html">
+   5. Investment Mode
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Scenario%20Generation.html">
+   6. Scenario Generation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Example%20Projects.html">
+   7. Example Projects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Modeling%20Tricks.html">
+   8. Modeling Tricks
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Mathematical Description
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Model%20Description.html">
+   1. Model Description
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Objective%20Function.html">
+   2. Objective Function
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Constraints.html">
+   3. Constraints
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Developers Guide
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Adding%20and%20Connection%20of%20new%20features%20into%20the%20model.html">
+   1. Adding and Connection of new features into the model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Adding%20new%20output%20indicators.html">
+   2. Adding new output indicators
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Adding%20new%20charts.html">
+   3. Adding new charts
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Dispatch-API.html">
+   4. Dispatch-API
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Scenario%20Generator-API.html">
+   5. Scenario Generator-API
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="_sources/The Web User Interface.md"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.md</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/tuw-eeg/hotmapsDispatch"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/tuw-eeg/hotmapsDispatch/issues/new?title=Issue%20on%20page%20%2FThe Web User Interface.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#button-section">
+   2.1. Button section
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#download-power-plant-parameters">
+     2.1.1. Download Power Plant Parameters
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#upload-power-plant-parameters">
+     2.1.2. Upload Power Plant Parameters
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#run-dispatch-model">
+     2.1.3. Run Dispatch Model
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#reset-view">
+     2.1.4. Reset View
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#invest">
+     2.1.5. Invest
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#scenario-mode">
+     2.1.6. Scenario Mode
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#notification-section">
+   2.2. Notification section
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#after-pressing-download-power-plant-parameters">
+     2.2.1. After pressing
+     <em>
+      Download Power Plant Parameters
+     </em>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#after-pressing-upload-power-plant-parameters">
+     2.2.2. After pressing
+     <em>
+      Upload Power Plant Parameters
+     </em>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#after-pressing-run-dispatch-model">
+     2.2.3. After pressing
+     <em>
+      Run Dispatch Model
+     </em>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#after-pressing-invest">
+     2.2.4. After pressing
+     <em>
+      Invest
+     </em>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#after-pressing-other-butttons">
+     2.2.5. After pressing other butttons
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#output-section">
+   2.3. Output section
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#data-section">
+   2.4. Data section
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="the-web-user-interface">
+<h1><span class="section-number">2. </span>The Web User Interface<a class="headerlink" href="#the-web-user-interface" title="Permalink to this headline">¶</a></h1>
+<p>The User Interface is shown in <a class="reference internal" href="#userinterface-fig"><span class="std std-numref">Fig. 2.1</span></a>. The application is divided into four sections:</p>
+<ol class="simple">
+<li><p><a class="reference internal" href="#section-buttonsection"><span class="std std-ref">Button section</span></a></p></li>
+<li><p><a class="reference internal" href="#section-notificationsection"><span class="std std-ref">Notification section</span></a></p></li>
+<li><p><a class="reference internal" href="#section-outputsection"><span class="std std-ref">Output section</span></a></p></li>
+<li><p><a class="reference internal" href="#section-datasection"><span class="std std-ref">Data section</span></a></p></li>
+</ol>
+<div class="figure align-default" id="userinterface-fig">
+<a class="reference internal image-reference" href="_images/UserInterface.PNG"><img alt="_images/UserInterface.PNG" src="_images/UserInterface.PNG" style="height: 450px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.1 </span><span class="caption-text">The Web User Interface and its sections.</span><a class="headerlink" href="#userinterface-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>In the following subchapters you can find a more detailed description for each mentioned section.</p>
+<div class="section" id="button-section">
+<span id="section-buttonsection"></span><h2><span class="section-number">2.1. </span>Button section<a class="headerlink" href="#button-section" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="#buttonsec-fig"><span class="std std-numref">Fig. 2.2</span></a> gives an overview of the different buttons.</p>
+<div class="figure align-default" id="buttonsec-fig">
+<a class="reference internal image-reference" href="_images/buttonSection.PNG"><img alt="_images/buttonSection.PNG" src="_images/buttonSection.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.2 </span><span class="caption-text">Buttons</span><a class="headerlink" href="#buttonsec-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>Here you have the choice between</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#subsection-downloadppp"><span class="std std-ref">Download Power Plant Parameters</span></a>: download the created structure to save your progress after calculation</p></li>
+<li><p><a class="reference internal" href="#subsection-uploadppp"><span class="std std-ref">Upload Power Plant Parameters</span></a>: upload your saved progress or a custom structure into the application</p></li>
+<li><p><a class="reference internal" href="#subsection-rundm"><span class="std std-ref">Run Dispatch Model</span></a>: run the created model (if  <a class="reference internal" href="#subsection-scenario"><span class="std std-ref">Scenario Mode</span></a> is not used )</p></li>
+<li><p><span class="xref std std-ref">subsection:Reset</span>: reset the view for a better workflow</p></li>
+<li><p><span class="xref std std-ref">subsection:Invest</span>: start an investment model</p></li>
+<li><p><a class="reference internal" href="#subsection-scenario"><span class="std std-ref">Scenario Mode</span></a>: run the created model through the scenario mode</p></li>
+</ul>
+<div class="section" id="download-power-plant-parameters">
+<span id="subsection-downloadppp"></span><h3><span class="section-number">2.1.1. </span>Download Power Plant Parameters<a class="headerlink" href="#download-power-plant-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="margin figure align-default" id="downloadbutton-fig">
+<a class="reference internal image-reference" href="_images/DownloadButton.PNG"><img alt="_images/DownloadButton.PNG" src="_images/DownloadButton.PNG" style="height: 35px;" /></a>
+</div>
+<p>By pressing this button, the browser will try to download a file with the name
+<code class="docutils literal notranslate"><span class="pre">download_input.xlsx</span></code> that contains all the information regarding heat producers
+and heat storages. The downloaded file has the following format: it consists of five worksheets, whearas these have a certain strucutre, as shown in detail in   <a class="reference internal" href="#defaultimageswhole-fig"><span class="std std-numref">Fig. 2.3</span></a>. The values would be filled, depending on the parameters which were set. In general, the file has the exact structure of the <code class="docutils literal notranslate"><span class="pre">default_input_dispatch.xlsx</span></code>, described in <a class="reference internal" href="Scenario%20Generation.html"><span class="doc">Scenario Generation</span></a>.</p>
+<div class="figure align-default" id="defaultimageswhole-fig">
+<a class="reference internal image-reference" href="_images/defaultImagesWhole.PNG"><img alt="_images/defaultImagesWhole.PNG" src="_images/defaultImagesWhole.PNG" style="height: 450px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.3 </span><span class="caption-text">Download file structure</span><a class="headerlink" href="#defaultimageswhole-fig" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="upload-power-plant-parameters">
+<span id="subsection-uploadppp"></span><h3><span class="section-number">2.1.2. </span>Upload Power Plant Parameters<a class="headerlink" href="#upload-power-plant-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="margin figure align-default" id="uploadbutton-fig">
+<a class="reference internal image-reference" href="_images/UploadButton.PNG"><img alt="_images/UploadButton.PNG" src="_images/UploadButton.PNG" style="height: 35px;" /></a>
+</div>
+<p>By clicking this button, a pop up window will open and you will be able to
+upload an <em>xlsx file</em>. That overwrites the content of the web user interface.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The file you upload <strong>must</strong> have the structure as described in <a class="reference internal" href="#subsection-downloadppp"><span class="std std-ref">Download Power Plant Parameters</span></a>.</p>
+</div>
+<p>When uploading a file, the following points are necessary to know:</p>
+<ul class="simple">
+<li><p>You have to create a file that has the same names for the worksheets (like displayed in <a class="reference internal" href="#subsection-downloadppp"><span class="std std-ref">Download Power Plant Parameters</span></a>) and columns</p></li>
+<li><p>The worksheet and column names are case sensitive</p></li>
+<li><p>You must specify an index column starting with 0</p></li>
+<li><p>You can create a maximum of 13 energy carriers</p></li>
+</ul>
+<p>In <a class="reference internal" href="#heatgentypes-tab"><span class="std std-numref">Table 2.1</span></a>, there is a list of available heat generator types. The types with a <code class="docutils literal notranslate"><span class="pre">*</span></code> define not predefined value types which haven’t been specified yet. All types of heat pumps are displayed in <a class="reference internal" href="#heatpump-tab"><span class="std std-numref">Table 2.2</span></a>, where <em>variable</em> COP means a COP depending on the flow temperature, the return temperature and the heat source. In general, depending on the heat generator type, there are predefined values for switch-off, power reduction or sensitivity, which can and should be adapted to achieve different behavior of the heat generators.</p>
+<table class="colwidths-auto table" id="heatgentypes-tab">
+<caption><span class="caption-number">Table 2.1 </span><span class="caption-text">Possible heat generators to choose</span><a class="headerlink" href="#heatgentypes-tab" title="Permalink to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>name available (case sensitive)</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>implementation note</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>CHP-BP</p></td>
+<td><p>Back Pressure CHP</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>CHP-SE</p></td>
+<td><p>Steam Pressure CHP</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>boiler</p></td>
+<td><p>heat boiler</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>Solar Thermal</p></td>
+<td><p>Solar thermal plant</p></td>
+<td><p>At maximum selected radiation profile the solar power plant gives the maximum output</p></td>
+</tr>
+<tr class="row-even"><td><p>Waste treatment</p></td>
+<td><p>waste incineration plants</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>Waste Heat*</p></td>
+<td><p>Power plants that work with the unused heat from other power plants</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>Geo Thermal*</p></td>
+<td><p>Geo thermal power plant</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>Power To Heat*</p></td>
+<td><p>Power to heat devices</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<table class="colwidths-auto table" id="heatpump-tab">
+<caption><span class="caption-number">Table 2.2 </span><span class="caption-text">Heat pump types and description</span><a class="headerlink" href="#heatpump-tab" title="Permalink to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>heat pumps -  variations</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>implementation note</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>heat pump</p></td>
+<td><p>constant COP</p></td>
+<td><p>For temperatures &lt; 0°C, the heat pump doesn’t work</p></td>
+</tr>
+<tr class="row-odd"><td><p>Heat Pump Air</p></td>
+<td><p><em>variable</em> COP</p></td>
+<td><p>As reference it uses the outside temperature</p></td>
+</tr>
+<tr class="row-even"><td><p>Heat Pump River</p></td>
+<td><p><em>variable</em> COP</p></td>
+<td><p>As reference it uses the river temperature; for temperatures &lt; 3°C it doesn’t work; linerar reduction of power between 6° C and 3°C</p></td>
+</tr>
+<tr class="row-odd"><td><p>Heat Pump WasteWater</p></td>
+<td><p><em>variable</em> COP</p></td>
+<td><p>As reference it uses the temperature of waste water</p></td>
+</tr>
+<tr class="row-even"><td><p>Heat Pump Ind. Wasteheat</p></td>
+<td><p><em>variable</em> COP</p></td>
+<td><p>As reference a constant heat source was taken</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="run-dispatch-model">
+<span id="subsection-rundm"></span><h3><span class="section-number">2.1.3. </span>Run Dispatch Model<a class="headerlink" href="#run-dispatch-model" title="Permalink to this headline">¶</a></h3>
+<div class="margin figure align-default" id="runmodellbutton-fig">
+<a class="reference internal image-reference" href="_images/RunModellButton.PNG"><img alt="_images/RunModellButton.PNG" src="_images/RunModellButton.PNG" style="height: 35px;" /></a>
+</div>
+<p>By pressing this button, the optimization will start. You will get a progress
+shown in the <a class="reference internal" href="#section-notificationsection"><span class="std std-ref">Notification section</span></a>.
+Depending on the structure you create, the optimization will run for about 60 to
+120 seconds.
+Please be aware that your browser might freeze at that time.
+After the solution is found the results are shown in the output section. You can
+download then the results via the <em>buttons</em> in the  <a class="reference internal" href="#section-notificationsection"><span class="std std-ref">Notification section</span></a>. Also, if something gets wrong you will get
+information there.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If unexpected errors occur, please document and send detailed instruction to
+reproduce the error and send these instruction with a short problem description.</p>
+</div>
+</div>
+<div class="section" id="reset-view">
+<span id="subsection-reset"></span><h3><span class="section-number">2.1.4. </span>Reset View<a class="headerlink" href="#reset-view" title="Permalink to this headline">¶</a></h3>
+<div class="margin figure align-default" id="resetbutton-fig">
+<a class="reference internal image-reference" href="_images/ResetButton.PNG"><img alt="_images/ResetButton.PNG" src="_images/ResetButton.PNG" style="height: 35px;" /></a>
+</div>
+<p>By pressing this button, the notification section and the output section will be
+cleared, and you will get a “fresh” view.</p>
+</div>
+<div class="section" id="invest">
+<span id="subsection-invest"></span><h3><span class="section-number">2.1.5. </span>Invest<a class="headerlink" href="#invest" title="Permalink to this headline">¶</a></h3>
+<div class="margin figure align-default" id="investbutton-fig">
+<a class="reference internal image-reference" href="_images/InvestButton.PNG"><img alt="_images/InvestButton.PNG" src="_images/InvestButton.PNG" style="height: 35px;" /></a>
+</div>
+<p>See <a class="reference internal" href="Investment%20Mode.html"><span class="doc">Investment Mode</span></a> for detailed information.</p>
+</div>
+<div class="section" id="scenario-mode">
+<span id="subsection-scenario"></span><h3><span class="section-number">2.1.6. </span>Scenario Mode<a class="headerlink" href="#scenario-mode" title="Permalink to this headline">¶</a></h3>
+<div class="margin figure align-default" id="scenariobutton-fig">
+<a class="reference internal image-reference" href="_images/ScenarioButton.PNG"><img alt="_images/ScenarioButton.PNG" src="_images/ScenarioButton.PNG" style="height: 40px;" /></a>
+</div>
+<p>See <a class="reference internal" href="Scenario%20Mode.html"><span class="doc">Scenario Mode</span></a> for detailed information.</p>
+</div>
+</div>
+<div class="section" id="notification-section">
+<span id="section-notificationsection"></span><h2><span class="section-number">2.2. </span>Notification section<a class="headerlink" href="#notification-section" title="Permalink to this headline">¶</a></h2>
+<div class="figure align-default" id="notificationsection1-fig">
+<a class="reference internal image-reference" href="_images/NotificationSection1.PNG"><img alt="_images/NotificationSection1.PNG" src="_images/NotificationSection1.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.4 </span><span class="caption-text">Notification and missing capacity section.</span><a class="headerlink" href="#notificationsection1-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>In the following you will see some frequent messages (progress and error
+information) that might appear in the notification section.
+In general, the <em>missing capacities</em> section gives you an overview of how much capacity is missing to reach the peak load, like the notification in <a class="reference internal" href="#installedcapac-fig"><span class="std std-numref">Fig. 2.13</span></a> shows.</p>
+<div class="section" id="after-pressing-download-power-plant-parameters">
+<span id="subsection-pressdownloadppp"></span><h3><span class="section-number">2.2.1. </span>After pressing <em>Download Power Plant Parameters</em><a class="headerlink" href="#after-pressing-download-power-plant-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="margin figure align-default" id="downloadbutton1-fig">
+<a class="reference internal image-reference" href="_images/DownloadButton.PNG"><img alt="_images/DownloadButton.PNG" src="_images/DownloadButton.PNG" style="height: 35px;" /></a>
+</div>
+<ul class="simple">
+<li><p><strong>Nothing to download</strong>
+Typically, this occurs when you want to download the initial page, to download
+you need to add first a heat generator.</p></li>
+</ul>
+<div class="figure align-default" id="id1">
+<a class="reference internal image-reference" href="_images/NothingToDownload.PNG"><img alt="_images/NothingToDownload.PNG" src="_images/NothingToDownload.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.5 </span><span class="caption-text">Nothing to download</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+<ul class="simple">
+<li><p><strong>Download done</strong></p></li>
+</ul>
+<div class="figure align-default" id="id2">
+<a class="reference internal image-reference" href="_images/DownloadDone.PNG"><img alt="_images/DownloadDone.PNG" src="_images/DownloadDone.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.6 </span><span class="caption-text">Download done</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="after-pressing-upload-power-plant-parameters">
+<span id="subsection-pressuploadppp"></span><h3><span class="section-number">2.2.2. </span>After pressing <em>Upload Power Plant Parameters</em><a class="headerlink" href="#after-pressing-upload-power-plant-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="margin figure align-default" id="uploadbutton1-fig">
+<a class="reference internal image-reference" href="_images/UploadButton.PNG"><img alt="_images/UploadButton.PNG" src="_images/UploadButton.PNG" style="height: 35px;" /></a>
+</div>
+<ul class="simple">
+<li><p><strong>Not a valid file to upload</strong></p></li>
+</ul>
+<div class="figure align-default" id="id3">
+<a class="reference internal image-reference" href="_images/NotValidUpload.PNG"><img alt="_images/NotValidUpload.PNG" src="_images/NotValidUpload.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.7 </span><span class="caption-text">Not a valid file to upload</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+<p>This is shown when you try to upload an filetype other then <code class="docutils literal notranslate"><span class="pre">.xlsx</span></code>.</p>
+<ul class="simple">
+<li><p><strong>Fatal Error &#64; Update</strong></p></li>
+</ul>
+<div class="figure align-default" id="id4">
+<a class="reference internal image-reference" href="_images/FatalErrorUpdate.PNG"><img alt="_images/FatalErrorUpdate.PNG" src="_images/FatalErrorUpdate.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.8 </span><span class="caption-text">Fatal Error &#64; Update</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+<p>This is shown when your file you want to upload has not the needed
+structure, see  <a class="reference internal" href="#subsection-uploadppp"><span class="std std-ref">Upload Power Plant Parameters</span></a>.</p>
+<ul class="simple">
+<li><p><strong>Upload Done</strong></p></li>
+</ul>
+<div class="figure align-default" id="id5">
+<a class="reference internal image-reference" href="_images/UploadDone.PNG"><img alt="_images/UploadDone.PNG" src="_images/UploadDone.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.9 </span><span class="caption-text">Upload Done</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="after-pressing-run-dispatch-model">
+<span id="subsection-pressrundm"></span><h3><span class="section-number">2.2.3. </span>After pressing <em>Run Dispatch Model</em><a class="headerlink" href="#after-pressing-run-dispatch-model" title="Permalink to this headline">¶</a></h3>
+<div class="margin figure align-default" id="runmodellbutton1-fig">
+<a class="reference internal image-reference" href="_images/RunModellButton.PNG"><img alt="_images/RunModellButton.PNG" src="_images/RunModellButton.PNG" style="height: 35px;" /></a>
+</div>
+<ul class="simple">
+<li><p><strong>Dispatch in progress, please be patient…</strong></p></li>
+</ul>
+<div class="figure align-default" id="dispatchprogress-fig">
+<a class="reference internal image-reference" href="_images/DispatchProgress.PNG"><img alt="_images/DispatchProgress.PNG" src="_images/DispatchProgress.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.10 </span><span class="caption-text">Dispatch in progress</span><a class="headerlink" href="#dispatchprogress-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>This can take some time. Typically, also to browser can freeze when the
+calculation is done and the results are rendered in the browser.</p>
+<ul class="simple">
+<li><p><strong>Calculation is done</strong></p></li>
+</ul>
+<div class="figure align-default" id="calcisdone-fig">
+<a class="reference internal image-reference" href="_images/CalcIsDone.PNG"><img alt="_images/CalcIsDone.PNG" src="_images/CalcIsDone.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.11 </span><span class="caption-text">Calculation is done</span><a class="headerlink" href="#calcisdone-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>With these buttons, you can download your results. It might happen that the
+page freezes after downloading, please be patient. Therefore it is recommended  to save the link of these files by  (right) clicking on the buttons and choosing <em>Copy Link</em>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>After 2 hours these links will not work but you can download the files directly if the page freezes and so save  time.</p>
+</div>
+<ul class="simple">
+<li><p><strong>No Heat Generators available</strong></p></li>
+</ul>
+<div class="figure align-default" id="noheatgenavailable-fig">
+<a class="reference internal image-reference" href="_images/NoHeatGenAvailable.PNG"><img alt="_images/NoHeatGenAvailable.PNG" src="_images/NoHeatGenAvailable.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.12 </span><span class="caption-text">No Heat Generators available</span><a class="headerlink" href="#noheatgenavailable-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>This will happen if you haven’t specified any heat generators and wanted to
+start the model from the initial page.</p>
+<ul class="simple">
+<li><p><strong>The installed capacities are not enough to cover the load</strong></p></li>
+</ul>
+<div class="figure align-default" id="installedcapac-fig">
+<a class="reference internal image-reference" href="_images/InstalledCapac.PNG"><img alt="_images/InstalledCapac.PNG" src="_images/InstalledCapac.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.13 </span><span class="caption-text">Installed capacities are not enough to cover load</span><a class="headerlink" href="#installedcapac-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>This will be shown when you haven’t specified enough MW to cover the peak load
+It can be checked via the <em>Missing Capacities</em> notification on the right sight of the notification section, see <a class="reference internal" href="#notificationsection1-fig"><span class="std std-numref">Fig. 2.4</span></a>.</p>
+<ul class="simple">
+<li><p><strong>Error: Problem proven to be feasable or unbounded</strong></p></li>
+</ul>
+<div class="figure align-default" id="errprobinfeasable-fig">
+<a class="reference internal image-reference" href="_images/ErrProbInfeasable.PNG"><img alt="_images/ErrProbInfeasable.PNG" src="_images/ErrProbInfeasable.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.14 </span><span class="caption-text">Problem proven to be feasable or unbounded</span><a class="headerlink" href="#errprobinfeasable-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>This happens typically when constraints cannot be met. This can have a lot of
+reasons, its upon to you to think about what could happen.</p>
+<ul class="simple">
+<li><p><strong>Error: Please specify the technologies for the investment model</strong></p></li>
+</ul>
+<div class="figure align-default" id="errinvestmentmode-fig">
+<a class="reference internal image-reference" href="_images/ErrInvestmentMode.PNG"><img alt="_images/ErrInvestmentMode.PNG" src="_images/ErrInvestmentMode.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.15 </span><span class="caption-text">Specify  technologies for the investment model</span><a class="headerlink" href="#errinvestmentmode-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>This is shown when you enable investment planning but you forgot to select the
+heat generators and heat storages to mark, with whom it should do an investment
+optimization.</p>
+</div>
+<div class="section" id="after-pressing-invest">
+<span id="id6"></span><h3><span class="section-number">2.2.4. </span>After pressing <em>Invest</em><a class="headerlink" href="#after-pressing-invest" title="Permalink to this headline">¶</a></h3>
+<div class="margin figure align-default" id="investbutton1-fig">
+<a class="reference internal image-reference" href="_images/InvestButton.PNG"><img alt="_images/InvestButton.PNG" src="_images/InvestButton.PNG" style="height: 35px;" /></a>
+</div>
+<ul class="simple">
+<li><p><strong>Mark Technologies by pressing “CTRL” + “left mouse”, Rows are marked yellow</strong></p></li>
+</ul>
+<div class="figure align-default" id="marktechnology-fig">
+<a class="reference internal image-reference" href="_images/MarkTechnology.PNG"><img alt="_images/MarkTechnology.PNG" src="_images/MarkTechnology.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.16 </span><span class="caption-text">Marking Technologies</span><a class="headerlink" href="#marktechnology-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>As soon as you press this button you will see this information in the
+notification section, it tells you that you need to specify for which generators
+and storages to do the investment planning. If you don’t mark technologies you
+will get the message as described in <a class="reference internal" href="#errinvestmentmode-fig"><span class="std std-numref">Fig. 2.15</span></a>.</p>
+</div>
+<div class="section" id="after-pressing-other-butttons">
+<span id="id7"></span><h3><span class="section-number">2.2.5. </span>After pressing other butttons<a class="headerlink" href="#after-pressing-other-butttons" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>After pressing the <code class="docutils literal notranslate"><span class="pre">+</span></code> button in the <em>heat producers and heat storage tab</em></p></li>
+</ul>
+<div class="figure align-default" id="heatprod-fig">
+<a class="reference internal image-reference" href="_images/HeatProd.PNG"><img alt="_images/HeatProd.PNG" src="_images/HeatProd.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.17 </span><span class="caption-text">Open heat producers and storage tab</span><a class="headerlink" href="#heatprod-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>This waiting spinner is especially visible after pressing the <code class="docutils literal notranslate"><span class="pre">+</span></code> button, typically
+the browser freezes, so be patient, the <em>add</em> section is loading.</p>
+<ul class="simple">
+<li><p>After Pressing the <code class="docutils literal notranslate"><span class="pre">✓</span> <span class="pre">ADD</span></code> button in the <em>heat generator adding section</em>
+<strong>Heat Generator ADDED</strong></p></li>
+</ul>
+<div class="figure align-default" id="heatgenadded-fig">
+<a class="reference internal image-reference" href="_images/HeatGenAdded.PNG"><img alt="_images/HeatGenAdded.PNG" src="_images/HeatGenAdded.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.18 </span><span class="caption-text">Pressing <code class="docutils literal notranslate"><span class="pre">✓</span> <span class="pre">ADD</span></code> button</span><a class="headerlink" href="#heatgenadded-fig" title="Permalink to this image">¶</a></p>
+</div>
+<ul class="simple">
+<li><p>After Pressing the <code class="docutils literal notranslate"><span class="pre">✓</span></code> button in the <em>Sale-/Electricity Price Tab</em></p></li>
+</ul>
+<p><strong>Sale-/Electricity price Data is set as Default</strong></p>
+<div class="figure align-default" id="elpricesetdefault-fig">
+<a class="reference internal image-reference" href="_images/ElPriceSetDefault.PNG"><img alt="_images/ElPriceSetDefault.PNG" src="_images/ElPriceSetDefault.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.19 </span><span class="caption-text">Pressing <code class="docutils literal notranslate"><span class="pre">✓</span></code> button</span><a class="headerlink" href="#elpricesetdefault-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p><strong>Sale-/Electricity price Data for <em>Heat Generator name</em> is added</strong></p>
+<div class="figure align-default" id="elecpricedataadded-fig">
+<a class="reference internal image-reference" href="_images/ElecPriceDataAdded.PNG"><img alt="_images/ElecPriceDataAdded.PNG" src="_images/ElecPriceDataAdded.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.20 </span><span class="caption-text">Sale-/Electricity price Data</span><a class="headerlink" href="#elecpricedataadded-fig" title="Permalink to this image">¶</a></p>
+</div>
+<ul class="simple">
+<li><p>After Uploading a file in the <em>Load Individual Data</em> tab</p></li>
+</ul>
+<p><strong>Invalid Filetyp to load &#64; Loading External Data</strong></p>
+<div class="figure align-default" id="invalidfiletypeextdata-fig">
+<a class="reference internal image-reference" href="_images/InvalidFiletypeExtData.PNG"><img alt="_images/InvalidFiletypeExtData.PNG" src="_images/InvalidFiletypeExtData.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.21 </span><span class="caption-text">Invalid Filetyp</span><a class="headerlink" href="#invalidfiletypeextdata-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>This is shown when you try to upload a filetype that is not <code class="docutils literal notranslate"><span class="pre">.xlsx</span></code> or <code class="docutils literal notranslate"><span class="pre">.csv</span></code></p>
+<p><strong>Your file has not enough values (please specify 8760 values)</strong></p>
+<div class="figure align-default" id="notenoughvalues-fig">
+<a class="reference internal image-reference" href="_images/NotEnoughValues.PNG"><img alt="_images/NotEnoughValues.PNG" src="_images/NotEnoughValues.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.22 </span><span class="caption-text">File has not enough values</span><a class="headerlink" href="#notenoughvalues-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>Your file that you upload has to have the structure as described in <a class="reference internal" href="Inputs.html"><span class="doc">Inputs</span></a>.</p>
+<p><strong>External Data Loaded</strong></p>
+<div class="figure align-default" id="externaldataloaded-fig">
+<a class="reference internal image-reference" href="_images/ExternalDataLoaded.PNG"><img alt="_images/ExternalDataLoaded.PNG" src="_images/ExternalDataLoaded.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.23 </span><span class="caption-text">Fullfilling the structure as described</span><a class="headerlink" href="#externaldataloaded-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>This is shown when the external data has been uploaded.</p>
+<ul class="simple">
+<li><p>After Pressing the <em>✓  Save</em>  button in the <em>Load Individual Data</em> tab</p></li>
+</ul>
+<p><strong>External Data <em>DataName</em> added to <em>profile type</em> as <em>DataName_1</em></strong></p>
+<div class="figure align-default" id="extdataindividualadded-fig">
+<a class="reference internal image-reference" href="_images/ExtDataIndividualAdded.PNG"><img alt="_images/ExtDataIndividualAdded.PNG" src="_images/ExtDataIndividualAdded.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.24 </span><span class="caption-text">External Data <em>DataName</em> added</span><a class="headerlink" href="#extdataindividualadded-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>This is shown after adding  custom data to the profiles as described
+in <a class="reference internal" href="Inputs.html"><span class="doc">Inputs</span></a>.</p>
+<p><strong>n_th/COP - External Data added to <em>Heat Generator name</em></strong></p>
+<div class="figure align-default" id="etaandcopadded-fig">
+<a class="reference internal image-reference" href="_images/EtaAndCOPAdded.PNG"><img alt="_images/EtaAndCOPAdded.PNG" src="_images/EtaAndCOPAdded.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2.25 </span><span class="caption-text">n_th/COP</span><a class="headerlink" href="#etaandcopadded-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>This is shown after adding a custom data for the thermal efficiency to a heat
+generator.</p>
+</div>
+</div>
+<div class="section" id="output-section">
+<span id="section-outputsection"></span><h2><span class="section-number">2.3. </span>Output section<a class="headerlink" href="#output-section" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference internal" href="Outputs.html"><span class="doc">Outputs</span></a> for general information about the structure of the outputs, or see the specific mode chapters (<a class="reference internal" href="Scenario%20Mode.html"><span class="doc">Scenario Mode</span></a>, <a class="reference internal" href="Scenario%20Generation.html"><span class="doc">Scenario Generation</span></a> or in general <a class="reference internal" href="Example%20Projects.html"><span class="doc">Example Projects</span></a>) for detailed information about the specific generated outputs there.</p>
+</div>
+<div class="section" id="data-section">
+<span id="section-datasection"></span><h2><span class="section-number">2.4. </span>Data section<a class="headerlink" href="#data-section" title="Permalink to this headline">¶</a></h2>
+<p>The data section is for defining the specific data you need for runing the application:</p>
+<ul class="simple">
+<li><p>defining heat generators and storages</p></li>
+<li><p>setting parameter</p></li>
+<li><p>choosing electricity prices</p></li>
+<li><p>adapting the heat demand</p></li>
+<li><p>implementing individual data</p></li>
+</ul>
+<p>To get detailed description, see <a class="reference internal" href="Inputs.html"><span class="doc">Inputs</span></a>.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="Installation.html" title="previous page"><span class="section-number">1. </span>Installation</a>
+    <a class='right-next' id="next-link" href="Get%20started.html" title="next page"><span class="section-number">1. </span>Get started</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Daniela Havlicek, Jeton Hasani<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

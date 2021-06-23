@@ -1,0 +1,911 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>6. Scenario Generation &#8212; HotmapsDispatch - Model Description</title>
+    
+  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.37f24b989f4638ff9c27c22dc7559d4f.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="7. Example Projects" href="Example%20Projects.html" />
+    <link rel="prev" title="5. Investment Mode" href="Investment%20Mode.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="index.html">
+  
+  <img src="_static/Hotmaps_Logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">HotmapsDispatch - Model Description</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Hotmaps%20Dispatch%20-%20Description.html">
+   Hotmaps Dispatch - Description
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  First Steps
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Installation.html">
+   1. Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="The%20Web%20User%20Interface.html">
+   2. The Web User Interface
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Get%20started.html">
+   1. Get started
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Inputs.html">
+   2. Inputs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Outputs.html">
+   3. Outputs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Scenario%20Mode.html">
+   4. Scenario Mode
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Investment%20Mode.html">
+   5. Investment Mode
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   6. Scenario Generation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Example%20Projects.html">
+   7. Example Projects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Modeling%20Tricks.html">
+   8. Modeling Tricks
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Mathematical Description
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Model%20Description.html">
+   1. Model Description
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Objective%20Function.html">
+   2. Objective Function
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Constraints.html">
+   3. Constraints
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Developers Guide
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Adding%20and%20Connection%20of%20new%20features%20into%20the%20model.html">
+   1. Adding and Connection of new features into the model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Adding%20new%20output%20indicators.html">
+   2. Adding new output indicators
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Adding%20new%20charts.html">
+   3. Adding new charts
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Dispatch-API.html">
+   4. Dispatch-API
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Scenario%20Generator-API.html">
+   5. Scenario Generator-API
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="_sources/Scenario Generation.md"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.md</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/tuw-eeg/hotmapsDispatch"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/tuw-eeg/hotmapsDispatch/issues/new?title=Issue%20on%20page%20%2FScenario Generation.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#scenario-generation-steps-for-manual-process">
+   6.1. Scenario Generation - steps for manual process
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#file-name-convention-and-its-effect">
+   6.2. File name convention and its effect
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#stl1-a-b-xlsx">
+     6.2.1. STL1 (
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       a_b.xlsx
+      </span>
+     </code>
+     )
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#stl2-a-b-c-xlsx">
+     6.2.2. STL2(
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       a_b_c.xlsx
+      </span>
+     </code>
+     )
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#stl3-a-b-c-d-xlsx">
+     6.2.3. STL3(
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       a_b_c_d.xlsx
+      </span>
+     </code>
+     )
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#stl4-a-b-c-d-e-xlsx">
+     6.2.4. STL4  (
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       a_b_c_d_e.xlsx
+      </span>
+     </code>
+     )
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#stl5-a-b-c-d-e-f-xlsx">
+     6.2.5. STL5 (
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       a_b_c_d_e_f.xlsx
+      </span>
+     </code>
+     )
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#scenario-management-tool">
+   6.3. Scenario Management Tool
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#default-input-dispatch-xlsx">
+     6.3.1.
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       default_input_dispatch.xlsx
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#scenarios-xlsx">
+     6.3.2.
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       scenarios.xlsx
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="scenario-generation">
+<h1><span class="section-number">6. </span>Scenario Generation<a class="headerlink" href="#scenario-generation" title="Permalink to this headline">¶</a></h1>
+<p>If you want to calculate many sensitivities or create a scenario tree with more than 2 levels, it is better to use the Scenario Management Tool instead of the WebUser Interface. The advantage of the Scenario Management Tool is that you can create many scenarios at once.</p>
+<p>With this tool you can create a multi level scenario tree, that has always the same number of sensitivities for each sub-scenario. You can decide how many sensitivities you want to have per sub-scenario.</p>
+<p>In <a class="reference internal" href="#smt-example"><span class="std std-numref">Fig. 6.1</span></a>  you can see an example. Shown is a two-level-scenario-tree with 2 scenarios,  2 sensitivities for sub-scenario-one and 4 sensitivities for sub-scenario-two, it also shows how the files are named.</p>
+<div class="figure align-default" id="smt-example">
+<a class="reference internal image-reference" href="_images/SMT_example.svg"><img alt="_images/SMT_example.svg" height="800px" src="_images/SMT_example.svg" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.1 </span><span class="caption-text">Example of a 2 level scenario tree</span><a class="headerlink" href="#smt-example" title="Permalink to this image">¶</a></p>
+</div>
+<p>In principle can the hotmpasDIspatch Application also calculate with different numbers of sensitivities per sub-scenario (see <a class="reference internal" href="Scenario%20Mode.html"><span class="doc">Scenario Mode</span></a>), but mostly you want to calculate the same sensitivities over a sub-scenario.</p>
+<div class="section" id="scenario-generation-steps-for-manual-process">
+<h2><span class="section-number">6.1. </span>Scenario Generation - steps for manual process<a class="headerlink" href="#scenario-generation-steps-for-manual-process" title="Permalink to this headline">¶</a></h2>
+<p>if you don’t use the the Scenario Management Tool you can create your own multi level scenario tree manually with excel files.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To generate scenarios through this way, the folder structure has to look like this:</p>
+<ul class="simple">
+<li><p>scenario folders, named by the scenario itself</p></li>
+<li><p>sub-scenario files, named by the sub-scenarios; inside the scenario folder</p></li>
+</ul>
+</div>
+<p>When you want to create multi level scenario tree manually you make the following steps:</p>
+<ol>
+<li><p>Copy the already existing excel files of the current sub-scenarios (e.g. when downloading the calculation in <a class="reference internal" href="Scenario%20Mode.html"><span class="doc">Scenario Mode</span></a>, you already get the first sub-scenarios)</p></li>
+<li><p>Rename the new excel files with an underline symbol.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The specialized structure of the sub-scenario file names helps you define the level of the scenario tree and also helps you visualize the plots for the output (See <a class="reference internal" href="#file-name-convention"><span class="std std-numref">Section 6.2</span></a>) .</p>
+</div>
+</li>
+<li><p>Inside each excel file for each sub-scenario, the particular sensitivities have to be changed in value.</p></li>
+<li><p>If you have defined and created all necessary coupled sub-scenarios and main scenarios, and you want to calculate your model, then you have to create a <em>zip-file</em> out of all the main scenario folders (e.g. Portfolio a,Portfolio b,… all have to be put into a <em>zip-file</em>)</p></li>
+<li><p>Then, go to the WebUser Interface again and upload this <em>zip-file</em></p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Before uploading your created <em>zip-file</em>, do the following steps:</p>
+<ul class="simple">
+<li><p>Refresh the page, so all scenarios which were created before are deleted and no collision can cause problems</p></li>
+<li><p>Enable the scenario mode</p></li>
+<li><p>Then push the button <em>Upload Power Plant Parameters</em> and choose your <em>zip-file</em></p></li>
+</ul>
+</div>
+</li>
+<li><p>Before running the calculation, you can check the values which you have adapted in the WebUser Interface, if they were changed properly.</p></li>
+<li><p>Push the button <em>Run Dispatch Model</em> for calculation</p></li>
+</ol>
+</div>
+<div class="section" id="file-name-convention-and-its-effect">
+<span id="file-name-convention"></span><h2><span class="section-number">6.2. </span>File name convention and its effect<a class="headerlink" href="#file-name-convention-and-its-effect" title="Permalink to this headline">¶</a></h2>
+<p>The naming of the files describe the <strong>s</strong>cenario <strong>t</strong>ree <strong>l</strong>evels (<strong>STL</strong>)  and also how the output chart will look. The file starts with the scenario name, followed by the sub-scenario name separated by an underscore. (see <a class="reference internal" href="#smt"><span class="std std-numref">Fig. 6.2</span></a>).</p>
+<div class="figure align-default" id="smt">
+<a class="reference internal image-reference" href="_images/SMT.svg"><img alt="_images/SMT.svg" height="800px" src="_images/SMT.svg" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.2 </span><span class="caption-text">A general 2 level scenario tree (<strong>STL2</strong>) and the file names of the different runs</span><a class="headerlink" href="#smt" title="Permalink to this image">¶</a></p>
+</div>
+<p>In the next chapters some examples of scenario trees  are shown , and the effect of the file naming to the output charts  is explained.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Each data point in the charts represents a dispatch run and the input is described by an Excel file. The filename of the Excel file follows a naming convention that is specified in the heading and described in the tables</p>
+</div>
+<div class="section" id="stl1-a-b-xlsx">
+<h3><span class="section-number">6.2.1. </span>STL1 (<code class="docutils literal notranslate"><span class="pre">a_b.xlsx</span></code>)<a class="headerlink" href="#stl1-a-b-xlsx" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="graph-sub1">
+<a class="reference internal image-reference" href="_images/SUB1.svg"><img alt="_images/SUB1.svg" src="_images/SUB1.svg" width="1000px" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.3 </span><span class="caption-text">Example of an one level scenario tree</span><a class="headerlink" href="#graph-sub1" title="Permalink to this image">¶</a></p>
+</div>
+<table class="colwidths-auto table" id="sz1sub">
+<caption><span class="caption-number">Table 6.1 </span><span class="caption-text">Naming and meaning of the structure for excel files for a 1 level scenario tree</span><a class="headerlink" href="#sz1sub" title="Permalink to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>position in naming</p></th>
+<th class="head"><p>Number of sensitivities  and possible meaning</p></th>
+<th class="head"><p>meaning for the plot(for system wide indicators)</p></th>
+<th class="head"><p>meaning  for the plot (for indicators by technologies)<a class="footnote-reference brackets" href="#footnote2" id="id1">1</a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>Scenario</p></td>
+<td><p>2 technology portfolio (Portfolio a,  Portfolio b)</p></td>
+<td><p>columns<a class="footnote-reference brackets" href="#footnote1" id="id2">2</a></p></td>
+<td><p>rows<a class="footnote-reference brackets" href="#footnote1" id="id3">2</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>b</p></td>
+<td><p>Sub Scenario 1</p></td>
+<td><p>2 <span class="math notranslate nohighlight">\(CO_2\)</span> Prices (Sub Scenario/1 ;Sub Scenario/2 )</p></td>
+<td><p>x-axis and color of the data point</p></td>
+<td><p>columns<a class="footnote-reference brackets" href="#footnote1" id="id4">2</a></p></td>
+</tr>
+</tbody>
+</table>
+<div class="figure align-default" id="sz1sub-system-inidicator">
+<a class="reference internal image-reference" href="_images/2SZ_1SUB.svg"><img alt="_images/2SZ_1SUB.svg" height="400px" src="_images/2SZ_1SUB.svg" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.4 </span><span class="caption-text">Plot example of a one level scenario tree (<a class="reference internal" href="#graph-sub1"><span class="std std-numref">Fig. 6.3</span></a>) for a system indicator</span><a class="headerlink" href="#sz1sub-system-inidicator" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="sz1sub-hg-inidicator">
+<a class="reference internal image-reference" href="_images/2SZ_1SUB_HG.svg"><img alt="_images/2SZ_1SUB_HG.svg" height="640px" src="_images/2SZ_1SUB_HG.svg" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.5 </span><span class="caption-text">Plot example of a one level scenario tree (<a class="reference internal" href="#graph-sub1"><span class="std std-numref">Fig. 6.3</span></a>) for an indicator by technologies</span><a class="headerlink" href="#sz1sub-hg-inidicator" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="stl2-a-b-c-xlsx">
+<h3><span class="section-number">6.2.2. </span>STL2(<code class="docutils literal notranslate"><span class="pre">a_b_c.xlsx</span></code>)<a class="headerlink" href="#stl2-a-b-c-xlsx" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="graph-sub2">
+<a class="reference internal image-reference" href="_images/SUB2.svg"><img alt="_images/SUB2.svg" src="_images/SUB2.svg" width="1000px" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.6 </span><span class="caption-text">Example of a two level scenario tree</span><a class="headerlink" href="#graph-sub2" title="Permalink to this image">¶</a></p>
+</div>
+<table class="colwidths-auto table" id="sz2sub">
+<caption><span class="caption-number">Table 6.2 </span><span class="caption-text">Naming and meaning of the structure for excel files for a 2 level scenario tree</span><a class="headerlink" href="#sz2sub" title="Permalink to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>position in naming</p></th>
+<th class="head"><p>Number of sensitivities  and possible meaning</p></th>
+<th class="head"><p>meaning for the plot(for system wide indicators)</p></th>
+<th class="head"><p>meaning  for the plot (for indicators by technologies)<a class="footnote-reference brackets" href="#footnote2" id="id5">1</a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>Scenario</p></td>
+<td><p>2 technology portfolio (Portfolio a,  Portfolio b)</p></td>
+<td><p>columns<a class="footnote-reference brackets" href="#footnote1" id="id6">2</a></p></td>
+<td><p>rows<a class="footnote-reference brackets" href="#footnote1" id="id7">2</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>b</p></td>
+<td><p>Sub Scenario 1</p></td>
+<td><p>2 <span class="math notranslate nohighlight">\(CO_2\)</span> Prices (Sub Scenario 1/1 ;Sub Scenario 1/2 )</p></td>
+<td><p>rows<a class="footnote-reference brackets" href="#footnote1" id="id8">2</a></p></td>
+<td><p>columns<a class="footnote-reference brackets" href="#footnote1" id="id9">2</a></p></td>
+</tr>
+<tr class="row-even"><td><p>c</p></td>
+<td><p>Sub Scenario 2</p></td>
+<td><p>2 Energy Carrier Prices (Sub Scenario 2/1 ;Sub Scenario 2/2 )</p></td>
+<td><p>x-axis and color of the data point</p></td>
+<td><p>shape of the data point</p></td>
+</tr>
+</tbody>
+</table>
+<div class="figure align-default" id="sz2sub-system-inidicator">
+<a class="reference internal image-reference" href="_images/2SZ_2SUB.svg"><img alt="_images/2SZ_2SUB.svg" height="640px" src="_images/2SZ_2SUB.svg" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.7 </span><span class="caption-text">Plot example of a two level scenario tree (<a class="reference internal" href="#graph-sub2"><span class="std std-numref">Fig. 6.6</span></a>) for a system indicator</span><a class="headerlink" href="#sz2sub-system-inidicator" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="sz2sub-hg-inidicator">
+<a class="reference internal image-reference" href="_images/2SZ_1SUB_HG.svg"><img alt="_images/2SZ_1SUB_HG.svg" height="640px" src="_images/2SZ_1SUB_HG.svg" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.8 </span><span class="caption-text">Plot example of a two level scenario tree (<a class="reference internal" href="#graph-sub2"><span class="std std-numref">Fig. 6.6</span></a>) for an indicator by technologies</span><a class="headerlink" href="#sz2sub-hg-inidicator" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="stl3-a-b-c-d-xlsx">
+<h3><span class="section-number">6.2.3. </span>STL3(<code class="docutils literal notranslate"><span class="pre">a_b_c_d.xlsx</span></code>)<a class="headerlink" href="#stl3-a-b-c-d-xlsx" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="graph-sub3">
+<a class="reference internal image-reference" href="_images/SUB3.svg"><img alt="_images/SUB3.svg" src="_images/SUB3.svg" width="1500px" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.9 </span><span class="caption-text">Example of three level scenario tree (For the sake of a better overview, not all edges and nodes of the graph are displayed.)</span><a class="headerlink" href="#graph-sub3" title="Permalink to this image">¶</a></p>
+</div>
+<table class="colwidths-auto table" id="sz3sub">
+<caption><span class="caption-number">Table 6.3 </span><span class="caption-text">Naming and meaning of the structure for excel files for a 3 level scenario tree</span><a class="headerlink" href="#sz3sub" title="Permalink to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>position in naming</p></th>
+<th class="head"><p>Number of sensitivities  and possible meaning</p></th>
+<th class="head"><p>meaning for the plot(for system wide indicators)</p></th>
+<th class="head"><p>meaning  for the plot (for indicators by technologies)<a class="footnote-reference brackets" href="#footnote2" id="id10">1</a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>Scenario</p></td>
+<td><p>2 technology portfolio (Portfolio a,  Portfolio b)</p></td>
+<td><p>rows<a class="footnote-reference brackets" href="#footnote1" id="id11">2</a></p></td>
+<td><p>rows<a class="footnote-reference brackets" href="#footnote1" id="id12">2</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>b</p></td>
+<td><p>Sub Scenario 1</p></td>
+<td><p>2 <span class="math notranslate nohighlight">\(CO_2\)</span> Prices (Sub Scenario 1/1 ;Sub Scenario 1/2 )</p></td>
+<td><p>columns<a class="footnote-reference brackets" href="#footnote1" id="id13">2</a></p></td>
+<td><p>columns<a class="footnote-reference brackets" href="#footnote1" id="id14">2</a></p></td>
+</tr>
+<tr class="row-even"><td><p>c</p></td>
+<td><p>Sub Scenario 2</p></td>
+<td><p>2 Energy Carrier Prices (Sub Scenario 2/1 ;Sub Scenario 2/2 )</p></td>
+<td><p>x-axis and color of the data point</p></td>
+<td><p>color of the data point</p></td>
+</tr>
+<tr class="row-odd"><td><p>d</p></td>
+<td><p>Sub Scenario 3</p></td>
+<td><p>2 Interest Rates (Sub Scenario 3/1 ;Sub Scenario 3/2 )</p></td>
+<td><p>shape of the data point</p></td>
+<td><p>shape of the data point</p></td>
+</tr>
+</tbody>
+</table>
+<div class="figure align-default" id="sz3sub-system-inidicator">
+<a class="reference internal image-reference" href="_images/2SZ_3SUB.svg"><img alt="_images/2SZ_3SUB.svg" height="640" src="_images/2SZ_3SUB.svg" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.10 </span><span class="caption-text">Plot example of a three level scenario tree (<a class="reference internal" href="#graph-sub3"><span class="std std-numref">Fig. 6.9</span></a>) for a system indicator</span><a class="headerlink" href="#sz3sub-system-inidicator" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="sz3sub-hg-inidicator">
+<a class="reference internal image-reference" href="_images/2SZ_3SUB_HG.svg"><img alt="_images/2SZ_3SUB_HG.svg" height="640px" src="_images/2SZ_3SUB_HG.svg" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.11 </span><span class="caption-text">Plot example of a three level scenario tree (<a class="reference internal" href="#graph-sub3"><span class="std std-numref">Fig. 6.9</span></a>)for an indicator by technologies</span><a class="headerlink" href="#sz3sub-hg-inidicator" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="stl4-a-b-c-d-e-xlsx">
+<h3><span class="section-number">6.2.4. </span>STL4  (<code class="docutils literal notranslate"><span class="pre">a_b_c_d_e.xlsx</span></code>)<a class="headerlink" href="#stl4-a-b-c-d-e-xlsx" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="graph-sub4">
+<a class="reference internal image-reference" href="_images/SUB4.svg"><img alt="_images/SUB4.svg" src="_images/SUB4.svg" width="1000px" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.12 </span><span class="caption-text">Example of four level scenario tree (For the sake of a better overview, not all edges and nodes of the graph are displayed.)</span><a class="headerlink" href="#graph-sub4" title="Permalink to this image">¶</a></p>
+</div>
+<table class="colwidths-auto table" id="sz4sub">
+<caption><span class="caption-number">Table 6.4 </span><span class="caption-text">Naming and meaning of the structure for excel files for a 4 level scenario tree</span><a class="headerlink" href="#sz4sub" title="Permalink to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>position in naming</p></th>
+<th class="head"><p>Number of sensitivities  and possible meaning</p></th>
+<th class="head"><p>meaning for the plot(for system wide indicators)</p></th>
+<th class="head"><p>meaning  for the plot (for indicators by technologies)<a class="footnote-reference brackets" href="#footnote2" id="id15">1</a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>Scenario</p></td>
+<td><p>2 technology portfolio (Portfolio a,  Portfolio b)</p></td>
+<td><p>rows<a class="footnote-reference brackets" href="#footnote1" id="id16">2</a></p></td>
+<td><p>rows<a class="footnote-reference brackets" href="#footnote1" id="id17">2</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>b</p></td>
+<td><p>Sub Scenario 1</p></td>
+<td><p>2 heat demands (Sub Scenario 1/1 ;Sub Scenario 1/2 )</p></td>
+<td><p>columns<a class="footnote-reference brackets" href="#footnote1" id="id18">2</a></p></td>
+<td><p>columns<a class="footnote-reference brackets" href="#footnote1" id="id19">2</a></p></td>
+</tr>
+<tr class="row-even"><td><p>c</p></td>
+<td><p>Sub Scenario 2</p></td>
+<td><p>2 years (Sub Scenario 2/1 ;Sub Scenario 2/2 )</p></td>
+<td><p>x-axis</p></td>
+<td><p>color of the data point</p></td>
+</tr>
+<tr class="row-odd"><td><p>d</p></td>
+<td><p>Sub Scenario 3</p></td>
+<td><p>2 Interest Rates (Sub Scenario 3/1 ;Sub Scenario 3/2 )</p></td>
+<td><p>color of the data point</p></td>
+<td><p>drop down menu</p></td>
+</tr>
+<tr class="row-even"><td><p>e</p></td>
+<td><p>Sub Scenario 4</p></td>
+<td><p>2 <span class="math notranslate nohighlight">\(CO_2\)</span> certificate prices (Sub Scenario 4/1 ;Sub Scenario 4/2)</p></td>
+<td><p>shape of the data point</p></td>
+<td><p>shape of the data point</p></td>
+</tr>
+</tbody>
+</table>
+<div class="figure align-default" id="sz4sub-system-inidicator">
+<a class="reference internal image-reference" href="_images/2SZ_4SUB.svg"><img alt="_images/2SZ_4SUB.svg" height="700px" src="_images/2SZ_4SUB.svg" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.13 </span><span class="caption-text">Plot example of a four level scenario tree (<a class="reference internal" href="#graph-sub4"><span class="std std-numref">Fig. 6.12</span></a>) for a system indicator</span><a class="headerlink" href="#sz4sub-system-inidicator" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="sz4sub-hg-inidicator">
+<a class="reference internal image-reference" href="_images/2SZ_4SUB_HG.svg"><img alt="_images/2SZ_4SUB_HG.svg" height="700px" src="_images/2SZ_4SUB_HG.svg" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.14 </span><span class="caption-text">Plot example of a four level scenario tree (<a class="reference internal" href="#graph-sub4"><span class="std std-numref">Fig. 6.12</span></a>) for an indicators by technologies</span><a class="headerlink" href="#sz4sub-hg-inidicator" title="Permalink to this image">¶</a></p>
+</div>
+<p>As you can see in <a class="reference internal" href="#sz4sub-hg-inidicator"><span class="std std-numref">Fig. 6.14</span></a> , there are duplicate data points that are indistinguishable. To make the data points distinctive, <code class="docutils literal notranslate"><span class="pre">Sub</span> <span class="pre">Scenario</span> <span class="pre">3</span></code> is added as a drop-down menu from a 4-level scenario tree upwards. This allows all data points to be distinctive. The illustration in  <a class="reference internal" href="#sz4sub-hg-inidicator-dropdown"><span class="std std-numref">Fig. 6.15</span></a> shows this approach.</p>
+<div class="figure align-default" id="sz4sub-hg-inidicator-dropdown">
+<a class="reference internal image-reference" href="_images/2SZ_4SUB_HG_1.png"><img alt="_images/2SZ_4SUB_HG_1.png" src="_images/2SZ_4SUB_HG_1.png" style="height: 700px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.15 </span><span class="caption-text">Plot Example of a four level scenario tree (<a class="reference internal" href="#graph-sub4"><span class="std std-numref">Fig. 6.12</span></a>) for Indicators by technologies with a drop-down menu</span><a class="headerlink" href="#sz4sub-hg-inidicator-dropdown" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="stl5-a-b-c-d-e-f-xlsx">
+<h3><span class="section-number">6.2.5. </span>STL5 (<code class="docutils literal notranslate"><span class="pre">a_b_c_d_e_f.xlsx</span></code>)<a class="headerlink" href="#stl5-a-b-c-d-e-f-xlsx" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="graph-sub5">
+<a class="reference internal image-reference" href="_images/SUB5.svg"><img alt="_images/SUB5.svg" src="_images/SUB5.svg" width="1000px" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.16 </span><span class="caption-text">Example of five level scenario tree (For the sake of a better overview, not all edges and nodes of the graph are displayed.)</span><a class="headerlink" href="#graph-sub5" title="Permalink to this image">¶</a></p>
+</div>
+<table class="colwidths-auto table" id="sz5sub">
+<caption><span class="caption-number">Table 6.5 </span><span class="caption-text">Naming and meaning of the structure for excel files for a 5 level scenario tree</span><a class="headerlink" href="#sz5sub" title="Permalink to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>position in naming</p></th>
+<th class="head"><p>Number of sensitivities  and possible meaning</p></th>
+<th class="head"><p>meaning for the plot(for system wide indicators)</p></th>
+<th class="head"><p>meaning  for the plot (for indicators by technologies)<a class="footnote-reference brackets" href="#footnote2" id="id20">1</a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>Scenario</p></td>
+<td><p>2 technology portfolio (Portfolio a,  Portfolio b)</p></td>
+<td><p>rows<a class="footnote-reference brackets" href="#footnote1" id="id21">2</a></p></td>
+<td><p>rows<a class="footnote-reference brackets" href="#footnote1" id="id22">2</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>b</p></td>
+<td><p>Sub Scenario 1</p></td>
+<td><p>2 heat demands (Sub Scenario 1/1 ;Sub Scenario 1/2 )</p></td>
+<td><p>columns<a class="footnote-reference brackets" href="#footnote1" id="id23">2</a></p></td>
+<td><p>columns<a class="footnote-reference brackets" href="#footnote1" id="id24">2</a></p></td>
+</tr>
+<tr class="row-even"><td><p>c</p></td>
+<td><p>Sub Scenario 2</p></td>
+<td><p>2 years (Sub Scenario 2/1 ;Sub Scenario 2/2 )</p></td>
+<td><p>x-axis</p></td>
+<td><p>color of the data point</p></td>
+</tr>
+<tr class="row-odd"><td><p>d</p></td>
+<td><p>Sub Scenario 3</p></td>
+<td><p>2 Interest Rates (Sub Scenario 3/1 ;Sub Scenario 3/2 )drop down menu</p></td>
+<td><p>drop down menu</p></td>
+<td><p>drop down menu</p></td>
+</tr>
+<tr class="row-even"><td><p>e</p></td>
+<td><p>Sub Scenario 4</p></td>
+<td><p>2 <span class="math notranslate nohighlight">\(CO_2\)</span> certificate prices (Sub Scenario 4/1 ;Sub Scenario 4/2)</p></td>
+<td><p>color of the data point</p></td>
+<td><p>shape of the data point</p></td>
+</tr>
+<tr class="row-odd"><td><p>f</p></td>
+<td><p>Sub Scenario 5</p></td>
+<td><p>2 Energy Carrier Prices (Sub Scenario 5/1 ;Sub Scenario 5/2)</p></td>
+<td><p>shape of the data point</p></td>
+<td><p>color or shape   <a class="footnote-reference brackets" href="#footnote3" id="id25">3</a></p></td>
+</tr>
+</tbody>
+</table>
+<div class="figure align-default" id="sz5sub-system-inidicator">
+<a class="reference internal image-reference" href="_images/2SZ_4SUB_HG.svg"><img alt="_images/2SZ_4SUB_HG.svg" height="700px" src="_images/2SZ_4SUB_HG.svg" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.17 </span><span class="caption-text">Plot example of a five level scenario tree (<a class="reference internal" href="#graph-sub5"><span class="std std-numref">Fig. 6.16</span></a>) for a system indicator</span><a class="headerlink" href="#sz5sub-system-inidicator" title="Permalink to this image">¶</a></p>
+</div>
+<p>As you can see in <a class="reference internal" href="#sz5sub-system-inidicator"><span class="std std-numref">Fig. 6.17</span></a> , there are duplicate data points that are indistinguishable. To make the data points distinctive, <code class="docutils literal notranslate"><span class="pre">Sub</span> <span class="pre">Scenario</span> <span class="pre">3</span></code> is added as a drop-down menu from a 5-level scenario tree upwards. This allows all data points to be distinctive. The illustration in  <a class="reference internal" href="#sz5sub-dropdown"><span class="std std-numref">Fig. 6.18</span></a> shows this approach.</p>
+<div class="figure align-default" id="sz5sub-dropdown">
+<a class="reference internal image-reference" href="_images/2SZ_5SUB_1.png"><img alt="_images/2SZ_5SUB_1.png" src="_images/2SZ_5SUB_1.png" style="height: 700px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.18 </span><span class="caption-text">Plot Example of a five level scenario tree (<a class="reference internal" href="#graph-sub5"><span class="std std-numref">Fig. 6.16</span></a>) for a system indicator with a drop-down menu</span><a class="headerlink" href="#sz5sub-dropdown" title="Permalink to this image">¶</a></p>
+</div>
+<p>The illustration in <a class="reference internal" href="#sz5sub-hg-inidicator"><span class="std std-numref">Fig. 6.19</span></a>  shows that from a 5-level scenario tree onwards, even the addition of a drop-down menu does not make it possible to visually create a clear allocation of the data points. Of course, one can now create a drop-down menu for each additional sub-scenario, which would solve the problem with the ability to distinguish the data points, but the chart itself would not become clearer, nor would it be possible to publish analogue graphics (for papers, for example).</p>
+<div class="figure align-default" id="sz5sub-hg-inidicator">
+<a class="reference internal image-reference" href="_images/2SZ_3SUB_HG.svg"><img alt="_images/2SZ_3SUB_HG.svg" height="700px" src="_images/2SZ_3SUB_HG.svg" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.19 </span><span class="caption-text">Plot example of a five level scenario tree (<a class="reference internal" href="#graph-sub5"><span class="std std-numref">Fig. 6.16</span></a>) for an indicators by technologies</span><a class="headerlink" href="#sz5sub-hg-inidicator" title="Permalink to this image">¶</a></p>
+</div>
+<hr class="docutils" />
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is not advisable to calculate scenario trees deeper than 5 levels (<a class="reference internal" href="#graph-sub5"><span class="std std-numref">Fig. 6.16</span></a>), as the results of the sensitivities are no longer straightforward to visualise and therefore can no longer be easily analysed and interpreted.</p>
+</div>
+</div>
+</div>
+<div class="section" id="scenario-management-tool">
+<h2><span class="section-number">6.3. </span>Scenario Management Tool<a class="headerlink" href="#scenario-management-tool" title="Permalink to this headline">¶</a></h2>
+<p>The main advantage of using the Scenario Management Tool is to only use two kind of files, whereas you separate which values stay constant and which parameters will change, this safes time and effort.</p>
+<p>Two files are being used for generating scenarios (<a class="reference internal" href="#scengenfiles1-fig"><span class="std std-numref">Fig. 6.20</span></a>):</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#section-defaultinput"><span class="std std-ref">default_input_dispatch.xlsx</span></a></p></li>
+<li><p><a class="reference internal" href="#section-scenarios"><span class="std std-ref">scenarios.xlsx</span></a></p></li>
+</ul>
+<div class="figure align-default" id="scengenfiles1-fig">
+<a class="reference internal image-reference" href="_images/scenGenFiles1.PNG"><img alt="_images/scenGenFiles1.PNG" src="_images/scenGenFiles1.PNG" style="height: 150px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.20 </span><span class="caption-text">Necessary excel files for scenario generation.</span><a class="headerlink" href="#scengenfiles1-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="section" id="default-input-dispatch-xlsx">
+<span id="section-defaultinput"></span><h3><span class="section-number">6.3.1. </span><code class="docutils literal notranslate"><span class="pre">default_input_dispatch.xlsx</span></code><a class="headerlink" href="#default-input-dispatch-xlsx" title="Permalink to this headline">¶</a></h3>
+<p>All values/parameters will be defined here which won’t change for this run. There are predefined worksheets, which are shown in <a class="reference internal" href="#defaultinput-fig"><span class="std std-numref">Fig. 6.21</span></a>.</p>
+<div class="figure align-default" id="defaultinput-fig">
+<a class="reference internal image-reference" href="_images/defaultInput.PNG"><img alt="_images/defaultInput.PNG" src="_images/defaultInput.PNG" style="height: 35px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.21 </span><span class="caption-text">Possible options for setting default values.</span><a class="headerlink" href="#defaultinput-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>Each worksheet has empty gaps to be filled up if necessary, as shown in <a class="reference internal" href="The%20Web%20User%20Interface.html#defaultimageswhole-fig"><span class="std std-numref">Fig. 2.3</span></a>.</p>
+<div class="figure align-default" id="defaultimageswhole-fig">
+<a class="reference internal image-reference" href="_images/defaultImagesWhole.PNG"><img alt="_images/defaultImagesWhole.PNG" src="_images/defaultImagesWhole.PNG" style="height: 450px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.22 </span><span class="caption-text">Predefined values to set.</span><a class="headerlink" href="#defaultimageswhole-fig" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="scenarios-xlsx">
+<span id="section-scenarios"></span><h3><span class="section-number">6.3.2. </span><code class="docutils literal notranslate"><span class="pre">scenarios.xlsx</span></code><a class="headerlink" href="#scenarios-xlsx" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>All values/parameters, which will be changed, will be added in the worksheets in <a class="reference internal" href="#scenariossheetswhole-fig"><span class="std std-numref">Fig. 6.23</span></a>.</p></li>
+</ul>
+<div class="figure align-default" id="scenariossheetswhole-fig">
+<a class="reference internal image-reference" href="_images/ScenariosSheetsWhole.PNG"><img alt="_images/ScenariosSheetsWhole.PNG" src="_images/ScenariosSheetsWhole.PNG" style="height: 25px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.23 </span><span class="caption-text">Predefined worksheets to fill in.</span><a class="headerlink" href="#scenariossheetswhole-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Delete all the values/parameters you don’t want to vary and define individual names for each scenario/sub-scenario and coupled ones. If you don’t want to make any specifications at a worksheet, however you have to put in the names of your <em>portfolios</em> and the number in the first column, like in <a class="reference internal" href="#scenariossheetsheatgen3-fig"><span class="std std-numref">Fig. 6.24</span></a>. The other columns you can left blank.</p>
+</div>
+<p>You can choose the number of portfolios which you want to create and the type of heat generators. In <a class="reference internal" href="#scenariossheetsheatgen3-fig"><span class="std std-numref">Fig. 6.24</span></a> there are different portfolios with its heat generators filled in each column (here <em>A</em>,<em>B</em>,<em>C</em> etc.). The different shades of the pink boxes just emphasize the different portfolios, but in general you are free to create as many as needed.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>All the different worksheets in excel can be almost chosen freely, depending on the different sensitivities you want to calculate. However, the names have to start the same way as predefined in the <a class="reference internal" href="#section-defaultinput"><span class="std std-ref">default_input_dispatch.xlsx</span></a>:</p>
+<ul class="simple">
+<li><p>All worksheets here have to start with the specific sensitivity category (e.g.: for different electricity prices you need the <em>Profile</em> worksheet)</p></li>
+<li><p>Then, add a minus afterwards and  a corresponding name for your sensitivity case (e.g.: <em>Profile - Electricity Prices</em> or <em>Data - interest rate</em>) .</p></li>
+</ul>
+</div>
+<div class="figure align-default" id="scenariossheetsheatgen3-fig">
+<a class="reference internal image-reference" href="_images/ScenariosSheetsHeatGen3.PNG"><img alt="_images/ScenariosSheetsHeatGen3.PNG" src="_images/ScenariosSheetsHeatGen3.PNG" style="height: 220px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.24 </span><span class="caption-text">Heat generators and portfolios definition.</span><a class="headerlink" href="#scenariossheetsheatgen3-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you want to use the same technologies for all portfolios (but e.g.: with different capacities), to get a better overview of the output plots, you should name the heating technologies equally for each portfolio, but with a <strong>space character</strong> afterwards the name, so that it will be treated as different values while runing the model, but to be plotted as the same technology to be comparable.</p>
+</div>
+<p>In <a class="reference internal" href="#scenariossheetsenergycarrier2-fig"><span class="std std-numref">Fig. 6.25</span></a> you can define the specified name and energy carrier for each portfolio.</p>
+<div class="figure align-default" id="scenariossheetsenergycarrier2-fig">
+<a class="reference internal image-reference" href="_images/ScenariosSheetsEnergyCarrier2.PNG"><img alt="_images/ScenariosSheetsEnergyCarrier2.PNG" src="_images/ScenariosSheetsEnergyCarrier2.PNG" style="height: 250px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.25 </span><span class="caption-text">Energy carrier definition.</span><a class="headerlink" href="#scenariossheetsenergycarrier2-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>Defining different heat storages is possible like in <a class="reference internal" href="#scenariossheetsheatstor2-fig"><span class="std std-numref">Fig. 6.26</span></a>.</p>
+<div class="figure align-default" id="scenariossheetsheatstor2-fig">
+<a class="reference internal image-reference" href="_images/ScenariosSheetsHeatStor2.PNG"><img alt="_images/ScenariosSheetsHeatStor2.PNG" src="_images/ScenariosSheetsHeatStor2.PNG" style="height: 170px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.26 </span><span class="caption-text">Heat storage definition.</span><a class="headerlink" href="#scenariossheetsheatstor2-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>You can define a sensitivity for <em>profile</em>, which will be adapted like in <a class="reference internal" href="#scenariossheetsprofile-fig"><span class="std std-numref">Fig. 6.27</span></a>.</p>
+<div class="figure align-default" id="scenariossheetsprofile-fig">
+<a class="reference internal image-reference" href="_images/ScenariosSheetsProfile.PNG"><img alt="_images/ScenariosSheetsProfile.PNG" src="_images/ScenariosSheetsProfile.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.27 </span><span class="caption-text">Examples of profile sensitivities.</span><a class="headerlink" href="#scenariossheetsprofile-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>For defining different sensitivities (e.g.: different gas prices, held in light and dark green in the figure), you have to adapt the following worksheet in <a class="reference internal" href="#scenariossheetspriceemission2-fig"><span class="std std-numref">Fig. 6.28</span></a>. It depends on the number of sensitivities how many “green boxes” you have create in that worksheet.</p>
+<div class="figure align-default" id="scenariossheetspriceemission2-fig">
+<a class="reference internal image-reference" href="_images/ScenariosSheetsPriceEmission2.PNG"><img alt="_images/ScenariosSheetsPriceEmission2.PNG" src="_images/ScenariosSheetsPriceEmission2.PNG" style="height: 400px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.28 </span><span class="caption-text">Sensitivity setting via price definition.</span><a class="headerlink" href="#scenariossheetspriceemission2-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>Additionally, you can define an <em>interest rate</em>, like in <a class="reference internal" href="#scenariossheetsdata2-fig"><span class="std std-numref">Fig. 6.29</span></a>.</p>
+<div class="figure align-default" id="scenariossheetsdata2-fig">
+<a class="reference internal image-reference" href="_images/ScenariosSheetsData2.PNG"><img alt="_images/ScenariosSheetsData2.PNG" src="_images/ScenariosSheetsData2.PNG" style="height: 200px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.29 </span><span class="caption-text">Interest rate definition.</span><a class="headerlink" href="#scenariossheetsdata2-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you want coupled sensitivities, you have to add the one you want to couple to the one which is defined in a worksheet. For instance, if you want to combine the effect of electricity prices with <span class="math notranslate nohighlight">\(CO_2\)</span> prices, then you add a column for <span class="math notranslate nohighlight">\(CO_2\)</span> prices in the worksheet where you defined the electricity price sensitivity.</p>
+</div>
+<p>If everything is defined correctly, then <code class="docutils literal notranslate"><span class="pre">dispatchScenarioGenerator.py</span></code> has to be executed, see <a class="reference internal" href="#scengenfiles2-fig"><span class="std std-numref">Fig. 6.30</span></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Inside the python file <code class="docutils literal notranslate"><span class="pre">dispatchScenarioGenerator.py</span></code>:
+Change the path of your input path for your dat-files, which should be the one where you cloned the repo in the beginning.</p>
+</div>
+<div class="figure align-default" id="scengenfiles2-fig">
+<a class="reference internal image-reference" href="_images/scenGenFiles2.PNG"><img alt="_images/scenGenFiles2.PNG" src="_images/scenGenFiles2.PNG" style="height: 150px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 6.30 </span><span class="caption-text">Execute the python file</span><a class="headerlink" href="#scengenfiles2-fig" title="Permalink to this image">¶</a></p>
+</div>
+<ul class="simple">
+<li><p>After the code run, it creates an <em>output</em> folder, where you have as many folders as generated scenarios. Inside them, you find all your excel files with the sub-scenarios and varying sensitivities.</p></li>
+<li><p>To calculate the model, a <em>zip-file</em> has to be created out of all the portfolio folders. Then you can upload it, like described in this chapter before, with the button <em>Upload Power Plant Parameters</em> and check again, if the values you changed, fit.</p></li>
+<li><p>The last step is the calculation via the button <em>Run Dispatch Model</em></p></li>
+</ul>
+<hr class="footnotes docutils" />
+<dl class="footnote brackets">
+<dt class="label" id="footnote2"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id5">2</a>,<a href="#id10">3</a>,<a href="#id15">4</a>,<a href="#id20">5</a>)</span></dt>
+<dd><p>(The x-axis is always reserved for the heat generators, therefore the scenarios and sub-scenarios must be adjusted accordingly)</p>
+</dd>
+<dt class="label" id="footnote1"><span class="brackets">2</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id3">2</a>,<a href="#id4">3</a>,<a href="#id6">4</a>,<a href="#id7">5</a>,<a href="#id8">6</a>,<a href="#id9">7</a>,<a href="#id11">8</a>,<a href="#id12">9</a>,<a href="#id13">10</a>,<a href="#id14">11</a>,<a href="#id16">12</a>,<a href="#id17">13</a>,<a href="#id18">14</a>,<a href="#id19">15</a>,<a href="#id21">16</a>,<a href="#id22">17</a>,<a href="#id23">18</a>,<a href="#id24">19</a>)</span></dt>
+<dd><p>(for each row and column a figure is created)</p>
+</dd>
+<dt class="label" id="footnote3"><span class="brackets"><a class="fn-backref" href="#id25">3</a></span></dt>
+<dd><p>(random selection)</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="Investment%20Mode.html" title="previous page"><span class="section-number">5. </span>Investment Mode</a>
+    <a class='right-next' id="next-link" href="Example%20Projects.html" title="next page"><span class="section-number">7. </span>Example Projects</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Daniela Havlicek, Jeton Hasani<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

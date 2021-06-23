@@ -1,0 +1,526 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3. Outputs &#8212; HotmapsDispatch - Model Description</title>
+    
+  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.37f24b989f4638ff9c27c22dc7559d4f.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="4. Scenario Mode" href="Scenario%20Mode.html" />
+    <link rel="prev" title="2. Inputs" href="Inputs.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="index.html">
+  
+  <img src="_static/Hotmaps_Logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">HotmapsDispatch - Model Description</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Hotmaps%20Dispatch%20-%20Description.html">
+   Hotmaps Dispatch - Description
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  First Steps
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Installation.html">
+   1. Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="The%20Web%20User%20Interface.html">
+   2. The Web User Interface
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Get%20started.html">
+   1. Get started
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Inputs.html">
+   2. Inputs
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   3. Outputs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Scenario%20Mode.html">
+   4. Scenario Mode
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Investment%20Mode.html">
+   5. Investment Mode
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Scenario%20Generation.html">
+   6. Scenario Generation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Example%20Projects.html">
+   7. Example Projects
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Modeling%20Tricks.html">
+   8. Modeling Tricks
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Mathematical Description
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Model%20Description.html">
+   1. Model Description
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Objective%20Function.html">
+   2. Objective Function
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Constraints.html">
+   3. Constraints
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Developers Guide
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Adding%20and%20Connection%20of%20new%20features%20into%20the%20model.html">
+   1. Adding and Connection of new features into the model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Adding%20new%20output%20indicators.html">
+   2. Adding new output indicators
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Adding%20new%20charts.html">
+   3. Adding new charts
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Dispatch-API.html">
+   4. Dispatch-API
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Scenario%20Generator-API.html">
+   5. Scenario Generator-API
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="_sources/Outputs.md"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.md</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/tuw-eeg/hotmapsDispatch"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/tuw-eeg/hotmapsDispatch/issues/new?title=Issue%20on%20page%20%2FOutputs.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#general-structure">
+   3.1. General structure
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#structure-in-detail">
+   3.2. Structure in detail
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#input-excel-file">
+     3.2.1. Input Excel File
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#output-html-file">
+     3.2.2. Output HTML File
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#output-excel-files">
+     3.2.3. Output Excel Files
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="outputs">
+<h1><span class="section-number">3. </span>Outputs<a class="headerlink" href="#outputs" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="general-structure">
+<h2><span class="section-number">3.1. </span>General structure<a class="headerlink" href="#general-structure" title="Permalink to this headline">¶</a></h2>
+<p>In general, you always get the excel data sheets for your model which you created, and you can analyze plots which are generated too. It is helpful to save the output after running the model, as it could be overwritten by refreshing the page or if an error occurs.<a class="reference internal" href="#portfoliowhole-fig"><span class="std std-numref">Fig. 3.1</span></a> show the structure of the output.</p>
+<div class="figure align-default" id="portfoliowhole-fig">
+<a class="reference internal image-reference" href="_images/portfolioWhole.PNG"><img alt="_images/portfolioWhole.PNG" src="_images/portfolioWhole.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.1 </span><span class="caption-text">Possible output when creating many portfolios and the corresponding sub folders</span><a class="headerlink" href="#portfoliowhole-fig" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="structure-in-detail">
+<h2><span class="section-number">3.2. </span>Structure in detail<a class="headerlink" href="#structure-in-detail" title="Permalink to this headline">¶</a></h2>
+<p>Depending on the mode you chose, the output varies a little bit concerning the structure. See the subchapters below for detailed information or go straight to the extra chapters for more information on the rest when picking these modes.</p>
+<div class="section" id="input-excel-file">
+<h3><span class="section-number">3.2.1. </span>Input Excel File<a class="headerlink" href="#input-excel-file" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="portfoliooutputinput-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputInput.PNG"><img alt="_images/portfolioOutputInput.PNG" src="_images/portfolioOutputInput.PNG" style="height: 250px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.2 </span><span class="caption-text">Input excel file which will be created for output</span><a class="headerlink" href="#portfoliooutputinput-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>As displayed in <a class="reference internal" href="#portfoliooutputinput2-fig"><span class="std std-numref">Fig. 3.3</span></a>, the structure of the input file, which will be generated, is the same as already mentioned in <a class="reference internal" href="The%20Web%20User%20Interface.html"><span class="doc">The Web User Interface</span></a>. There you will find all the input parameters you put in the model for calculation.</p>
+<div class="figure align-default" id="portfoliooutputinput2-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputInput2.PNG"><img alt="_images/portfolioOutputInput2.PNG" src="_images/portfolioOutputInput2.PNG" style="height: 250px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.3 </span><span class="caption-text">Input excel file structure</span><a class="headerlink" href="#portfoliooutputinput2-fig" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="output-html-file">
+<h3><span class="section-number">3.2.2. </span>Output HTML File<a class="headerlink" href="#output-html-file" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="portfoliooutputhtml-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHtml.PNG"><img alt="_images/portfolioOutputHtml.PNG" src="_images/portfolioOutputHtml.PNG" style="height: 250px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.4 </span><span class="caption-text">Output HTML file which will be created for output</span><a class="headerlink" href="#portfoliooutputhtml-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>If you open the HTML file, you find various analyses of the calculation and different graphs. Like <a class="reference internal" href="#portfoliooutputhtml3-fig"><span class="std std-numref">Fig. 3.5</span></a> shows, you have some options where you can take a closer look to the results. <a class="reference internal" href="#portfoliooutputhtml4-fig"><span class="std std-numref">Fig. 3.6</span></a>to   <a class="reference internal" href="#portfoliooutputhtml4-fig"><span class="std std-numref">Fig. 3.6</span></a>then shows the graphs for the first option, the <em>Thermal Power Energy Mix</em>. If you want to filter the results, you can click in the legend on the functions you don’t want to see in the graph, and it will get grey in the legend and disappear in the graph, see <a class="reference internal" href="#portfoliooutputhtml5-fig"><span class="std std-numref">Fig. 3.7</span></a> for instance. This option you also have for the other graphs which have a legend beside, like comparing  <a class="reference internal" href="#portfoliooutputhtml7-fig"><span class="std std-numref">Fig. 3.9</span></a> and <a class="reference internal" href="#portfoliooutputhtml8-fig"><span class="std std-numref">Fig. 3.10</span></a>.</p>
+<div class="figure align-default" id="portfoliooutputhtml3-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHTML3.PNG"><img alt="_images/portfolioOutputHTML3.PNG" src="_images/portfolioOutputHTML3.PNG" style="height: 100px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.5 </span><span class="caption-text">Output HTML file options</span><a class="headerlink" href="#portfoliooutputhtml3-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="portfoliooutputhtml4-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHTML4.PNG"><img alt="_images/portfolioOutputHTML4.PNG" src="_images/portfolioOutputHTML4.PNG" style="height: 500px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.6 </span><span class="caption-text">Energy mix and electricity price</span><a class="headerlink" href="#portfoliooutputhtml4-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="portfoliooutputhtml5-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHTML5.PNG"><img alt="_images/portfolioOutputHTML5.PNG" src="_images/portfolioOutputHTML5.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.7 </span><span class="caption-text">Filtering options through the legend</span><a class="headerlink" href="#portfoliooutputhtml5-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="portfoliooutputhtml6-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHTML6.PNG"><img alt="_images/portfolioOutputHTML6.PNG" src="_images/portfolioOutputHTML6.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.8 </span><span class="caption-text">Output HTML file - heat price graph</span><a class="headerlink" href="#portfoliooutputhtml6-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="portfoliooutputhtml7-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHTML7.PNG"><img alt="_images/portfolioOutputHTML7.PNG" src="_images/portfolioOutputHTML7.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.9 </span><span class="caption-text">Filtering option for heat storages - one function visible</span><a class="headerlink" href="#portfoliooutputhtml7-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="portfoliooutputhtml8-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHTML8.PNG"><img alt="_images/portfolioOutputHTML8.PNG" src="_images/portfolioOutputHTML8.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.10 </span><span class="caption-text">Filtering option for heat storages - two functions visible</span><a class="headerlink" href="#portfoliooutputhtml8-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>Other sections which have the same graphs, are the <em>TPE</em> for summer and winter, specifically, if you like to filter for seasonal data.</p>
+<p>The next section, where different graphs are used, is the <em>Load Duration Curve</em> section, see <a class="reference internal" href="#portfoliooutputhtml9-fig"><span class="std std-numref">Fig. 3.11</span></a>.</p>
+<div class="figure align-default" id="portfoliooutputhtml9-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHTML9.PNG"><img alt="_images/portfolioOutputHTML9.PNG" src="_images/portfolioOutputHTML9.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.11 </span><span class="caption-text">Load duration curve graph - also filter possibilities</span><a class="headerlink" href="#portfoliooutputhtml9-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>The following figures ( <a class="reference internal" href="#portfoliooutputhtml10-fig"><span class="std std-numref">Fig. 3.12</span></a> to <a class="reference internal" href="#portfoliooutputhtml13-fig"><span class="std std-numref">Fig. 3.15</span></a>) show the output pie charts of <em>TPE and plant capacities</em>. Every pie chart has a corresponding bar chart on the right side, like the example in <a class="reference internal" href="#portfoliooutputhtml11-fig"><span class="std std-numref">Fig. 3.13</span></a> shows, and also filtering options like described before.</p>
+<div class="figure align-default" id="portfoliooutputhtml10-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHTML10.PNG"><img alt="_images/portfolioOutputHTML10.PNG" src="_images/portfolioOutputHTML10.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.12 </span><span class="caption-text">Pie chart for thermal generation mix</span><a class="headerlink" href="#portfoliooutputhtml10-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="portfoliooutputhtml11-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHTML11.PNG"><img alt="_images/portfolioOutputHTML11.PNG" src="_images/portfolioOutputHTML11.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.13 </span><span class="caption-text">Bar chart for thermal generation mix</span><a class="headerlink" href="#portfoliooutputhtml11-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="portfoliooutputhtml12-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHTML12.PNG"><img alt="_images/portfolioOutputHTML12.PNG" src="_images/portfolioOutputHTML12.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.14 </span><span class="caption-text">Pie chart for installed capacities</span><a class="headerlink" href="#portfoliooutputhtml12-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="portfoliooutputhtml13-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHTML13.PNG"><img alt="_images/portfolioOutputHTML13.PNG" src="_images/portfolioOutputHTML13.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.15 </span><span class="caption-text">Pie chart for full load hours</span><a class="headerlink" href="#portfoliooutputhtml13-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>The section <em>Specific capital costs of IC</em> shows details about the costs through a bar chart and a corresponding table underneath the chart, like shown (here seperately) in <a class="reference internal" href="#portfoliooutputhtml14-fig"><span class="std std-numref">Fig. 3.16</span></a> and <a class="reference internal" href="#portfoliooutputhtml11-fig"><span class="std std-numref">Fig. 3.13</span></a>.</p>
+<div class="figure align-default" id="portfoliooutputhtml14-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHTML14.PNG"><img alt="_images/portfolioOutputHTML14.PNG" src="_images/portfolioOutputHTML14.PNG" style="height: 400px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.16 </span><span class="caption-text">Bar chart for cost details</span><a class="headerlink" href="#portfoliooutputhtml14-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="portfoliooutputhtml15-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHTML15.PNG"><img alt="_images/portfolioOutputHTML15.PNG" src="_images/portfolioOutputHTML15.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.17 </span><span class="caption-text">Table for cost details</span><a class="headerlink" href="#portfoliooutputhtml15-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>The last two sections contain on the one hand all details for the <em><span class="math notranslate nohighlight">\(CO_2\)</span> emissions</em>, <a class="reference internal" href="#portfoliooutputhtml16-fig"><span class="std std-numref">Fig. 3.18</span></a>and <a class="reference internal" href="#portfoliooutputhtml17-fig"><span class="std std-numref">Fig. 3.19</span></a>, and on the other hand a summary of the results through a table, see <a class="reference internal" href="#portfoliooutputhtml18-fig"><span class="std std-numref">Fig. 3.20</span></a>.</p>
+<div class="figure align-default" id="portfoliooutputhtml16-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHTML16.PNG"><img alt="_images/portfolioOutputHTML16.PNG" src="_images/portfolioOutputHTML16.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.18 </span><span class="caption-text">Bar chart for <span class="math notranslate nohighlight">\(CO_2\)</span> emissions</span><a class="headerlink" href="#portfoliooutputhtml16-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="portfoliooutputhtml17-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHTML17.PNG"><img alt="_images/portfolioOutputHTML17.PNG" src="_images/portfolioOutputHTML17.PNG" style="height: 250px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.19 </span><span class="caption-text">Table for <span class="math notranslate nohighlight">\(CO_2\)</span> emissions</span><a class="headerlink" href="#portfoliooutputhtml17-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="portfoliooutputhtml18-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputHTML18.PNG"><img alt="_images/portfolioOutputHTML18.PNG" src="_images/portfolioOutputHTML18.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.20 </span><span class="caption-text">Table for total results</span><a class="headerlink" href="#portfoliooutputhtml18-fig" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="output-excel-files">
+<h3><span class="section-number">3.2.3. </span>Output Excel Files<a class="headerlink" href="#output-excel-files" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-default" id="portfoliooutputexcel-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputExcel.PNG"><img alt="_images/portfolioOutputExcel.PNG" src="_images/portfolioOutputExcel.PNG" style="height: 250px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.21 </span><span class="caption-text">Output excel files which will be created for output</span><a class="headerlink" href="#portfoliooutputexcel-fig" title="Permalink to this image">¶</a></p>
+</div>
+<p>Depending on the variety of sensitivities you made, you get different number of output excel files. For example, like shown from <a class="reference internal" href="#portfoliooutputexcel2-fig"><span class="std std-numref">Fig. 3.22</span></a> to <a class="reference internal" href="#portfoliooutputexcel6-fig"><span class="std std-numref">Fig. 3.26</span></a>, you can easily filter <em>values</em>, <em>heat generators</em>, <em>time</em> or <em>topic</em> to filter the necessary values for you. Just go to <em>Data</em>, then click on <em>filter</em> and the columns can be filtered for the necessary parameters.</p>
+<div class="figure align-default" id="portfoliooutputexcel2-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputExcel2.PNG"><img alt="_images/portfolioOutputExcel2.PNG" src="_images/portfolioOutputExcel2.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.22 </span><span class="caption-text">Output excel file structure - differs on the column number</span><a class="headerlink" href="#portfoliooutputexcel2-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="portfoliooutputexcel3-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputExcel3.PNG"><img alt="_images/portfolioOutputExcel3.PNG" src="_images/portfolioOutputExcel3.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.23 </span><span class="caption-text">Filter possibility - topic</span><a class="headerlink" href="#portfoliooutputexcel3-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="portfoliooutputexcel4-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputExcel4.PNG"><img alt="_images/portfolioOutputExcel4.PNG" src="_images/portfolioOutputExcel4.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.24 </span><span class="caption-text">Filter possibility - time</span><a class="headerlink" href="#portfoliooutputexcel4-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="portfoliooutputexcel5-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputExcel5.PNG"><img alt="_images/portfolioOutputExcel5.PNG" src="_images/portfolioOutputExcel5.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.25 </span><span class="caption-text">Filter possibility - heat generator</span><a class="headerlink" href="#portfoliooutputexcel5-fig" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="portfoliooutputexcel6-fig">
+<a class="reference internal image-reference" href="_images/portfolioOutputExcel6.PNG"><img alt="_images/portfolioOutputExcel6.PNG" src="_images/portfolioOutputExcel6.PNG" style="height: 350px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.26 </span><span class="caption-text">Filter possibility - value</span><a class="headerlink" href="#portfoliooutputexcel6-fig" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="Inputs.html" title="previous page"><span class="section-number">2. </span>Inputs</a>
+    <a class='right-next' id="next-link" href="Scenario%20Mode.html" title="next page"><span class="section-number">4. </span>Scenario Mode</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Daniela Havlicek, Jeton Hasani<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>
