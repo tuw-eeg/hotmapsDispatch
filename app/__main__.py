@@ -9,7 +9,7 @@ from above folder
 from app.modules.common.FEAT.F16.F_16_server import check_modules,main
 import argparse
 
-def start_app(solver,openbrowser,port):
+def start_app(solver,openbrowser,port,num_procs):
     flag = check_modules(solver)
     while flag:
         try:
