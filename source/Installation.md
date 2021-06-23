@@ -171,6 +171,8 @@ Login Linux Terminal
 
 ## Solver
 
+To solve an optimisation problem, a solver is necessary. The HotmapsDispatch Model supports the GLPK and the GUROBI solver. Their installation is described in the following chapters.
+
 ### GLPK
 
 The GLPK solver is automatically part of the HotmapsDispatchModel installation (see {numref}`install_app`).
@@ -225,7 +227,7 @@ For Windows open the AnacondaPrompt and type the flowing command
 rundll32.exe sysdm.cpl,EditEnvironmentVariables
 ```
 
-Now a new window open ({numref}`path_var_windows`) , enter threre the path to the w64 folder of the solver, depending on where you unpacked the [zip-file](https://sourceforge.net/projects/winglpk/files/latest/download, in this example the w64 folder was extracted in `C:\glpk-4.65\w64`
+Now a new window open ({numref}`path_var_windows`) , enter threre the path to the w64 folder of the solver, depending on where you unpacked the [zip-file](https://sourceforge.net/projects/winglpk/files/latest/download), in this example the w64 folder was extracted in `C:\glpk-4.65\w64`
 
 
 
@@ -384,6 +386,8 @@ Extract Gurobi optimizer to installation directory
      :height: 25px
    :name: Gurobi3_linux
      
+     ```
+  
    Open the .bashrc file
      ```
   
@@ -409,6 +413,8 @@ Extract Gurobi optimizer to installation directory
      :height: 250px
    :name: Gurobi5_linux
      
+     ```
+  
    Save the changes in .bashrc
      ```
   
@@ -516,25 +522,48 @@ Never close the **Anaconda Promt** during installation process until it is finis
 
 ### Normal Interface
 
-To Start the tool after installation (({numref}`install_app`) ) open the AnacondaPrompt and type following commands:
+To Start the tool after installation ({numref}`install_app`)  open the AnacondaPrompt and type following commands:
 
-1. activate your environment with `conda activate hotmapsDispatch`
+1. activate your environment with 
 
-2. navigate to the location you unzip the tool by typing `cd path2folder` (Note: Replace "path2folder" with the path of the location where you unzip the tool)
+   ```
+   conda activate hotmapsDispatch
+   ```
+
+   ```{margin} Note
+   Replace "path2folder" with the path of the location where you unzip the tool
+   ```
+
+2. navigate to the location you unzip the tool by typing 
+
+   ```
+   cd path2folder
+   
+   ```
+
+   
 
 3. type `python -m app `for the GUROBI solver or if you want to use the GLPK solver `python -m app --s glpk` After that your default browser should open and the web user interface will show up 
 
-   ~~~{warning}
-   If you are working on an operating system without a graphical user interface, you must also set the flag `gui` to False, otherwise the program will try to open a browser and this can lead to an error.
-   In addition, you can specify which port should be opened with the paramter `port`. 
-   An example is the following command 
-   
+   ~~~{sidebar} A short hand for this is following command
    ```
-   python -m app --solver gurobi --port 1234 --gui False
+   python -m app --s gurobi --p 1234 --o False --n 1
    ```
    ~~~
 
    
+
+   ~~~{warning}
+   If you are working on an operating system without a graphical user interface, you must also set the flag `openbrowser` to False, otherwise the program will try to open a browser and this can lead to an error.
+   In addition, you can specify which port should be opened with the paramter `port`. 
+   In Linux you can also choose if you like to start a multiprocess so that multiple instances can be open at the same time, with the `numproc` you can specify the number of cores that should be used, 0 means that the application decides how many cpu cores are used depending on how many people acces the web user interface
+   An example is the following command that opens a port at 1233, use only one core, use the GUROBI Solver and  do nott open the browser automatically
+   
+   ```
+   python -m app --solver gurobi --port 1234 --openbrowser False --numproc 1
+   ```
+   ~~~
+
 
 ### Headless  Interface (remote server)
 
@@ -558,7 +587,7 @@ ssh -N -f -L local_port:localhost:remote_port username@serverIP
 | name          | meaning                                                      |
 | ------------- | ------------------------------------------------------------ |
 | `local_port`  | this is the port of your local machine (if you use for example `1111` as your `local_port`, you can excess the WebUserInterface of the hotmapsDispatch Model with your browser at  http://localhost:1111/ |
-| `remote_port` | this is the port of the hotmapsDispatch application at your remote machine. You can change the port with the `config.json` file when you start the the Dispatch Model at the remote machine. (i.e. 9666) |
+| `remote_port` | this is the port of the hotmapsDispatch application at your remote machine. You can change the port with the `config.json` file or when you start the the Dispatch Model at the remote machine specify the port with the `p`-flag (i.e. 9666) |
 | `username`    | username  of the remote machine                              |
 | `serverIP`    | (IP)-Adress of the remote machine                            |
 

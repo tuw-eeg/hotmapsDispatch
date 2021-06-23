@@ -529,6 +529,7 @@ All you have to do is copy the appropriate link and enter the following command 
 <hr class="docutils" />
 <div class="section" id="solver">
 <h2><span class="section-number">1.2. </span>Solver<a class="headerlink" href="#solver" title="Permalink to this headline">¶</a></h2>
+<p>To solve an optimisation problem, a solver is necessary. The HotmapsDispatch Model supports the GLPK and the GUROBI solver. Their installation is described in the following chapters.</p>
 <div class="section" id="glpk">
 <h3><span class="section-number">1.2.1. </span>GLPK<a class="headerlink" href="#glpk" title="Permalink to this headline">¶</a></h3>
 <p>The GLPK solver is automatically part of the HotmapsDispatchModel installation (see <a class="reference internal" href="#install-app"><span class="std std-numref">Section 1.3</span></a>).</p>
@@ -570,7 +571,7 @@ Enter the following commands in your Anaconda Prompt/Linux terminal</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rundll32</span><span class="o">.</span><span class="n">exe</span> <span class="n">sysdm</span><span class="o">.</span><span class="n">cpl</span><span class="p">,</span><span class="n">EditEnvironmentVariables</span>
 </pre></div>
 </div>
-<p>Now a new window open (<a class="reference internal" href="#path-var-windows"><span class="std std-numref">Fig. 1.13</span></a>) , enter threre the path to the w64 folder of the solver, depending on where you unpacked the [zip-file](<a class="reference external" href="https://sourceforge.net/projects/winglpk/files/latest/download">https://sourceforge.net/projects/winglpk/files/latest/download</a>, in this example the w64 folder was extracted in <code class="docutils literal notranslate"><span class="pre">C:\glpk-4.65\w64</span></code></p>
+<p>Now a new window open (<a class="reference internal" href="#path-var-windows"><span class="std std-numref">Fig. 1.13</span></a>) , enter threre the path to the w64 folder of the solver, depending on where you unpacked the <a class="reference external" href="https://sourceforge.net/projects/winglpk/files/latest/download">zip-file</a>, in this example the w64 folder was extracted in <code class="docutils literal notranslate"><span class="pre">C:\glpk-4.65\w64</span></code></p>
 <div class="figure align-default" id="path-var-windows">
 <a class="reference internal image-reference" href="_images/path_var_windows.png"><img alt="_images/path_var_windows.png" src="_images/path_var_windows.png" style="height: 400px;" /></a>
 <p class="caption"><span class="caption-number">Fig. 1.13 </span><span class="caption-text">Setting Path Environment Variable in</span><a class="headerlink" href="#path-var-windows" title="Permalink to this image">¶</a></p>
@@ -683,14 +684,18 @@ Enter the following commands in your Anaconda Prompt/Linux terminal</p>
 </li>
 </ol>
 <p>:name: Gurobi3_linux</p>
-<p>Open the .bashrc file</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
-<span class="mf">2.</span> <span class="n">Use</span> <span class="n">your</span> <span class="n">arrow</span> <span class="n">keys</span> <span class="ow">and</span> <span class="n">go</span> <span class="n">to</span> <span class="n">the</span> <span class="n">buttom</span> <span class="n">of</span> <span class="n">the</span> <span class="n">file</span> <span class="ow">and</span> <span class="n">copy</span> <span class="n">paste</span> <span class="n">the</span> <span class="n">below</span> <span class="n">lines</span><span class="o">.</span>
-
+<span class="n">Open</span> <span class="n">the</span> <span class="o">.</span><span class="n">bashrc</span> <span class="n">file</span>
 </pre></div>
 </div>
-<p>export GUROBI_HOME=~/myApps/gurobi912/linux64
-export PATH=”<span class="math notranslate nohighlight">\({PATH}:\)</span>{GUROBI_HOME}/bin”
+<ol>
+<li><p>Use your arrow keys and go to the buttom of the file and copy paste the below lines.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">GUROBI_HOME</span><span class="o">=~/</span><span class="n">myApps</span><span class="o">/</span><span class="n">gurobi912</span><span class="o">/</span><span class="n">linux64</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>export PATH=”<span class="math notranslate nohighlight">\({PATH}:\)</span>{GUROBI_HOME}/bin”
 export LD_LIBRARY_PATH=”<span class="math notranslate nohighlight">\({GUROBI_HOME}/lib&quot;
    export LD_LIBRARY_PATH=&quot;\)</span>{LD_LIBRARY_PATH}:${GUROBI_HOME}/lib”</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
@@ -709,25 +714,26 @@ Export the system path variables to get access to gurobi
 </li>
 </ol>
 <p>:name: Gurobi5_linux</p>
-<p>Save the changes in .bashrc</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
-4. Press &#39;enter&#39;
-
-```{figure} images/bashrc_gurobi3.PNG
-:height: 250px
-:name: Gurobi6_linux
-
-Save the changes in .bashrc 
+<span class="n">Save</span> <span class="n">the</span> <span class="n">changes</span> <span class="ow">in</span> <span class="o">.</span><span class="n">bashrc</span>
 </pre></div>
 </div>
+<ol>
+<li><p>Press ‘enter’</p>
+<div class="figure align-default" id="gurobi6-linux">
+<a class="reference internal image-reference" href="_images/bashrc_gurobi3.PNG"><img alt="_images/bashrc_gurobi3.PNG" src="_images/bashrc_gurobi3.PNG" style="height: 250px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 1.26 </span><span class="caption-text">Save the changes in .bashrc</span><a class="headerlink" href="#gurobi6-linux" title="Permalink to this image">¶</a></p>
+</div>
+</li>
+</ol>
 </li>
 </ul>
 <ul>
 <li><p>Close your current terminal window and open a new one after you have made these changes in order to pick up the new settings.</p>
-<p>Type then <code class="docutils literal notranslate"><span class="pre">gurobi_cl</span></code> in your terminal. If you get a message like <a class="reference internal" href="#gurobi7-linux"><span class="std std-numref">Fig. 1.26</span></a>, then you have successfully installed the Gurobi optimizer</p>
+<p>Type then <code class="docutils literal notranslate"><span class="pre">gurobi_cl</span></code> in your terminal. If you get a message like <a class="reference internal" href="#gurobi7-linux"><span class="std std-numref">Fig. 1.27</span></a>, then you have successfully installed the Gurobi optimizer</p>
 <div class="figure align-default" id="gurobi7-linux">
 <a class="reference internal image-reference" href="_images/gurobi_cl.PNG"><img alt="_images/gurobi_cl.PNG" src="_images/gurobi_cl.PNG" style="height: 350px;" /></a>
-<p class="caption"><span class="caption-number">Fig. 1.26 </span><span class="caption-text">Test if Gurobi optimizer is installed</span><a class="headerlink" href="#gurobi7-linux" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-number">Fig. 1.27 </span><span class="caption-text">Test if Gurobi optimizer is installed</span><a class="headerlink" href="#gurobi7-linux" title="Permalink to this image">¶</a></p>
 </div>
 </li>
 </ul>
@@ -736,34 +742,34 @@ Save the changes in .bashrc
 <div class="section" id="set-up-a-gurobi-license">
 <h4><span class="section-number">1.2.2.3. </span>Set up a Gurobi license<a class="headerlink" href="#set-up-a-gurobi-license" title="Permalink to this headline">¶</a></h4>
 <ul>
-<li><p>After installation, you go to the Gurpobi Webpage again, click <em>Downloads &amp; Licenses</em> (point a in <a class="reference internal" href="#gurobielev-fig"><span class="std std-numref">Fig. 1.27</span></a>), then <em>Your Gurobi Licenses</em> (point b in <a class="reference internal" href="#gurobielev-fig"><span class="std std-numref">Fig. 1.27</span></a>). There you can find your licenses, click on the License ID (point c in <a class="reference internal" href="#gurobielev-fig"><span class="std std-numref">Fig. 1.27</span></a>)</p>
+<li><p>After installation, you go to the Gurpobi Webpage again, click <em>Downloads &amp; Licenses</em> (point a in <a class="reference internal" href="#gurobielev-fig"><span class="std std-numref">Fig. 1.28</span></a>), then <em>Your Gurobi Licenses</em> (point b in <a class="reference internal" href="#gurobielev-fig"><span class="std std-numref">Fig. 1.28</span></a>). There you can find your licenses, click on the License ID (point c in <a class="reference internal" href="#gurobielev-fig"><span class="std std-numref">Fig. 1.28</span></a>)</p>
 <p>If you want to request an academic license click <a class="reference external" href="https://www.gurobi.com/downloads/end-user-license-agreement-academic/">here</a></p>
 </li>
 </ul>
 <div class="figure align-default" id="gurobielev-fig">
 <a class="reference internal image-reference" href="_images/16.PNG"><img alt="_images/16.PNG" src="_images/16.PNG" style="height: 350px;" /></a>
-<p class="caption"><span class="caption-number">Fig. 1.27 </span><span class="caption-text">Gurobi Installation Process - step eight</span><a class="headerlink" href="#gurobielev-fig" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-number">Fig. 1.28 </span><span class="caption-text">Gurobi Installation Process - step eight</span><a class="headerlink" href="#gurobielev-fig" title="Permalink to this image">¶</a></p>
 </div>
 <ul class="simple">
 <li><p>At the bottom of the page there is a <em>key</em> for installation. Copy the whole line and enter it in your Anaconda Prompt or in your Linux shell. Then hit ‘enter’</p></li>
 </ul>
 <div class="figure align-default" id="gurobitwelve-fig">
 <a class="reference internal image-reference" href="_images/16a.PNG"><img alt="_images/16a.PNG" src="_images/16a.PNG" style="height: 350px;" /></a>
-<p class="caption"><span class="caption-number">Fig. 1.28 </span><span class="caption-text">Gurobi Installation Process - step nine</span><a class="headerlink" href="#gurobitwelve-fig" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-number">Fig. 1.29 </span><span class="caption-text">Gurobi Installation Process - step nine</span><a class="headerlink" href="#gurobitwelve-fig" title="Permalink to this image">¶</a></p>
 </div>
 <div class="figure align-default" id="gurobilicense-linux">
 <a class="reference internal image-reference" href="_images/gurobi_license.PNG"><img alt="_images/gurobi_license.PNG" src="_images/gurobi_license.PNG" style="height: 250px;" /></a>
-<p class="caption"><span class="caption-number">Fig. 1.29 </span><span class="caption-text">Gurobi Installation Process - step nine</span><a class="headerlink" href="#gurobilicense-linux" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-number">Fig. 1.30 </span><span class="caption-text">Gurobi Installation Process - step nine</span><a class="headerlink" href="#gurobilicense-linux" title="Permalink to this image">¶</a></p>
 </div>
 <ul>
 <li><p>Test if the license worked by typing <code class="docutils literal notranslate"><span class="pre">guroib_cl</span></code> in your Anaconda Prompt or in your Linux shell</p>
 <div class="figure align-default" id="gurobi-cl2">
 <a class="reference internal image-reference" href="_images/gurobi_cl2.PNG"><img alt="_images/gurobi_cl2.PNG" src="_images/gurobi_cl2.PNG" style="height: 150px;" /></a>
-<p class="caption"><span class="caption-number">Fig. 1.30 </span><span class="caption-text">Test Gurobi with license in Linux</span><a class="headerlink" href="#gurobi-cl2" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-number">Fig. 1.31 </span><span class="caption-text">Test Gurobi with license in Linux</span><a class="headerlink" href="#gurobi-cl2" title="Permalink to this image">¶</a></p>
 </div>
 <div class="figure align-default" id="gurobi-cl3">
 <a class="reference internal image-reference" href="_images/gurobi_cl3.PNG"><img alt="_images/gurobi_cl3.PNG" src="_images/gurobi_cl3.PNG" style="height: 200px;" /></a>
-<p class="caption"><span class="caption-number">Fig. 1.31 </span><span class="caption-text">Test Gurobi with license in Windows</span><a class="headerlink" href="#gurobi-cl3" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-number">Fig. 1.32 </span><span class="caption-text">Test Gurobi with license in Windows</span><a class="headerlink" href="#gurobi-cl3" title="Permalink to this image">¶</a></p>
 </div>
 </li>
 </ul>
@@ -792,17 +798,37 @@ Save the changes in .bashrc
 <h2><span class="section-number">1.4. </span>Start  HotmapsDispatch Application<a class="headerlink" href="#start-hotmapsdispatch-application" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="normal-interface">
 <span id="id3"></span><h3><span class="section-number">1.4.1. </span>Normal Interface<a class="headerlink" href="#normal-interface" title="Permalink to this headline">¶</a></h3>
-<p>To Start the tool after installation ((<a class="reference internal" href="#install-app"><span class="std std-numref">Section 1.3</span></a>) ) open the AnacondaPrompt and type following commands:</p>
+<p>To Start the tool after installation (<a class="reference internal" href="#install-app"><span class="std std-numref">Section 1.3</span></a>)  open the AnacondaPrompt and type following commands:</p>
 <ol>
-<li><p>activate your environment with <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">hotmapsDispatch</span></code></p></li>
-<li><p>navigate to the location you unzip the tool by typing <code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">path2folder</span></code> (Note: Replace “path2folder” with the path of the location where you unzip the tool)</p></li>
+<li><p>activate your environment with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">activate</span> <span class="n">hotmapsDispatch</span>
+</pre></div>
+</div>
+<div class="margin sidebar">
+<p class="sidebar-title">Note</p>
+<p>Replace “path2folder” with the path of the location where you unzip the tool</p>
+</div>
+</li>
+<li><p>navigate to the location you unzip the tool by typing</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">path2folder</span>
+
+</pre></div>
+</div>
+</li>
 <li><p>type <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">app</span> </code>for the GUROBI solver or if you want to use the GLPK solver <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">app</span> <span class="pre">--s</span> <span class="pre">glpk</span></code> After that your default browser should open and the web user interface will show up</p>
+<div class="sidebar">
+<p class="sidebar-title">A short hand for this is following command</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">app</span> <span class="o">--</span><span class="n">s</span> <span class="n">gurobi</span> <span class="o">--</span><span class="n">p</span> <span class="mi">1234</span> <span class="o">--</span><span class="n">o</span> <span class="kc">False</span> <span class="o">--</span><span class="n">n</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>If you are working on an operating system without a graphical user interface, you must also set the flag <code class="docutils literal notranslate"><span class="pre">gui</span></code> to False, otherwise the program will try to open a browser and this can lead to an error.
+<p>If you are working on an operating system without a graphical user interface, you must also set the flag <code class="docutils literal notranslate"><span class="pre">openbrowser</span></code> to False, otherwise the program will try to open a browser and this can lead to an error.
 In addition, you can specify which port should be opened with the paramter <code class="docutils literal notranslate"><span class="pre">port</span></code>.
-An example is the following command</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">app</span> <span class="o">--</span><span class="n">solver</span> <span class="n">gurobi</span> <span class="o">--</span><span class="n">port</span> <span class="mi">1234</span> <span class="o">--</span><span class="n">gui</span> <span class="kc">False</span>
+In Linux you can also choose if you like to start a multiprocess so that multiple instances can be open at the same time, with the <code class="docutils literal notranslate"><span class="pre">numproc</span></code> you can specify the number of cores that should be used, 0 means that the application decides how many cpu cores are used depending on how many people acces the web user interface
+An example is the following command that opens a port at 1233, use only one core, use the GUROBI Solver and  do nott open the browser automatically</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">app</span> <span class="o">--</span><span class="n">solver</span> <span class="n">gurobi</span> <span class="o">--</span><span class="n">port</span> <span class="mi">1234</span> <span class="o">--</span><span class="n">openbrowser</span> <span class="kc">False</span> <span class="o">--</span><span class="n">numproc</span> <span class="mi">1</span>
 </pre></div>
 </div>
 </div>
@@ -834,7 +860,7 @@ An example is the following command</p>
 <td><p>this is the port of your local machine (if you use for example <code class="docutils literal notranslate"><span class="pre">1111</span></code> as your <code class="docutils literal notranslate"><span class="pre">local_port</span></code>, you can excess the WebUserInterface of the hotmapsDispatch Model with your browser at  <a class="reference external" href="http://localhost:1111/">http://localhost:1111/</a></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">remote_port</span></code></p></td>
-<td><p>this is the port of the hotmapsDispatch application at your remote machine. You can change the port with the <code class="docutils literal notranslate"><span class="pre">config.json</span></code> file when you start the the Dispatch Model at the remote machine. (i.e. 9666)</p></td>
+<td><p>this is the port of the hotmapsDispatch application at your remote machine. You can change the port with the <code class="docutils literal notranslate"><span class="pre">config.json</span></code> file or when you start the the Dispatch Model at the remote machine specify the port with the <code class="docutils literal notranslate"><span class="pre">p</span></code>-flag (i.e. 9666)</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">username</span></code></p></td>
 <td><p>username  of the remote machine</p></td>
@@ -847,10 +873,10 @@ An example is the following command</p>
 </div>
 <div class="section" id="putty">
 <h4><span class="section-number">1.4.2.2. </span>Putty<a class="headerlink" href="#putty" title="Permalink to this headline">¶</a></h4>
-<p>If you use Putty you have to make the settings as shown in the <a class="reference internal" href="#putty-ssh"><span class="std std-numref">Fig. 1.32</span></a> in your local machine.  See <a class="reference internal" href="#tunnel-params"><span class="std std-numref">Table 1.1</span></a> for the used parameters.</p>
+<p>If you use Putty you have to make the settings as shown in the <a class="reference internal" href="#putty-ssh"><span class="std std-numref">Fig. 1.33</span></a> in your local machine.  See <a class="reference internal" href="#tunnel-params"><span class="std std-numref">Table 1.1</span></a> for the used parameters.</p>
 <div class="figure align-default" id="putty-ssh">
 <a class="reference internal image-reference" href="_images/putty_ssh.PNG"><img alt="_images/putty_ssh.PNG" src="_images/putty_ssh.PNG" style="height: 400px;" /></a>
-<p class="caption"><span class="caption-number">Fig. 1.32 </span><span class="caption-text">Putty settings for ssh tunnel</span><a class="headerlink" href="#putty-ssh" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-number">Fig. 1.33 </span><span class="caption-text">Putty settings for ssh tunnel</span><a class="headerlink" href="#putty-ssh" title="Permalink to this image">¶</a></p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
