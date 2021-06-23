@@ -61,13 +61,12 @@ To Start the tool after installation open the conda prompt and type following co
 3. type `python -m app ` for the GUROBI solver  or if you want to use the GLPK solver `python -m app --s glpk`
 After that your default browser should open and the web user interface will show up
 
-> **Not implemented todo**
 
-See the documentation for more [information on installing](#how-to-install).
+See the documentation for more [information on installing](https://tuw-eeg.github.io/hotmapsDispatch/Installation.html).
 
-and also some example are [included]()
+and also some example are [included](https://tuw-eeg.github.io/hotmapsDispatch/Example%20Projects.html#)
 
-The [Getting Started Guide](https://tuw-eeg.github.io/hotmapsDispatch/) is a good place to start and to get a feeling how the model works.
+The [Getting Started Guide](https://tuw-eeg.github.io/hotmapsDispatch/Get%20started.html#) is a good place to start and to get a feeling how the model works.
 
 ## Documentation
 
