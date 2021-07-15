@@ -302,79 +302,97 @@
                 
   <div class="section" id="model-description">
 <h1><span class="section-number">1. </span>Model Description<a class="headerlink" href="#model-description" title="Permalink to this headline">¶</a></h1>
-<p><a class="reference internal" href="#val-tab"><span class="std std-numref">Table 1.2</span></a> shows all the details for the used variables.</p>
-<table class="colwidths-auto table" id="val-tab">
-<caption><span class="caption-number">Table 1.2 </span><span class="caption-text">Variables used for mathematical description</span><a class="headerlink" href="#val-tab" title="Permalink to this table">¶</a></caption>
+<p><code class="xref std std-numref docutils literal notranslate"><span class="pre">val-tab</span></code> shows all the details for the used variables.</p>
+<p>{table} Variables used for mathematical description
+:name: val-tab</p>
+<table class="colwidths-auto table">
 <thead>
-<tr class="row-odd"><th class="head"><p>symboles of variables</p></th>
+<tr class="row-odd"><th class="head"><p>symbols of variables</p></th>
+<th class="head"><p>unit</p></th>
 <th class="head"><p>definition</p></th>
 <th class="head"><p>description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( x_{{th}_{j,t}} \)</span></p></td>
-<td><p></p></td>
+<td><p>non -negative real</p></td>
+<td><p>thermal energy fed into the grid</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( Cap_{j} \)</span></p></td>
-<td><p></p></td>
+<td><p>non -negative real</p></td>
+<td><p>capacity</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( Cap_{{nom}_{j}} \)</span></p></td>
-<td><p></p></td>
+<td><p>non -negative real</p></td>
+<td><p>normative capacity</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( x_{{el}_{j,t}} \)</span></p></td>
-<td><p></p></td>
+<td><p>non -negative real</p></td>
+<td><p>electrical energy fed into the grid</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( P_{{el}_{max}} \)</span></p></td>
-<td><p></p></td>
+<td><p>non -negative real</p></td>
+<td><p>maximum electrical power</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( x_{{load}_{hs,t}} \)</span></p></td>
-<td><p></p></td>
+<td><p>real</p></td>
+<td><p>optimization variable depending on the load of heat storages, time-dependent</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( Cap_{hs} \)</span></p></td>
-<td><p></p></td>
+<td><p>non -negative real</p></td>
+<td><p>capacity of heat storage</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( storelevel_{{hs}_{t}} \)</span></p></td>
-<td><p></p></td>
+<td><p>non -negative real</p></td>
+<td><p>storage level of heat storage, time-dependent</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( ramp_{{j}_{chp,t}} \)</span></p></td>
-<td><p></p></td>
+<td><p>non -negative real</p></td>
+<td><p>ramp function, chp (combined heat and power) and time-dependent</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( ramp_{{j}_{waste,t}} \)</span></p></td>
-<td><p></p></td>
+<td><p>non -negative real</p></td>
+<td><p>ramp function, waste and time-dependent</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( coldstart_{j,t} \)</span></p></td>
-<td><p></p></td>
+<td><p>boolean</p></td>
+<td><p>cold start, time-dependent</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( Activate_{j,t} \)</span></p></td>
+<td><p>boolean</p></td>
 <td><p></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( Activate_{{2}_{j,t}} \)</span></p></td>
+<td><p>binary</p></td>
 <td><p></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( Activate_{{3}_{j,t}} \)</span></p></td>
+<td><p>binary</p></td>
 <td><p></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
-<p>In <a class="reference internal" href="#param-tab"><span class="std std-numref">Table 1.3</span></a>, the parameters are mentioned and described.</p>
-<table class="colwidths-auto table" id="param-tab">
-<caption><span class="caption-number">Table 1.3 </span><span class="caption-text">Parameters used for mathematical description</span><a class="headerlink" href="#param-tab" title="Permalink to this table">¶</a></caption>
+<p>In <code class="xref std std-numref docutils literal notranslate"><span class="pre">param-tab</span></code>, the parameters are mentioned and described.</p>
+<p>{table} Parameters used for mathematical description
+:name: param-tab</p>
+<table class="colwidths-auto table">
 <thead>
-<tr class="row-odd"><th class="head"><p>symboles of parameters</p></th>
+<tr class="row-odd"><th class="head"><p>symbols of parameters</p></th>
+<th class="head"><p>unit</p></th>
 <th class="head"><p>definition</p></th>
 <th class="head"><p>description</p></th>
 </tr>
@@ -382,210 +400,262 @@
 <tbody>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( demand_{{th}_{t}} \)</span></p></td>
 <td><p></p></td>
+<td><p>thermal demand, time-dependent</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( temp_{river} \)</span></p></td>
 <td><p></p></td>
+<td><p>temperature of river water</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( temp_{ww} \)</span></p></td>
+<td><p></p></td>
 <td><p>temperature of waste water</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( temp_{flow} \)</span></p></td>
 <td><p></p></td>
+<td><p>flow temperature</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( temp_{return} \)</span></p></td>
 <td><p></p></td>
+<td><p>return temperature</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( temp_{ambient} \)</span></p></td>
 <td><p></p></td>
+<td><p>ambient temperature</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( radiation \)</span></p></td>
 <td><p></p></td>
+<td><p>solar radiation</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( max_{demand} \)</span></p></td>
 <td><p></p></td>
+<td><p>maximum demand</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( potential_{j} \)</span></p></td>
 <td><p></p></td>
+<td><p>potential of the heat generator <em>j</em></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( pow_{{cap}_{j}} \)</span></p></td>
 <td><p></p></td>
 <td><p></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( radiation_{t} \)</span></p></td>
 <td><p></p></td>
+<td><p>radiation, time-dependent</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( IK_{j} \)</span></p></td>
+<td><p></p></td>
 <td><p></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( OP_{{fix}_{j}} \)</span></p></td>
 <td><p></p></td>
 <td><p></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( n_{{el}_{j}} \)</span></p></td>
 <td><p></p></td>
+<td><p>electrical efficiency of heat generator <em>j</em></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( elPrice_{jt} \)</span></p></td>
 <td><p></p></td>
+<td><p>electricity price for heat generator <em>j</em> , time-dependent</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( P_{{min,el}_{chp}} \)</span></p></td>
 <td><p></p></td>
+<td><p>minimum electrical power of chp</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( Q_{{min,th}_{chp}} \)</span></p></td>
 <td><p></p></td>
+<td><p>minimum thermal energy of chp</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( ratio_{{P,max}_{FW}} \)</span></p></td>
 <td><p></p></td>
+<td><p>ratio of maximum power for FW</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( ratio_{P,max} \)</span></p></td>
 <td><p></p></td>
+<td><p>ratio of maximum power</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( mc_{jt} \)</span></p></td>
 <td><p></p></td>
 <td><p></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( n_{{th}_{jt}} \)</span></p></td>
 <td><p></p></td>
+<td><p>thermal efficiency of heat generator <em>j</em>, time-dependent</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( hp_{{restrictionfactor}_{jt}} \)</span></p></td>
 <td><p></p></td>
+<td><p>restriction factor of heat pump of heat generator <em>j</em>, time-dependent</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( nom_{{p}_{th,j}} \)</span></p></td>
+<td><p></p></td>
 <td><p></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( min_{{p}_{th,j}} \)</span></p></td>
 <td><p></p></td>
 <td><p></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( x_{{th}_{cap,j}} \)</span></p></td>
+<td><p></p></td>
 <td><p></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( lt_{j} \)</span></p></td>
 <td><p></p></td>
 <td><p></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( ec_{j} \)</span></p></td>
+<td><p></p></td>
 <td><p></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( ir \)</span></p></td>
 <td><p></p></td>
 <td><p></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( \alpha_{j} \)</span></p></td>
+<td><p></p></td>
 <td><p></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( load_{{cap}_{hs}} \)</span></p></td>
 <td><p></p></td>
+<td><p>load capacity of heat storage</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( unload_{{cap}_{hs}} \)</span></p></td>
 <td><p></p></td>
+<td><p>unload capacity of heat storage</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( n_{hs} \)</span></p></td>
 <td><p></p></td>
+<td><p>efficiency of heat storage</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( loss_{hs} \)</span></p></td>
 <td><p></p></td>
+<td><p>losses of heat storage</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( IK_{hs} \)</span></p></td>
 <td><p></p></td>
+<td><p>IK of heat storage</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( cap_{hs} \)</span></p></td>
 <td><p></p></td>
+<td><p>capacity of heat storage</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( c_{{ramp}_{chp}} \)</span></p></td>
+<td><p></p></td>
 <td><p></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( c_{{ramp}_{waste}} \)</span></p></td>
 <td><p></p></td>
 <td><p></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( c_{{coldstart}_{j}} \)</span></p></td>
+<td><p></p></td>
 <td><p></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( \alpha_{hs} \)</span></p></td>
 <td><p></p></td>
 <td><p></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( rf_{j} \)</span></p></td>
+<td><p></p></td>
 <td><p></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( rf_{tot} \)</span></p></td>
 <td><p></p></td>
 <td><p></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( OP_{{var}_{j}} \)</span></p></td>
+<td><p></p></td>
 <td><p></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( temperature_{t} \)</span></p></td>
 <td><p></p></td>
+<td><p>time-dependent temperature</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( sale_{{electricityprice}_{jt}} \)</span></p></td>
+<td><p></p></td>
 <td><p></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( OP_{{fix}_{hs}} \)</span></p></td>
 <td><p></p></td>
 <td><p></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( mr_{j} \)</span></p></td>
+<td><p></p></td>
 <td><p></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( em_{j} \)</span></p></td>
 <td><p></p></td>
 <td><p></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( pco2 \)</span></p></td>
 <td><p></p></td>
+<td><p><span class="math notranslate nohighlight">\(CO_2\)</span> price</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( cap_{{losse}_{hs}} \)</span></p></td>
 <td><p></p></td>
+<td><p>capacity losses of heat storages</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( n_{{th}_{nom,jt}} \)</span></p></td>
 <td><p></p></td>
+<td><p>thermal, normative efficiency of heat generator <em>j</em>, time-dependent</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><span class="math notranslate nohighlight">\( restricitionfactor_{th} \)</span></p></td>
 <td><p></p></td>
+<td><p>thermal restriction factor</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><span class="math notranslate nohighlight">\( min_{{out}_{factor,j}} \)</span></p></td>
 <td><p></p></td>
+<td><p>minimum output factor of heat generator <em>j</em></p></td>
 <td><p></p></td>
 </tr>
 </tbody>

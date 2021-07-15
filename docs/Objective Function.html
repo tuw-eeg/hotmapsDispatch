@@ -303,12 +303,48 @@
   <div class="section" id="objective-function">
 <h1><span class="section-number">2. </span>Objective Function<a class="headerlink" href="#objective-function" title="Permalink to this headline">¶</a></h1>
 <p>For detailed information about the variables, go to  <a class="reference internal" href="Model%20Description.html"><span class="doc">Model Description</span></a>.</p>
-<p><span class="math notranslate nohighlight">\(
+<p>Investment costs in <a class="reference internal" href="#equation-first-eq">(2.1)</a>.</p>
+<div class="math notranslate nohighlight" id="equation-first-eq">
+<span class="eqno">(2.1)<a class="headerlink" href="#equation-first-eq" title="Permalink to this equation">¶</a></span>\[
 c_{inv} = \sum_j (Cap_j - x_{{th}_{cap,j}}) * IK_j *\alpha_j + \sum_{hs}(Cap_{hs} - cap_{hs}) * IK_{hs} *\alpha_{hs}
-\)</span></p>
-<div class="math notranslate nohighlight">
-\[
+\]</div>
+<p>Fixed op price costs in <a class="reference internal" href="#equation-second-eq">(2.2)</a>.</p>
+<div class="math notranslate nohighlight" id="equation-second-eq">
+<span class="eqno">(2.2)<a class="headerlink" href="#equation-second-eq" title="Permalink to this equation">¶</a></span>\[
 c_{op_{fix}} = \sum_j Cap_j * OP_{{fix}_j} + \sum_{hs} Cap_{hs} * OP_{{fix}_{hs}}
+\]</div>
+<p>Variable op costs in <a class="reference internal" href="#equation-third-eq">(2.3)</a>.</p>
+<div class="math notranslate nohighlight" id="equation-third-eq">
+<span class="eqno">(2.3)<a class="headerlink" href="#equation-third-eq" title="Permalink to this equation">¶</a></span>\[
+c_{op_{var}} = \sum_{j,t} x_{{th}_j,t} * OP_{{var}_j} 
+\]</div>
+<p>Variable costs in <a class="reference internal" href="#equation-fourth-eq">(2.4)</a>.</p>
+<div class="math notranslate nohighlight" id="equation-fourth-eq">
+<span class="eqno">(2.4)<a class="headerlink" href="#equation-fourth-eq" title="Permalink to this equation">¶</a></span>\[
+c_{var} = \sum_{j,t} x_{{th}_j,t} * mc_{j,t} 
+\]</div>
+<div class="math notranslate nohighlight" id="equation-fifth-eq">
+<span class="eqno">(2.5)<a class="headerlink" href="#equation-fifth-eq" title="Permalink to this equation">¶</a></span>\[
+c_{ramp} = \sum_{j,t} ramp_{{j}_{waste}} * c_{{ramp}_{waste}} + \sum_{j,t} ramp_{{j}_{chp,t}} * ramp_{chp}
+\]</div>
+<p><span class="math notranslate nohighlight">\( c_{cold} \)</span> in <a class="reference internal" href="#equation-sixth-eq">(2.6)</a> counts up the coldstarts and multiplies it with the coldstart costs.</p>
+<div class="math notranslate nohighlight" id="equation-sixth-eq">
+<span class="eqno">(2.6)<a class="headerlink" href="#equation-sixth-eq" title="Permalink to this equation">¶</a></span>\[
+c_{cold} = \sum_{j,t} coldstart_{jt} * c_{coldstart_{j}} 
+\]</div>
+<p>Sum of all costs is calculated in <a class="reference internal" href="#equation-seventh-eq">(2.7)</a>.</p>
+<div class="math notranslate nohighlight" id="equation-seventh-eq">
+<span class="eqno">(2.7)<a class="headerlink" href="#equation-seventh-eq" title="Permalink to this equation">¶</a></span>\[
+c_{tot} =  c_{inv} + c_{var} + c_{op_{fix}} + c_{op_{var}} + c_{cold} + c_{ramp}
+\]</div>
+<div class="math notranslate nohighlight" id="equation-eighth-eq">
+<span class="eqno">(2.8)<a class="headerlink" href="#equation-eighth-eq" title="Permalink to this equation">¶</a></span>\[
+rev_{gen_{electricity}} =  \sum_{j,t} x_{el_{jt}} * sale_{electricityprice_{j,t}}
+\]</div>
+<p><a class="reference internal" href="#equation-ninth-eq">(2.9)</a>shows all costs which are subtracted by the electricity generation.</p>
+<div class="math notranslate nohighlight" id="equation-ninth-eq">
+<span class="eqno">(2.9)<a class="headerlink" href="#equation-ninth-eq" title="Permalink to this equation">¶</a></span>\[
+rule =  c_{tot} - rev_{gen_{electricity}}
 \]</div>
 </div>
 

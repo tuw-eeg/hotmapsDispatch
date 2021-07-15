@@ -52,6 +52,8 @@
         const thebe_selector_output = ".output"
     </script>
     <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="1. Adding and Connection of new features into the model" href="Adding%20and%20Connection%20of%20new%20features%20into%20the%20model.html" />
@@ -336,23 +338,18 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#generation-minimum-heat-power">
-     3.8.1. Generation minimum heat power
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#must-run-rule">
-     3.8.2. Must run rule
+     3.8.1. Must run rule
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#must-run-rule-2">
-     3.8.3. Must run rule 2
+     3.8.2. Must run rule 2
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#must-run-rule-3">
-     3.8.4. Must run rule 3
+     3.8.3. Must run rule 3
     </a>
    </li>
   </ul>
@@ -415,13 +412,18 @@
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#storage-state-capacity-restriction-heat-storage-rule">
+     3.12.5. Storage state capacity restriction heat storage rule
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#load-heat-storage-restriction-rule">
-     3.12.5. Load heat storage restriction rule
+     3.12.6. Load heat storage restriction rule
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#unload-heat-storage-restriction-rule">
-     3.12.6. Unload heat storage restriction rule
+     3.12.7. Unload heat storage restriction rule
     </a>
    </li>
   </ul>
@@ -462,63 +464,134 @@
 <h1><span class="section-number">3. </span>Constraints<a class="headerlink" href="#constraints" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="potential-restricition-rule">
 <h2><span class="section-number">3.1. </span>Potential restricition rule<a class="headerlink" href="#potential-restricition-rule" title="Permalink to this headline">¶</a></h2>
+<p>In <a class="reference internal" href="#equation-eq-one">(3.1)</a> you can see the potential of the jth heat generator defines the upper bound for the sum over all the thermal energy values.
+If  <span class="math notranslate nohighlight">\(potential_j &gt;  0\)</span> , then <a class="reference internal" href="#equation-eq-one">(3.1)</a>is used.</p>
+<div class="math notranslate nohighlight" id="equation-eq-one">
+<span class="eqno">(3.1)<a class="headerlink" href="#equation-eq-one" title="Permalink to this equation">¶</a></span>\[
+\sum_t (Cap_j - x_{{th}_{j,t}}) \le potential_j 
+\]</div>
 </div>
 <div class="section" id="power-restriction-rule">
 <h2><span class="section-number">3.2. </span>Power restriction rule<a class="headerlink" href="#power-restriction-rule" title="Permalink to this headline">¶</a></h2>
+<p>If  <span class="math notranslate nohighlight">\(pow_{cap_{j}} &gt;  0\)</span> , then <a class="reference internal" href="#equation-eq-two">(3.2)</a> is used.</p>
+<div class="math notranslate nohighlight" id="equation-eq-two">
+<span class="eqno">(3.2)<a class="headerlink" href="#equation-eq-two" title="Permalink to this equation">¶</a></span>\[
+\sum_t (Cap_j - x_{{th}_{j,t}}) \le pow_{cap_{j}} 
+\]</div>
 </div>
 <div class="section" id="electrical-power-generation">
 <h2><span class="section-number">3.3. </span>Electrical power generation<a class="headerlink" href="#electrical-power-generation" title="Permalink to this headline">¶</a></h2>
+<p>If <em>j</em> is valid or <span class="math notranslate nohighlight">\(n_{{th}_{j,t}} \neq 0\)</span> , then <a class="reference internal" href="#equation-eq-three">(3.3)</a>is used.</p>
+<div class="math notranslate nohighlight" id="equation-eq-three">
+<span class="eqno">(3.3)<a class="headerlink" href="#equation-eq-three" title="Permalink to this equation">¶</a></span>\[
+x_{{el}_{j,t}} = \frac{x_{{th}_{j,t}}}{n_{{th}_{j,t}}}\  \cdot n_{{el}_{j}} 
+\]</div>
 </div>
 <div class="section" id="heating-generation-covers-demand">
 <h2><span class="section-number">3.4. </span>Heating generation covers demand<a class="headerlink" href="#heating-generation-covers-demand" title="Permalink to this headline">¶</a></h2>
 <p>At any time, the heating generation must cover the heating demand.</p>
+<div class="math notranslate nohighlight" id="equation-eq-four">
+<span class="eqno">(3.4)<a class="headerlink" href="#equation-eq-four" title="Permalink to this equation">¶</a></span>\[
+\sum_t (x_{{th}_{j,t}}) - \sum_{hs} (x_{{load}_{hs,t}}) = demand_{f} \cdot demand_{th_{t}}
+\]</div>
 </div>
 <div class="section" id="capacity-restriction-rule-maximum">
 <h2><span class="section-number">3.5. </span>Capacity restriction rule - maximum<a class="headerlink" href="#capacity-restriction-rule-maximum" title="Permalink to this headline">¶</a></h2>
+<p>If the <em>inv_flag</em> is set <em>true</em>, then the rule in <a class="reference internal" href="#equation-eq-five">(3.5)</a> is valid, otherwise <a class="reference internal" href="#equation-eq-six">(3.7)</a> is valid.</p>
+<div class="math notranslate nohighlight" id="equation-eq-five">
+<span class="eqno">(3.5)<a class="headerlink" href="#equation-eq-five" title="Permalink to this equation">¶</a></span>\[
+Cap_j \le demand_{f} \cdot max_{demand} 
+\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-six">
+<span class="eqno">(3.7)<a class="headerlink" href="#equation-eq-six" title="Permalink to this equation">¶</a></span>\[
+Cap_j = x_{{th}_{cap,j}} 
+\]</div>
 </div>
 <div class="section" id="capacity-restriction-rule-minimum">
 <h2><span class="section-number">3.6. </span>Capacity restriction rule - minimum<a class="headerlink" href="#capacity-restriction-rule-minimum" title="Permalink to this headline">¶</a></h2>
+<div class="math notranslate nohighlight" id="equation-eq-six">
+<span class="eqno">(3.7)<a class="headerlink" href="#equation-eq-six" title="Permalink to this equation">¶</a></span>\[
+Cap_j \ge x_{{th}_{cap,j}} 
+\]</div>
 </div>
 <div class="section" id="generation-restriction-rule">
 <h2><span class="section-number">3.7. </span>Generation restriction rule<a class="headerlink" href="#generation-restriction-rule" title="Permalink to this headline">¶</a></h2>
-<p>The amount of heat energy generated must not exceed the installed capacities.</p>
+<p>The amount of heat energy generated must not exceed the installed capacities.
+$<span class="math notranslate nohighlight">\(
+x_{{th}_{j,t}} \le  \frac{Cap_{j}}{n_{{th}_{nom,jt}}}\  \cdot n_{{th}_{j,t}} \cdot Active_{j,t} \cdot restrictionfactor_{j,t}
+\)</span>$ (eq_seven)</p>
 </div>
 <div class="section" id="generation-rule-minimum-operating-power">
 <h2><span class="section-number">3.8. </span>Generation rule - minimum operating power<a class="headerlink" href="#generation-rule-minimum-operating-power" title="Permalink to this headline">¶</a></h2>
 <p>All generators have a <em>minimum operating power</em>.</p>
-<div class="section" id="generation-minimum-heat-power">
-<h3><span class="section-number">3.8.1. </span>Generation minimum heat power<a class="headerlink" href="#generation-minimum-heat-power" title="Permalink to this headline">¶</a></h3>
-</div>
+<div class="math notranslate nohighlight" id="equation-eq-eight">
+<span class="eqno">(3.8)<a class="headerlink" href="#equation-eq-eight" title="Permalink to this equation">¶</a></span>\[
+x_{{th}_{j,t}} \ge \frac{Cap_{j}}{n_{{th}_{nom,jt}}}\ \cdot n_{{th}_{j,t}} \cdot Active_{j,t} \cdot min_{out_{factor,j}}
+\]</div>
 <div class="section" id="must-run-rule">
-<h3><span class="section-number">3.8.2. </span>Must run rule<a class="headerlink" href="#must-run-rule" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.8.1. </span>Must run rule<a class="headerlink" href="#must-run-rule" title="Permalink to this headline">¶</a></h3>
+<div class="math notranslate nohighlight" id="equation-eq-nine">
+<span class="eqno">(3.9)<a class="headerlink" href="#equation-eq-nine" title="Permalink to this equation">¶</a></span>\[
+x_{{th}_{j,t}} \ge \frac{mr_{j} \cdot Cap_j}{n_{{th}_{nom,jt}}}\ \cdot n_{{th}_{j,t}} \cdot restrictionfactor_{j,t} \cdot Active3_{j,t} 
+\]</div>
 </div>
 <div class="section" id="must-run-rule-2">
-<h3><span class="section-number">3.8.3. </span>Must run rule 2<a class="headerlink" href="#must-run-rule-2" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.8.2. </span>Must run rule 2<a class="headerlink" href="#must-run-rule-2" title="Permalink to this headline">¶</a></h3>
+<div class="math notranslate nohighlight" id="equation-eq-eleven">
+<span class="eqno">(3.10)<a class="headerlink" href="#equation-eq-eleven" title="Permalink to this equation">¶</a></span>\[
+x_{{th}_{j,t}} \ge demand_{th_{t}}  \cdot Active2_{j,t} 
+\]</div>
 </div>
 <div class="section" id="must-run-rule-3">
-<h3><span class="section-number">3.8.4. </span>Must run rule 3<a class="headerlink" href="#must-run-rule-3" title="Permalink to this headline">¶</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">mr</span></code> specifies the amount of capacity that has to run all the time (0-1).</p>
+<h3><span class="section-number">3.8.3. </span>Must run rule 3<a class="headerlink" href="#must-run-rule-3" title="Permalink to this headline">¶</a></h3>
+<div class="math notranslate nohighlight" id="equation-eq-twelf">
+<span class="eqno">(3.11)<a class="headerlink" href="#equation-eq-twelf" title="Permalink to this equation">¶</a></span>\[
+Active2_{j,t} + Active3_{j,t} = 1
+\]</div>
 </div>
 </div>
 <div class="section" id="solar-restriction-rule">
 <h2><span class="section-number">3.9. </span>Solar restriction rule<a class="headerlink" href="#solar-restriction-rule" title="Permalink to this headline">¶</a></h2>
-<p>Solar gains depend on the installed capacity and the solar radiation. The value <code class="docutils literal notranslate"><span class="pre">1000</span></code> represents the radiation at wich the solar plant has <em>maximal power</em>.</p>
+<p>Solar gains depend on the installed capacity and the solar radiation. The value <code class="docutils literal notranslate"><span class="pre">1000</span></code> represents the radiation at wich the solar plant has <em>maximal power</em>, see <a class="reference internal" href="#equation-eq-thirteen">(3.12)</a>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-thirteen">
+<span class="eqno">(3.12)<a class="headerlink" href="#equation-eq-thirteen" title="Permalink to this equation">¶</a></span>\[
+x_{{th}_{j,t}} \le \frac{Cap_{j} \cdot radiation_t}{max(radiation_t)}\ 
+\]</div>
 </div>
 <div class="section" id="waste-incineration-restriction-rule">
 <h2><span class="section-number">3.10. </span>Waste incineration restriction rule<a class="headerlink" href="#waste-incineration-restriction-rule" title="Permalink to this headline">¶</a></h2>
-<p>No investment in waste incineration plants possible, thus geneartion can’t exeed already installed capacities.</p>
+<p>No investment in waste incineration plants possible, thus geneartion can’t exeed already installed capacities.
+$<span class="math notranslate nohighlight">\(
+x_{{th}_{j,t}} \le x_{{th}_{cap,j}}
+\)</span>$ (eq_fourteen)</p>
 </div>
 <div class="section" id="power-loss-when-full-heat-extraction">
 <h2><span class="section-number">3.11. </span>Power loss when full heat extraction<a class="headerlink" href="#power-loss-when-full-heat-extraction" title="Permalink to this headline">¶</a></h2>
 <p>With full heat extraction, a loss of power can occur which, only reduces the maximum power.</p>
 <div class="section" id="chp-generation-restriction-rule-1">
 <h3><span class="section-number">3.11.1. </span>CHP generation restriction rule 1<a class="headerlink" href="#chp-generation-restriction-rule-1" title="Permalink to this headline">¶</a></h3>
+<div class="math notranslate nohighlight" id="equation-eq-fifteen">
+<span class="eqno">(3.13)<a class="headerlink" href="#equation-eq-fifteen" title="Permalink to this equation">¶</a></span>\[
+sv_{chp} = \frac{ratioPMaxFW - ratioPMax}{ratioPMax \cdot ratioPMaxFW}\
+\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-sixteen">
+<span class="eqno">(3.14)<a class="headerlink" href="#equation-eq-sixteen" title="Permalink to this equation">¶</a></span>\[
+x_{{el}_{j,t}} \le \frac{Cap_j}{ratioPMax}\ - (sv_{chp} \cdot x_{{th}_{j,t}})
+\]</div>
 </div>
 <div class="section" id="chp-generation-restriction-rule-2">
 <h3><span class="section-number">3.11.2. </span>CHP generation restriction rule 2<a class="headerlink" href="#chp-generation-restriction-rule-2" title="Permalink to this headline">¶</a></h3>
+<div class="math notranslate nohighlight" id="equation-eq-seventeen">
+<span class="eqno">(3.15)<a class="headerlink" href="#equation-eq-seventeen" title="Permalink to this equation">¶</a></span>\[
+P_{min_{el,chp}} \le x_{{el}_{j,t}}  
+\]</div>
 </div>
 <div class="section" id="chp-generation-restriction-rule-5">
 <h3><span class="section-number">3.11.3. </span>CHP generation restriction rule 5<a class="headerlink" href="#chp-generation-restriction-rule-5" title="Permalink to this headline">¶</a></h3>
+<div class="math notranslate nohighlight" id="equation-eq-eighteen">
+<span class="eqno">(3.16)<a class="headerlink" href="#equation-eq-eighteen" title="Permalink to this equation">¶</a></span>\[
+Q_{min_{th,chp}} \le x_{{th}_{j,t}}  
+\]</div>
 </div>
 </div>
 <div class="section" id="decrese-of-maximum-heat-decoupling">
@@ -526,38 +599,121 @@
 <p>The ratio of the maximum heat decoupling to the maximum electrical power determines the decrease in the maximum heat decoupling with the produced electrical net power</p>
 <div class="section" id="chp-generation-restriction-rule-3">
 <h3><span class="section-number">3.12.1. </span>CHP generation restriction rule 3<a class="headerlink" href="#chp-generation-restriction-rule-3" title="Permalink to this headline">¶</a></h3>
+<p>Depending on the value of <em>j</em>, <a class="reference internal" href="#equation-eq-nineteen">(3.17)</a> or <a class="reference internal" href="#equation-eq-twenty">(3.18)</a> will be taken.</p>
+<div class="math notranslate nohighlight" id="equation-eq-nineteen">
+<span class="eqno">(3.17)<a class="headerlink" href="#equation-eq-nineteen" title="Permalink to this equation">¶</a></span>\[
+x_{{el}_{j,t}} \ge \frac{x_{{th}_{j,t}}}{ratioPMaxFW}\
+\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-twenty">
+<span class="eqno">(3.18)<a class="headerlink" href="#equation-eq-twenty" title="Permalink to this equation">¶</a></span>\[
+x_{{el}_{j,t}} == \frac{x_{{th}_{j,t}}}{n_{{th}_{j,t}}}\ \cdot n_{{el}_{j}}
+\]</div>
 </div>
 <div class="section" id="chp-generation-restriction-rule-4">
 <h3><span class="section-number">3.12.2. </span>CHP generation restriction rule 4<a class="headerlink" href="#chp-generation-restriction-rule-4" title="Permalink to this headline">¶</a></h3>
 <p>Setting capacity  for <em>chp generation</em>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-twentyone">
+<span class="eqno">(3.19)<a class="headerlink" href="#equation-eq-twentyone" title="Permalink to this equation">¶</a></span>\[
+x_{{th}_{j,t}} \le demand_{th_t} + \sum_{hs} x_{load_{hs,t}}
+\]</div>
 </div>
 <div class="section" id="storage-state-heat-storage-rule">
 <h3><span class="section-number">3.12.3. </span>Storage state heat storage rule<a class="headerlink" href="#storage-state-heat-storage-rule" title="Permalink to this headline">¶</a></h3>
-<p><em>Heat storage level</em> = <em>old_level</em> + <em>pumping</em>  - <em>turbining</em></p>
+<p><em>Heat storage level</em> = <em>old_level</em> + <em>pumping</em>  - <em>turbining</em>
+Depending on the value of <em>t</em> there is one special condition rule. If <em>t</em> is equal to <em>1</em>, <a class="reference internal" href="#equation-eq-twentytwo">(3.20)</a> is taken, otherwise <a class="reference internal" href="#equation-eq-twentythree">(3.21)</a>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-twentytwo">
+<span class="eqno">(3.20)<a class="headerlink" href="#equation-eq-twentytwo" title="Permalink to this equation">¶</a></span>\[
+store_{level_{hs,t}}(hs,t) == store_{level_{hs,t}}(hs,8760)
+\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-twentythree">
+<span class="eqno">(3.21)<a class="headerlink" href="#equation-eq-twentythree" title="Permalink to this equation">¶</a></span>\[
+store_{level_{hs,t}}(hs,t) == store_{level_{hs,t-1}}(hs,8760) \cdot (1- cap_{losse_{hs}}) + x_{load_{hs,t}} (hs, t-1) \cdot n_hs
+\]</div>
 </div>
 <div class="section" id="storage-capacity-restriction-heat-storage-rule">
 <h3><span class="section-number">3.12.4. </span>Storage capacity restriction heat storage rule<a class="headerlink" href="#storage-capacity-restriction-heat-storage-rule" title="Permalink to this headline">¶</a></h3>
-<p>Installed capcities must be greater or equal to the pre-installed capacities.</p>
+<p>Installed capcities must be greater or equal to the pre-installed capacities. If the <em>inv_flag</em> is set, then <a class="reference internal" href="#equation-eq-twentyfour">(3.22)</a> is taken, otherwise <a class="reference internal" href="#equation-eq-twentyfive">(3.23)</a>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-twentyfour">
+<span class="eqno">(3.22)<a class="headerlink" href="#equation-eq-twentyfour" title="Permalink to this equation">¶</a></span>\[
+Cap_{hs} \ge cap_hs
+\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-twentyfive">
+<span class="eqno">(3.23)<a class="headerlink" href="#equation-eq-twentyfive" title="Permalink to this equation">¶</a></span>\[
+Cap_{hs} == cap_hs
+\]</div>
+</div>
+<div class="section" id="storage-state-capacity-restriction-heat-storage-rule">
+<h3><span class="section-number">3.12.5. </span>Storage state capacity restriction heat storage rule<a class="headerlink" href="#storage-state-capacity-restriction-heat-storage-rule" title="Permalink to this headline">¶</a></h3>
+<div class="math notranslate nohighlight" id="equation-eq-twentysix">
+<span class="eqno">(3.24)<a class="headerlink" href="#equation-eq-twentysix" title="Permalink to this equation">¶</a></span>\[
+store_{level_{hs,t}}(hs,t) \le Cap_hs
+\]</div>
 </div>
 <div class="section" id="load-heat-storage-restriction-rule">
-<h3><span class="section-number">3.12.5. </span>Load heat storage restriction rule<a class="headerlink" href="#load-heat-storage-restriction-rule" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.12.6. </span>Load heat storage restriction rule<a class="headerlink" href="#load-heat-storage-restriction-rule" title="Permalink to this headline">¶</a></h3>
 <p>The discharge and charge amounts are limited</p>
+<div class="math notranslate nohighlight" id="equation-eq-twentyseven">
+<span class="eqno">(3.25)<a class="headerlink" href="#equation-eq-twentyseven" title="Permalink to this equation">¶</a></span>\[
+x_{load_{hs,t}}(hs,t) \le load_{cap_{hs}}
+\]</div>
 </div>
 <div class="section" id="unload-heat-storage-restriction-rule">
-<h3><span class="section-number">3.12.6. </span>Unload heat storage restriction rule<a class="headerlink" href="#unload-heat-storage-restriction-rule" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.12.7. </span>Unload heat storage restriction rule<a class="headerlink" href="#unload-heat-storage-restriction-rule" title="Permalink to this headline">¶</a></h3>
+<p>If the <em>flag</em> is set, then the <a class="reference internal" href="#equation-eq-twentyeight">(3.26)</a> is taken, otherwise <a class="reference internal" href="#equation-eq-twentynine">(3.27)</a>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-twentyeight">
+<span class="eqno">(3.26)<a class="headerlink" href="#equation-eq-twentyeight" title="Permalink to this equation">¶</a></span>\[
+x_{load_{hs,t}}(hs,t) \ge -unload_{cap_{hs}}
+\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-twentynine">
+<span class="eqno">(3.27)<a class="headerlink" href="#equation-eq-twentynine" title="Permalink to this equation">¶</a></span>\[
+x_{load_{hs,t}}(hs,t) \ge -store_{level_{hs,t}}(hs,t)
+\]</div>
 </div>
 </div>
 <div class="section" id="ramp-chp-rule">
 <h2><span class="section-number">3.13. </span>Ramp CHP rule<a class="headerlink" href="#ramp-chp-rule" title="Permalink to this headline">¶</a></h2>
+<p>If <em>t</em> is equal to <em>1</em>, <a class="reference internal" href="#equation-eq-thirty">(3.28)</a> is taken, otherwise <a class="reference internal" href="#equation-eq-thirtyone">(3.29)</a>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-thirty">
+<span class="eqno">(3.28)<a class="headerlink" href="#equation-eq-thirty" title="Permalink to this equation">¶</a></span>\[
+ramp_{j_{waste}} == 0
+\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-thirtyone">
+<span class="eqno">(3.29)<a class="headerlink" href="#equation-eq-thirtyone" title="Permalink to this equation">¶</a></span>\[
+ramp_{j_{waste}} \ge ( x_{{th}_{j,t}}(j,t) - x_{{th}_{j,t}}(j,t-1))
+\]</div>
 </div>
 <div class="section" id="ramp-waste-rule">
 <h2><span class="section-number">3.14. </span>Ramp waste rule<a class="headerlink" href="#ramp-waste-rule" title="Permalink to this headline">¶</a></h2>
+<p>If <em>t</em> is equal to <em>1</em>, <a class="reference internal" href="#equation-eq-thirtytwo">(3.30)</a> is taken, otherwise <a class="reference internal" href="#equation-eq-twentythree">(3.21)</a>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-thirtytwo">
+<span class="eqno">(3.30)<a class="headerlink" href="#equation-eq-thirtytwo" title="Permalink to this equation">¶</a></span>\[
+ramp_{j_{waste,t}} == 0
+\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-thirtythree">
+<span class="eqno">(3.31)<a class="headerlink" href="#equation-eq-thirtythree" title="Permalink to this equation">¶</a></span>\[
+ramp_{j_{waste,t}} \ge ( x_{{th}_{j,t}}(j,t) - x_{{th}_{j,t}}(j,t-1))
+\]</div>
 </div>
 <div class="section" id="coldstart-rule">
 <h2><span class="section-number">3.15. </span>Coldstart rule<a class="headerlink" href="#coldstart-rule" title="Permalink to this headline">¶</a></h2>
+<p>If <em>t</em> is equal to <em>1</em>, <a class="reference internal" href="#equation-eq-thirtyfour">(3.32)</a> is taken, otherwise <a class="reference internal" href="#equation-eq-thirtyfive">(3.33)</a>.</p>
+<div class="math notranslate nohighlight" id="equation-eq-thirtyfour">
+<span class="eqno">(3.32)<a class="headerlink" href="#equation-eq-thirtyfour" title="Permalink to this equation">¶</a></span>\[
+coldstart_{j,t} == 1
+\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-thirtyfive">
+<span class="eqno">(3.33)<a class="headerlink" href="#equation-eq-thirtyfive" title="Permalink to this equation">¶</a></span>\[
+coldstart_{j,t} \ge ( activate_{j,t}(j,t) - activate_{j,t}(j,t-1))
+\]</div>
+<p><a class="reference internal" href="#equation-eq-thirtyfive">(3.33)</a> has only a <em>true</em> output for coldstarts.</p>
 </div>
 <div class="section" id="renewable-factor-rule">
 <h2><span class="section-number">3.16. </span>Renewable factor rule<a class="headerlink" href="#renewable-factor-rule" title="Permalink to this headline">¶</a></h2>
+<p>If   <span class="math notranslate nohighlight">\( \sum_j rf_j \neq 0\)</span>, <a class="reference internal" href="#equation-eq-thirtysix">(3.34)</a> is taken.</p>
+<div class="math notranslate nohighlight" id="equation-eq-thirtysix">
+<span class="eqno">(3.34)<a class="headerlink" href="#equation-eq-thirtysix" title="Permalink to this equation">¶</a></span>\[
+\sum_j (\sum_t (x_{{th}_{j,t}} + x_{{el}_{j,t}}) \cdot rf_j) \ge rf_{tot} \cdot \sum_j (\sum_t (x_{{th}_{j,t}} + x_{{el}_{j,t}})
+\]</div>
 </div>
 </div>
 
