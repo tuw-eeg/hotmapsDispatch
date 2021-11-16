@@ -2925,6 +2925,8 @@ def main(solver,openbrowser,port,num_procs=0):
 # =============================================================================
 #     
 # =============================================================================
+    except KeyboardInterrupt:
+        sys.exit()
     except:
         print("Start single Thread...")
 
@@ -2961,5 +2963,8 @@ if __name__ == '__main__':
         try:
             main(solver,openbrowser=openbrowser,port=port)
             flag = False
+        except KeyboardInterrupt:
+            sys.exit()
         except:
             pass
+    

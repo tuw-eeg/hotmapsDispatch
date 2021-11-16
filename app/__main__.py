@@ -7,7 +7,7 @@ execute
 from above folder 
 """
 from app.modules.common.FEAT.F16.F_16_server import check_modules,main
-import argparse
+import argparse,sys
 
 def start_app(solver,openbrowser,port,num_procs):
     flag = check_modules(solver)
@@ -15,6 +15,8 @@ def start_app(solver,openbrowser,port,num_procs):
         try:
             main(solver,openbrowser=openbrowser,port=port,num_procs=num_procs)
             flag = False
+        except KeyboardInterrupt:
+            sys.exit()
         except:
             pass
 
