@@ -109,9 +109,9 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     #%% Variablen
     m.x_th_jt = pe.Var(m.j,m.t,within=pe.NonNegativeReals)
     m.Cap_j = pe.Var(m.j,within=pe.NonNegativeReals)
-    m.Cap_nom_j = pe.Var(m.j,within=pe.NonNegativeReals)
+#     m.Cap_nom_j = pe.Var(m.j,within=pe.NonNegativeReals)
     m.x_el_jt = pe.Var(m.j,m.t,within=pe.NonNegativeReals)
-    m.P_el_max = pe.Var(within=pe.NonNegativeReals)
+#     m.P_el_max = pe.Var(within=pe.NonNegativeReals)
 
     m.x_load_hs_t = pe.Var(m.j_hs,m.t,within=pe.Reals)
 #    m.x_unload_hs_t = pe.Var(m.j_hs,m.t,within=pe.NonNegativeReals)
