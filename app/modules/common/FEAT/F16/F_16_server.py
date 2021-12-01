@@ -7,7 +7,7 @@ Created on Fri Mar  9 15:30:16 2018
 #%% Check if modules are installed
 def check_modules(solver):
     print("Check if needed modules are installed...")
-    import bokeh,tornado,xlsxwriter, openpyxl, pyomo.environ, matplotlib, xlrd, numpy, pandas, sys,subprocess,argparse
+    import bokeh,tornado,xlsxwriter, openpyxl, pyomo.environ, matplotlib, xlrd, numpy, pandas, sys,subprocess,argparse,colorcet
     
     assert not subprocess.call(["node", "-v"]), "Please install nodejs (type: <conda install -c bokeh nodejs>)"
     #XXX: Downgrade back bokeh version "0.12.10"
@@ -22,7 +22,7 @@ def check_modules(solver):
     print("Check passed !")
     return True
 #%% import modules
-import sys,argparse,random
+import sys,argparse,random,colorcet
 from pathlib import Path
 #matplotlib.use('agg',warn=False)
 from tornado.ioloop import IOLoop
