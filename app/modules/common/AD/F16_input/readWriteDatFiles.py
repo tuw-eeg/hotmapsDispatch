@@ -20,11 +20,6 @@ from pathlib import Path
 from pprint import pprint
 import pandas as pd
 import numpy as np
-import altair as alt
-alt.renderers.enable('svg')
-alt.themes.enable('default')
-import matplotlib.pyplot as plt
-import seaborn as sns; sns.set()
 import pickle
 
 # =============================================================================
