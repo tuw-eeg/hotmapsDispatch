@@ -23,7 +23,7 @@ def start_app(solver,openbrowser,port,num_procs):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run the HotMaps Dispatch Server')
     parser.add_argument('--solver', type=str,default="gurobi",help='specify which solver to use (i.e.: gurobi,glpk...')
-    parser.add_argument('--openbrowser', type=bool,default=True,help="specify if the web user interface should open automatically with your default browser, default is True")
+    parser.add_argument('--openbrowser', type=bool,default=False,help="specify if the web user interface should open automatically with your default browser, default is True")
     parser.add_argument('--port', type=int,default=-1,help="specify the port which should be open, default port is a random free port")
     parser.add_argument('--num_procs', type=int,default=0,help="specify the number of cpus used, 0 is auto")
 

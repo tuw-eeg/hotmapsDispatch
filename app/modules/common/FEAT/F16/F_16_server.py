@@ -2951,7 +2951,7 @@ def main(solver,openbrowser,port,num_procs=0):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run the HotMaps Dispatch Server')
     parser.add_argument('--solver', type=str,default="gurobi",help='specify which solver to use (i.e.: gurobi,glpk...')
-    parser.add_argument('--openbrowser', type=bool,default=True,help="specify if the web user interface should open automatically with your default browser, default is True")
+    parser.add_argument('--openbrowser', type=bool,default=False,help="specify if the web user interface should open automatically with your default browser, default is True")
     parser.add_argument('--port', type=int,default=-1,help="specify the port which should be open, default port is a random free port")
     args = parser.parse_args()
     print(f"Start HotMaps Dispatch Server using {args.solver.upper()}")
