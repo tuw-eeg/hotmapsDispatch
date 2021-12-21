@@ -123,8 +123,8 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
     m.coldstart_jt = pe.Var(m.j, m.t, within = pe.Boolean)
     
     m.Active_jt = pe.Var(m.j,m.t, within = pe.Boolean)
-    m.Active2_jt = pe.Var(m.j,m.t, within = pe.Binary)
-    m.Active3_jt = pe.Var(m.j,m.t, within = pe.Binary)
+    # m.Active2_jt = pe.Var(m.j,m.t, within = pe.Binary)
+    # m.Active3_jt = pe.Var(m.j,m.t, within = pe.Binary)
 #    m.Storage_load_hs_jt = pe.Var(m.j_hs,m.t, within = pe.Boolean)
 #    m.Storage_unload_hs_jt = pe.Var(m.j_hs,m.t, within = pe.Boolean)
 #    m.cop_HP_jt = pe.Var(m.j,m.t,within=pe.NonNegativeReals)
@@ -191,18 +191,18 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
 
 
     def must_run_jt_rule(m,j,t):
-        rule = m.x_th_jt[j,t] >= m.mr_j[j] * m.Cap_j[j] / m.n_th_nom_jt[j,t] * m.n_th_jt[j,t] * m.restriction_factor_jt[j,t]   * m.Active3_jt[j,t]
+        rule = m.x_th_jt[j,t] >= m.mr_j[j] * m.Cap_j[j] / m.n_th_nom_jt[j,t] * m.n_th_jt[j,t] * m.restriction_factor_jt[j,t] #  * m.Active3_jt[j,t]
         return rule
     m.mr_jt = pe.Constraint(m.j,m.t,rule=must_run_jt_rule)
 
-    def must_run_jt_rule2(m,j,t):
-        rule = m.x_th_jt[j,t] >= m.demand_th_t[t]  * m.Active2_jt[j,t]
-        return rule
-    m.mr_jt2 = pe.Constraint(m.j,m.t,rule=must_run_jt_rule2)
+    # def must_run_jt_rule2(m,j,t):
+    #     rule = m.x_th_jt[j,t] >= m.demand_th_t[t]  * m.Active2_jt[j,t]
+    #     return rule
+    # m.mr_jt2 = pe.Constraint(m.j,m.t,rule=must_run_jt_rule2)
     
-    def must_run_jt_rule3(m,j,t):
-        return m.Active2_jt[j,t] + m.Active3_jt[j,t] == 1
-    m.mr_jt3 = pe.Constraint(m.j,m.t,rule=must_run_jt_rule3) 
+    # def must_run_jt_rule3(m,j,t):
+    #     return m.Active2_jt[j,t] + m.Active3_jt[j,t] == 1
+    # m.mr_jt3 = pe.Constraint(m.j,m.t,rule=must_run_jt_rule3) 
      #% mr specifies the amaount of capacity that has to run all the time. (0-1)
 
     #% The solar gains depend on the installed capacity and the solar radiation
@@ -394,8 +394,8 @@ def run(data,inv_flag,selection=[[],[]],demand_f=1):
         print("*****************\nFixing Binary and resolving...\n*****************") 
         # to get Dual Variables the binary variables had to be fixed and then resolved again  
         instance.Active_jt.fix() 
-        instance.Active2_jt.fix() 
-        instance.Active3_jt.fix() 
+        # instance.Active2_jt.fix() 
+        # instance.Active3_jt.fix() 
 #        instance.Storage_load_hs_jt.fix() 
 #        instance.Storage_unload_hs_jt.fix()
         instance.coldstart_jt.fix()
