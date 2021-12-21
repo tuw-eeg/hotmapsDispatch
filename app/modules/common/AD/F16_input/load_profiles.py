@@ -15,9 +15,9 @@ import pandas as pd
 import numpy as np
 import altair as alt
 import pickle,os
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from pandas.core.algorithms import mode
-import seaborn as sns; sns.set()
+# import seaborn as sns; sns.set()
 import hotmapsloadprofiles as hlp
 #%%% global paths and variables
 BASE_DIR = Path(__file__).parent.resolve()
