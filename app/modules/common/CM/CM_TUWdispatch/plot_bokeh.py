@@ -184,7 +184,7 @@ def stack_chart(t,dic,y,legend,decison_var,path2output,cmap,flag=0):
     p.grid.minor_grid_line_color = '#eeeeee'
 
     line = p.line(t,list(demand_f*np.array(dic["Heat Demand"])[t]),color="black",line_width=0.5,muted_alpha=0.2)
-    null = [i for i,x in enumerate(range(y.shape[0])) if np.sum(y[x,:]) !=0]
+    null = [i for i,x in enumerate(range(y.shape[0])) if np.sum(y[x,:]) >1e-9]
     # mc_mask=np.argsort(np.array(dic["Marginal Costs"])[null])
     mc_mask=np.argsort(-np.array([dic['Full Load Hours:'][j] for j in legend])[null])
     legend = np.array(legend)[null][mc_mask].tolist()
@@ -322,7 +322,7 @@ def load_duration_curve(t,dic,y,legend,decison_var,path2output,cmap):
     heat_demand = np.array(dic["Heat Demand"])
     line = p.line(t,summe[idx],color="black",line_width=0.5,muted_alpha=0.2)
     line_heat_demand = p.line(t,heat_demand[np.argsort(-heat_demand)],color="black",line_width=0.8,muted_alpha=0.2)
-    null = [i for i,x in enumerate(range(y.shape[0])) if np.sum(y[x,:]) !=0]
+    null = [i for i,x in enumerate(range(y.shape[0])) if np.sum(y[x,:]) >1e-9]
     # mc_mask=np.argsort(np.array(dic["Marginal Costs"])[null])
     mc_mask=np.argsort(-np.array([dic['Full Load Hours:'][j] for j in legend])[null])
     legend = np.array(legend)[null][mc_mask].tolist()
@@ -370,7 +370,7 @@ def pie_chart(dic,path2output,decison_var,cmap):
 
     labels = list(dic)
     sizes = np.array(list(dic.values()))/sum(dic.values())
-    mask = sizes>0
+    mask = sizes>1e-9
     labels = list(itertools.compress(labels, mask))
     sizes_cum = np.cumsum(sizes[mask]*2*pi)
     explode = 0/180*pi
@@ -426,7 +426,7 @@ def bar_chart(dic,path2output,decison_var,cmap):
     p.toolbar_location = None
     legend = list(dic)
     val = list(dic.values())
-    k = [i for i,x in enumerate(val) if x!=0]
+    k = [i for i,x in enumerate(val) if x>1e-9]
     legend= [legend[i] for i in k]
     val= [val[i] for i in k]
     colors = [cmap[i] for i in legend]
@@ -490,8 +490,9 @@ def costBarStack_chart(dic,decison_vars,path2output,cmap):
 
     source = ColumnDataSource(data=data)
 
-    p.vbar_stack(dic["Technologies:"], x='bars', width=0.9, color=[cmap[x] for x in dic["Technologies:"]],
-                 source=source, legend=[value(x) for x in dic["Technologies:"]])
+    _tec = [x for x,v in dic["Installed Capacities:"].items() if v !=0]
+    p.vbar_stack(_tec, x='bars', width=0.9, color=[cmap[x] for x in _tec],
+                 source=source, legend=[value(x) for x in _tec])
 
     p.legend.location = "top_right"
     p.legend.orientation = "vertical"
@@ -523,6 +524,7 @@ def plot_table (decision_vars,dic,path2output):
         table:              bokeh.layouts.widgetbox
     """
     val = []
+    
     for decision_var in decision_vars:
         if type(dic[decision_var]) == dict:
             val.append(sum(dic[decision_var].values()))
@@ -570,10 +572,15 @@ def plotExtra_table (decision_vars,dic,path2output):
     """
     data = []
     line =[]
+    _tec = [x for x,v in dic["Installed Capacities:"].items() if v !=0]
     for decision_var in decision_vars:
         if type(dic[decision_var]) == dict:
             formatted_val = []
-            for item in list(dic[decision_var].values()):
+            for tec in _tec:
+                try: 
+                    item= dic[decision_var][tec]
+                except Exception as exc:
+                    continue
 #                formatted_val.append("%.3e"%item)
                 try:
                     formatted_val.append(str(EngNumber(item)))
@@ -582,10 +589,10 @@ def plotExtra_table (decision_vars,dic,path2output):
 
             line = [[decision_var] + formatted_val]
             data = data + line
-    source = ColumnDataSource(pd.DataFrame(data, columns=["topic"]+list(dic["Technologies:"])))
+    source = ColumnDataSource(pd.DataFrame(data, columns=["topic"]+_tec))
 
     column0 = [TableColumn(field="topic", title="Topic")]
-    columns = [TableColumn(field=x, title=x) for x in dic["Technologies:"]]
+    columns = [TableColumn(field=x, title=x) for x in _tec]
     columns = column0+columns
 
     data_table = DataTable(source=source, columns=columns, width=1200, height=500)
@@ -614,7 +621,7 @@ def tab_panes(path2output,**kwargs):
     return tabs
 #%%
 def co2_barplot(decision_vars,dic,cmap):
-    tec = list(dic[decision_vars[0]].keys())
+    tec = [x for x,v in dic["Installed Capacities"].items() if v !=0]
     total = [str(EngNumber(round(sum([dic[key][j] for key in decision_vars]),2))) for j in tec]
     #FIXME: Use Numberformater
     columns = [TableColumn(field="tec", title="Heat Producers")] + [TableColumn(field=key, title=key) for key in decision_vars]
@@ -644,7 +651,7 @@ def co2_barplot(decision_vars,dic,cmap):
     p.toolbar_location = None
     
     val = [sum([dic[key][j] for key in decision_vars]) for j in tec]
-    index = [i for i,v in enumerate(val) if v == 0]
+    index = [i for i,v in enumerate(val) if v <= 1e-6]
     val = [v for i,v in enumerate(val) if i not in index] 
     tec = [t for i,t in enumerate(tec) if i not in index]  
     legend_items = []
@@ -846,7 +853,7 @@ def plot_solutions(show_plot=False, path2json=path2json,
         p2,_ = stack_chart(ts,dic,y2,legend,decison_var,path2output,cmap,"s")
         p3,_ = stack_chart(t,dic,y3,legend,decison_var,path2output,cmap)
         p4 = load_duration_curve(t,dic,y3,legend,decison_var,path2output,cmap)
-        decison_var = "Thermal Generation Mix:"
+        decison_var = "Thermal Generation Mix"
         p5 = pie_chart(dic[decison_var],path2output,decison_var,cmap)
         p10 = bar_chart(dic[decison_var],path2output,decison_var,cmap)
         decison_var = "Installed Capacities:"
@@ -935,8 +942,8 @@ def plot_solutions(show_plot=False, path2json=path2json,
 #%%
 if __name__ == "__main__":
     print('Plot Results...')
-    path2json = r"C:\Users\hasani\Desktop\pure dispatch frankfurt\hot water net\Porfolio 4\Base_Price 1_T0\output_Porfolio 4_Base_Price 1_T0.json"
-    cmap = pickle.load(open(r"C:\Users\hasani\Desktop\cmap.dat","rb"))
+    path2json = r"C:\Users\hasani\Documents\Workplace\RESHC - Pathways\GitLab\hotmapsDispatch\app\modules\common\AD\F16_input\static\2021-12-21-12-23-18-623170\output_data.json"
+    # cmap = pickle.load(open(r"C:\Users\hasani\Desktop\cmap.dat","rb"))
     plot_solutions(show_plot=True,path2json=path2json)
     print('Plot Results done')
 

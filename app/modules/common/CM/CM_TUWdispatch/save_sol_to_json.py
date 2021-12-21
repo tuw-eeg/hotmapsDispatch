@@ -167,13 +167,13 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
                   "Heat Price": [results.solution(0).constraint["genearation_covers_demand_t["+str(t)+"]"]["Dual"] for t in instance.t],
                   "Electricity Production by CHP" : sum([instance.x_el_jt[(j,t)]() for j in instance.j_chp for t in instance.t]),
                   "Thermal Production by CHP" : sum([instance.x_th_jt[(j,t)]() for j in instance.j_chp for t in instance.t]),
-                  "Electrical Consumption of Heatpumps and Power to Heat devices" : \
-                                       sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for j in instance.j_hp for t in instance.t])+\
-                                       sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for j in instance.j_air_heat_pump for t in instance.t])+\
-                                       sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for j in instance.j_river_heat_pump for t in instance.t])+\
-                                       sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for j in instance.j_wastewater_heat_pump for t in instance.t])+\
-                                       sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for j in instance.j_wasteheat_heat_pump for t in instance.t])+\
-                                       sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for j in instance.j_pth for t in instance.t]),
+                  "Electrical Consumption of Heatpumps and Power to Heat devices" : {
+                                       **{j:sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for t in instance.t])for j in instance.j_hp },
+                                       **{j:sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for t in instance.t])for j in instance.j_air_heat_pump},
+                                       **{j:sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for t in instance.t])for j in instance.j_river_heat_pump},
+                                       **{j:sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for t in instance.t])for j in instance.j_wastewater_heat_pump },
+                                       **{j:sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for t in instance.t])for j in instance.j_wasteheat_heat_pump },
+                                       **{j:sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for t in instance.t])for j in instance.j_pth }},
                   "Maximum Electrical Load of Heatpumps and Power to Heat devices" : \
                                        max([max(np.array([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for j in instance.j_hp for t in instance.t]),default=0),
                                             max(np.array([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for j in instance.j_air_heat_pump for t in instance.t]),default=0),
@@ -328,8 +328,10 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
                      solution["Coldstart Count"][j]+=1
 
         try:
+            ecl = "Electrical Consumption of Heatpumps and Power to Heat devices"
             for j in instance.j_hp:
-                solution["Seasonal Performance Factor"][j] = solution["Thermal Generation Mix"][j]/sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for t in instance.t])
+                _ecl = solution[ecl][j]
+                solution["Seasonal Performance Factor"][j] = solution["Thermal Generation Mix"][j]/_ecl if _ecl else 0
                 # solution["Full Load Hours"][j] = int(solution["Thermal Generation Mix"][j] / solution["Installed Capacities"][j] / solution["Seasonal Performance Factor"][j])  
     #            #only for Thesis Purpose, Works only with One HP per scenario
     #            solution["Seasonal Performance Factor of HP"] = solution["Seasonal Performance Factor"][j]
@@ -337,20 +339,25 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
     #            solution["Operating Hours of HP"] = solution["Operation Hours"][j]
     #            solution["Coldstart Count of HP"] = solution["Coldstart Count"][j]
             for j in instance.j_air_heat_pump:
-                solution["Seasonal Performance Factor"][j] = solution["Thermal Generation Mix"][j]/sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for t in instance.t])
+                _ecl = solution[ecl][j]
+                solution["Seasonal Performance Factor"][j] = solution["Thermal Generation Mix"][j]/_ecl if _ecl else 0
                 # solution["Full Load Hours"][j] = int(solution["Thermal Generation Mix"][j] / solution["Installed Capacities"][j] / solution["Seasonal Performance Factor"][j])  
            
             for j in instance.j_river_heat_pump:
-                solution["Seasonal Performance Factor"][j] = solution["Thermal Generation Mix"][j]/sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for t in instance.t])
+                _ecl = solution[ecl][j]
+                solution["Seasonal Performance Factor"][j] = solution["Thermal Generation Mix"][j]/_ecl if _ecl else 0
                 # solution["Full Load Hours"][j] = int(solution["Thermal Generation Mix"][j] / solution["Installed Capacities"][j] / solution["Seasonal Performance Factor"][j])  
     
             for j in instance.j_wastewater_heat_pump:
-                solution["Seasonal Performance Factor"][j] = solution["Thermal Generation Mix"][j]/sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for t in instance.t])
+                _ecl = solution[ecl][j]
+                solution["Seasonal Performance Factor"][j] = solution["Thermal Generation Mix"][j]/_ecl if _ecl else 0
                 # solution["Full Load Hours"][j] = int(solution["Thermal Generation Mix"][j] / solution["Installed Capacities"][j] / solution["Seasonal Performance Factor"][j])  
     
             for j in instance.j_wasteheat_heat_pump:
-                solution["Seasonal Performance Factor"][j] = solution["Thermal Generation Mix"][j]/sum([instance.x_th_jt[(j,t)]() / instance.n_th_jt[j,t] for t in instance.t])
+                _ecl = solution[ecl][j]
+                solution["Seasonal Performance Factor"][j] = solution["Thermal Generation Mix"][j]/_ecl if _ecl else 0
                 # solution["Full Load Hours"][j] = int(solution["Thermal Generation Mix"][j] / solution["Installed Capacities"][j] / solution["Seasonal Performance Factor"][j])  
+
 
         except:
             pass
@@ -400,7 +407,7 @@ def save_sol_to_json (instance,results,inv_flag,path2solution = path2solution):
         #     pass
 # =============================================================================
 
-        solution["Total Electricty Consumption"] = solution["Electrical Consumption of Heatpumps and Power to Heat devices"]
+        solution["Total Electricty Consumption"] = sum(solution["Electrical Consumption of Heatpumps and Power to Heat devices"].values())
         
         solution["Total Coldstart Costs"]= sum(solution["Coldstart Costs:"].values())
         solution["Total Ramping Costs"] = sum(solution["Ramping Costs:"].values())
