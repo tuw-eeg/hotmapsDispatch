@@ -123,16 +123,18 @@ def savedat(profile, mapper, string, path2dat):
 # =============================================================================
 #         
 # =============================================================================
-def heizkurve(t_max,t_min,t_amb_min,t_amb_max):
-    k = abs ( (t_max-t_min) / (t_amb_max-t_amb_min) ) 
-    d =  t_max + k*t_amb_min
-    return k,d
 
-def flow_return_temp(t_max,t_min,t_amb_min,t_amb_max,t_amb):
-    k,d = heizkurve(t_max,t_min,t_amb_min,t_amb_max)
-    y = d - k * t_amb
-    y[y >= t_max] = t_max
-    y[y <= t_min] = t_min
+def flow_return_temp(t_min,t_max,t_amb_min,t_amb_max,t_amb):   
+    ymax = max(t_max,t_min)
+    ymin = min(t_max,t_min)
+    
+    k = (t_max-t_min)/(t_amb_max-t_amb_min)
+
+    y = k*(t_amb-t_amb_min)+ t_min
+
+    y[y >= ymax] = ymax
+    y[y <= ymin] = ymin
+    
     return y
 
 def add_flow_return_temp(y_tamb,dat_path,output_path,
